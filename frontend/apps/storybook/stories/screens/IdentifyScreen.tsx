@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
+import { IconButton } from "../../../../packages/ui/src/primitives/IconButton";
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
 const OPTIONS = [
@@ -43,9 +45,7 @@ export function IdentifyScreen() {
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
       {/* Header */}
       <header className="flex items-center px-4 py-2">
-        <button className="w-9 h-9 flex items-center justify-center bg-surface-container-lowest border-[3px] border-on-surface rounded-lg sticker-shadow active-press">
-          <span className="material-symbols-outlined text-on-surface text-lg">close</span>
-        </button>
+        <IconButton icon="close" variant="surface" label="Schließen" />
       </header>
 
       <main className="flex-1 px-4 pb-6 max-w-sm mx-auto w-full">
@@ -112,7 +112,7 @@ export function IdentifyScreen() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>arrow_forward</span>
+              <Icon name="arrow_forward" size="md" />
               Weiter zur Entdeckung!
             </motion.button>
           </motion.div>

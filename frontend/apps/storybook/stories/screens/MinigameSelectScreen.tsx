@@ -1,6 +1,8 @@
 import { TopBar } from "../../../../packages/ui/src/components/TopBar";
 import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
 import { BottomNav } from "../../../../packages/ui/src/components/BottomNav";
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
+import { Card } from "../../../../packages/ui/src/primitives/Card";
 
 /**
  * Mini-Spiel Auswahl
@@ -37,13 +39,13 @@ export function MinigameSelectScreen() {
               }`}
             >
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${game.available ? "bg-primary-fixed" : "bg-surface-container-highest"}`}>
-                <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>{game.icon}</span>
+                <Icon name={game.icon} size="lg" />
               </div>
               <div className="flex-1">
                 <p className="text-xs font-black uppercase">{game.name}</p>
                 <p className="text-[10px] text-on-surface-variant">{game.desc}</p>
               </div>
-              {!game.available && <span className="material-symbols-outlined text-outline-variant" style={{ fontSize: "18px" }}>lock</span>}
+              {!game.available && <Icon name="lock" size="md" className="text-outline-variant" />}
             </button>
           ))}
         </div>

@@ -13,6 +13,7 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { FullscreenHeader } from "../../../../packages/ui/src/components/FullscreenHeader";
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
 const GRID = { cols: 3, rows: 3 };
@@ -189,7 +190,7 @@ export function PuzzleScreen() {
         <div className="px-4 mb-2">
           <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg p-2">
             <div className="w-7 h-7 bg-primary-fixed rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>face</span>
+              <Icon name="face" size="sm" filled className="text-primary" />
             </div>
             <p className="text-[11px] font-bold text-white/70">
               {complete ? "Wow! Das Skelett ist komplett!" : "Ziehe die Teile an die richtige Stelle!"}
@@ -221,7 +222,7 @@ export function PuzzleScreen() {
       {complete && (
         <motion.div className="px-4 pb-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}>
           <button className="w-full py-3 bg-[#1B5E20] text-white border-[3px] border-on-surface rounded-lg sticker-shadow font-bold uppercase tracking-wider text-sm flex items-center justify-center gap-1.5 active-press">
-            <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>arrow_forward</span>
+            <Icon name="arrow_forward" size="md" />
             Welcher Dino ist das?
           </button>
         </motion.div>

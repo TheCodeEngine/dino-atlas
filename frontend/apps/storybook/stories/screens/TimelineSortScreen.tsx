@@ -13,6 +13,7 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { MinigameShell } from "../../../../packages/ui/src/components/MinigameShell";
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
 const PERIODS = [
@@ -148,7 +149,7 @@ export function TimelineSortScreen() {
             {unplaced.length > 0 && (
               <div>
                 <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant mb-2 flex items-center gap-1">
-                  <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>drag_indicator</span>
+                  <Icon name="drag_indicator" size="xs" />
                   Ziehe die Dinos:
                 </p>
                 <div className="flex gap-2 justify-center flex-wrap">

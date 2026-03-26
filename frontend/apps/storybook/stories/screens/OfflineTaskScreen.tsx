@@ -2,6 +2,8 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
 import { Button } from "../../../../packages/ui/src/primitives/Button";
+import { IconButton } from "../../../../packages/ui/src/primitives/IconButton";
+import { Avatar } from "../../../../packages/ui/src/primitives/Avatar";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
 const TASK_TYPES = [
@@ -67,12 +69,8 @@ export function OfflineTaskScreen() {
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Header */}
         <header className="flex justify-between items-center px-4 py-3">
-          <button className="w-9 h-9 flex items-center justify-center bg-white/80 backdrop-blur-sm border-[3px] border-on-surface rounded-lg sticker-shadow active-press">
-            <span className="material-symbols-outlined text-on-surface text-lg">close</span>
-          </button>
-          <div className="w-9 h-9 rounded-full border-[3px] border-[#1B5E20] bg-primary-fixed flex items-center justify-center text-base shadow-md">
-            🦖
-          </div>
+          <IconButton icon="close" variant="surface" label="Schließen" className="bg-white/80 backdrop-blur-sm" />
+          <Avatar size="sm" className="shadow-md">🦖</Avatar>
         </header>
 
         <main className="flex-1 flex flex-col items-center justify-center px-4 max-w-sm mx-auto">

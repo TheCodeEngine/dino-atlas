@@ -1,3 +1,5 @@
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
+
 /**
  * Museum Detail (Dino-Vitrine)
  * - Nutzt die gleichen Elemente wie Discovery Screen
@@ -14,7 +16,7 @@ export function MuseumDetailScreen() {
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col items-center justify-center px-4">
       <div className="text-center max-w-sm">
-        <span className="material-symbols-outlined text-primary-container mb-3" style={{ fontSize: "48px", fontVariationSettings: "'FILL' 1" }}>museum</span>
+        <Icon name="museum" size="xl" filled className="text-primary-container mb-3" />
         <h1 className="text-xl font-black uppercase tracking-tight mb-2">Museum Detail</h1>
         <p className="text-xs text-on-surface-variant mb-4">
           Nutzt die gleichen Elemente wie der Discovery Screen — Bild-Switcher, Fakten-Karussell, AudioPlayer, Karten.

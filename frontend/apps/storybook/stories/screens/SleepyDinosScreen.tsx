@@ -1,3 +1,5 @@
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
+
 export function SleepyDinosScreen() {
   return (
     <div
@@ -50,7 +52,7 @@ export function SleepyDinosScreen() {
         {/* Forscher */}
         <div className="flex items-start gap-2 mb-6">
           <div className="w-8 h-8 bg-primary-fixed border-[3px] border-outline rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>face</span>
+            <Icon name="face" size="sm" filled className="text-primary" />
           </div>
           <div className="bg-inverse-surface border-[3px] border-outline rounded-lg rounded-tl-none p-2.5 flex-1 text-left">
             <p className="text-xs font-bold text-inverse-on-surface">
@@ -61,14 +63,14 @@ export function SleepyDinosScreen() {
 
         {/* Timer visual */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <span className="material-symbols-outlined text-[#fef0c7] text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>dark_mode</span>
+          <Icon name="dark_mode" size="lg" filled className="text-[#fef0c7]" />
           <div className="flex-1 max-w-[200px]">
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
               <div className="h-full w-[30%] bg-gradient-to-r from-[#fef0c7] to-secondary-container rounded-full" />
             </div>
             <p className="text-[9px] font-bold text-white/40 mt-1">Morgen um 14:00 geht's weiter</p>
           </div>
-          <span className="material-symbols-outlined text-secondary-container text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>light_mode</span>
+          <Icon name="light_mode" size="lg" filled className="text-secondary-container" />
         </div>
 
         {/* Bis morgen */}

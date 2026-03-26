@@ -4,6 +4,8 @@ import { AudioPlayer } from "../../../../packages/ui/src/components/AudioPlayer"
 import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
 import { ImageSwitcher } from "../../../../packages/ui/src/components/ImageSwitcher";
 import { MuseumTransition, LandScene } from "../../../../packages/ui/src/components/museum-transition";
+import { IconButton } from "../../../../packages/ui/src/primitives/IconButton";
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
 // ── Map Carousel: Wann → Wo damals → Wo heute ──────────────────
@@ -108,7 +110,7 @@ function MapCarousel({ dinoImage }: { dinoImage: string }) {
   return (
     <div className="mb-4">
       <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant flex items-center gap-1 px-4 mb-2">
-        <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>explore</span>
+        <Icon name="explore" size="xs" />
         Entdecke mehr — wische durch
       </p>
       <div
@@ -128,7 +130,7 @@ function MapCarousel({ dinoImage }: { dinoImage: string }) {
           >
             <div className="flex items-center gap-2 mb-2">
               <div className="w-7 h-7 bg-white/80 rounded-lg flex items-center justify-center">
-                <span className="material-symbols-outlined text-on-surface" style={{ fontSize: "16px" }}>{card.icon}</span>
+                <Icon name={card.icon} size="sm" className="text-on-surface" />
               </div>
               <div>
                 <p className="text-xs font-black text-on-surface">{card.title}</p>
@@ -165,14 +167,13 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
   const haptics = useHaptics();
 
   const spawnHearts = useCallback(() => {
-    // Hearts burst out from dino center in all directions
     const emojis = ["❤️", "💕", "💖", "✨", "⭐"];
     const newHearts = Array.from({ length: 6 }, (_, i) => ({
       id: heartId.current++,
-      x: 50 + (Math.random() - 0.5) * 30, // % from center
+      x: 50 + (Math.random() - 0.5) * 30,
       y: 50 + (Math.random() - 0.5) * 20,
-      dx: (Math.random() - 0.5) * 120, // spread distance
-      dy: -40 - Math.random() * 80, // always float up
+      dx: (Math.random() - 0.5) * 120,
+      dy: -40 - Math.random() * 80,
       emoji: emojis[Math.floor(Math.random() * emojis.length)]!,
       size: 20 + Math.random() * 16,
       delay: i * 0.05,
@@ -200,7 +201,6 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
       setMood("eating");
       setMessage(`${name} liebt ${food.label}! 😋`);
       haptics.success();
-      // After eating animation → happy done state
       setTimeout(() => {
         setMood("done");
         setMessage(`${name} ist satt und glücklich!`);
@@ -218,12 +218,12 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
   return (
     <div className="mx-4 mb-4">
       <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant flex items-center gap-1 mb-2">
-        <span className="material-symbols-outlined" style={{ fontSize: "14px", fontVariationSettings: "'FILL' 1" }}>favorite</span>
+        <Icon name="favorite" size="xs" filled />
         Dein neuer Freund
       </p>
 
       <div className="bg-gradient-to-br from-primary-fixed/40 to-tertiary-fixed/30 rounded-xl border-[3px] border-on-surface sticker-shadow p-5">
-        {/* Dino area — only image is touchable */}
+        {/* Dino area */}
         <div className="relative flex items-center justify-center mb-4 h-52">
           <motion.img
             src={image}
@@ -244,17 +244,12 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
             }
           />
 
-          {/* Particle burst from dino */}
           <AnimatePresence>
             {hearts.map((heart) => (
               <motion.span
                 key={heart.id}
                 className="absolute pointer-events-none"
-                style={{
-                  left: `${heart.x}%`,
-                  top: `${heart.y}%`,
-                  fontSize: `${heart.size}px`,
-                }}
+                style={{ left: `${heart.x}%`, top: `${heart.y}%`, fontSize: `${heart.size}px` }}
                 initial={{ opacity: 1, x: 0, y: 0, scale: 0 }}
                 animate={{ opacity: 0, x: heart.dx, y: heart.dy, scale: 1.3, rotate: (Math.random() - 0.5) * 40 }}
                 exit={{ opacity: 0 }}
@@ -265,7 +260,6 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
             ))}
           </AnimatePresence>
 
-          {/* Reject: big red X */}
           {mood === "reject" && (
             <motion.div
               className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
@@ -278,7 +272,6 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
           )}
         </div>
 
-        {/* Message — fixed height to prevent layout shift */}
         <div className="h-5 flex items-center justify-center mb-2">
           <AnimatePresence mode="wait">
             {message ? (
@@ -307,7 +300,6 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
           </AnimatePresence>
         </div>
 
-        {/* Food or Done — single container, no nesting */}
         <div className="min-h-[60px] flex items-center justify-center">
           {mood === "done" ? (
             <motion.p
@@ -406,18 +398,16 @@ export function DiscoveryScreen() {
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-2 z-10">
-        <button className="w-9 h-9 flex items-center justify-center bg-surface-container-lowest border-[3px] border-on-surface rounded-lg sticker-shadow active-press">
-          <span className="material-symbols-outlined text-on-surface text-lg">close</span>
-        </button>
+        <IconButton icon="close" variant="surface" label="Schließen" />
         <span className="bg-secondary-container text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase whitespace-nowrap flex items-center gap-1">
-          <span className="material-symbols-outlined" style={{ fontSize: "14px", fontVariationSettings: "'FILL' 1" }}>new_releases</span>
+          <Icon name="new_releases" size="xs" filled />
           Neu entdeckt!
         </span>
       </header>
 
       {/* Scrollable */}
       <main className="flex-1 overflow-y-auto pb-6 max-w-md mx-auto w-full">
-        {/* Hero Image — square, switchable */}
+        {/* Hero Image */}
         <div className="mx-4 mb-2">
           <ImageSwitcher views={DINO_IMAGES} alt={DINO.name} square />
         </div>
@@ -427,7 +417,7 @@ export function DiscoveryScreen() {
           <div className="flex items-center justify-center gap-2">
             <h1 className="text-2xl font-black uppercase tracking-tight">{DINO.name}</h1>
             <button className="w-7 h-7 bg-surface-container-high border-2 border-outline-variant rounded-full flex items-center justify-center active:scale-90 transition-transform">
-              <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: "14px", fontVariationSettings: "'FILL' 1" }}>volume_up</span>
+              <Icon name="volume_up" size="xs" filled className="text-on-surface-variant" />
             </button>
           </div>
           <p className="text-xs font-semibold text-on-surface-variant italic">{DINO.latin}</p>
@@ -441,7 +431,7 @@ export function DiscoveryScreen() {
         {/* Fact Carousel */}
         <div className="mb-4">
           <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant flex items-center gap-1 px-4 mb-2">
-            <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>school</span>
+            <Icon name="school" size="xs" />
             Steckbrief — wische durch
           </p>
 
@@ -460,7 +450,7 @@ export function DiscoveryScreen() {
               <div key={fact.label} className={`flex-shrink-0 w-[260px] snap-center rounded-xl border-[3px] ${fact.color} p-3`}>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-8 h-8 bg-white/80 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="material-symbols-outlined text-on-surface" style={{ fontSize: "18px" }}>{fact.icon}</span>
+                    <Icon name={fact.icon} size="md" className="text-on-surface" />
                   </div>
                   <div>
                     <p className="text-[9px] font-bold text-on-surface-variant uppercase">{fact.label}</p>
@@ -480,7 +470,7 @@ export function DiscoveryScreen() {
           </div>
         </div>
 
-        {/* Map Carousel: Wann → Wo damals → Wo heute */}
+        {/* Map Carousel */}
         <MapCarousel dinoImage="/dinos/triceratops/comic.png" />
 
         {/* Interactive Dino Friend */}
@@ -491,7 +481,7 @@ export function DiscoveryScreen() {
           <ForscherSpeech text="Streichle deinen neuen Freund! Und füttere ihn mit dem richtigen Futter!" />
         </div>
 
-        {/* Museum CTA with land animation */}
+        {/* Museum CTA */}
         <MuseumTransition
           dinoImage={DINO.images.comic}
           dinoName={DINO.name}

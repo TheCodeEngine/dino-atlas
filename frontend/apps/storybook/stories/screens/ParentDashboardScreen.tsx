@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { TopBar } from "../../../../packages/ui/src/components/TopBar";
 import { TabBar } from "../../../../packages/ui/src/primitives/TabBar";
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
 
 /**
  * Eltern-Dashboard
@@ -40,21 +41,21 @@ export function ParentDashboardScreen() {
           )}
           {tab === "usage" && (
             <div className="text-center text-sm text-on-surface-variant py-8">
-              <span className="material-symbols-outlined mb-2" style={{ fontSize: "32px" }}>analytics</span>
+              <Icon name="analytics" size="xl" className="mb-2" />
               <p className="font-bold">Nutzungs-Protokoll</p>
               <p className="text-xs mt-1">Kalender + Session-Zeiten</p>
             </div>
           )}
           {tab === "costs" && (
             <div className="text-center text-sm text-on-surface-variant py-8">
-              <span className="material-symbols-outlined mb-2" style={{ fontSize: "32px" }}>payments</span>
+              <Icon name="payments" size="xl" className="mb-2" />
               <p className="font-bold">KI-Kosten: $0.42 / Monat</p>
               <p className="text-xs mt-1">Bilder, Stories, Foto-Bewertung</p>
             </div>
           )}
           {tab === "settings" && (
             <div className="text-center text-sm text-on-surface-variant py-8">
-              <span className="material-symbols-outlined mb-2" style={{ fontSize: "32px" }}>settings</span>
+              <Icon name="settings" size="xl" className="mb-2" />
               <p className="font-bold">Budget & Einstellungen</p>
               <p className="text-xs mt-1">Expeditionen/Tag, TTS-Stimme</p>
             </div>

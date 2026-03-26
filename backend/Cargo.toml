@@ -4,4 +4,5 @@ members = [
     "api",
     "generator",
     "core",
+    "dino-gen",
 ]

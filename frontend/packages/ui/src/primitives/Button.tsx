@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { Icon } from "./Icon";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "tertiary" | "surface" | "ghost";
@@ -38,14 +39,7 @@ export function Button({
   className = "",
   ...props
 }: ButtonProps) {
-  const iconEl = icon && (
-    <span
-      className="material-symbols-outlined"
-      style={{ fontSize: "18px", lineHeight: 1 }}
-    >
-      {icon}
-    </span>
-  );
+  const iconEl = icon && <Icon name={icon} size="md" />;
 
   return (
     <button

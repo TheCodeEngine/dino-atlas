@@ -1,3 +1,5 @@
+import { Icon } from "../primitives/Icon";
+
 interface NavItem {
   icon: string;
   label: string;
@@ -24,7 +26,7 @@ export function BottomNav({ items, active, onChange }: BottomNavProps) {
               : "text-[#1C1C17]",
           ].join(" ")}
         >
-          <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>{item.icon}</span>
+          <Icon name={item.icon} size="md" />
           <span className="font-bold text-[8px] uppercase">{item.label}</span>
         </button>
       ))}

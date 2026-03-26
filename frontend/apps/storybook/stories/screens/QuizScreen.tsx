@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "motion/react";
 import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
 import { FullscreenHeader } from "../../../../packages/ui/src/components/FullscreenHeader";
 import { Button } from "../../../../packages/ui/src/primitives/Button";
+import { ProgressBar } from "../../../../packages/ui/src/primitives/ProgressBar";
+import { StarRating } from "../../../../packages/ui/src/primitives/StarRating";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
 const QUESTIONS = [
@@ -52,14 +54,14 @@ export function QuizScreen() {
 
   function handleAnswer(correct: boolean) {
     if (phase !== "question") return;
-    haptics.tap(); // immediate feedback on any tap
+    haptics.tap();
     if (correct) {
-      setTimeout(() => haptics.success(), 150); // delayed success
+      setTimeout(() => haptics.success(), 150);
       setStars((s) => s + 1);
       setPhase("correct");
       setExplanation(q.explanation);
     } else {
-      setTimeout(() => haptics.error(), 150); // delayed error
+      setTimeout(() => haptics.error(), 150);
       setPhase("wrong");
       setExplanation("Hmm, nicht ganz! Versuch es nochmal!");
       setTimeout(() => setPhase("question"), 1500);
@@ -78,6 +80,8 @@ export function QuizScreen() {
     }
   }
 
+  const progress = ((current + (phase === "correct" || phase === "done" ? 1 : 0)) / total) * 100;
+
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
       <FullscreenHeader title="Dino-Quiz" playerEmoji="🦖" />
@@ -88,23 +92,8 @@ export function QuizScreen() {
           <span className="text-[10px] font-black text-on-surface-variant whitespace-nowrap">
             {Math.min(current + 1, total)}/{total}
           </span>
-          <div className="flex-1 h-2.5 bg-surface-container-high rounded-full border-2 border-on-surface/20 overflow-hidden">
-            <motion.div
-              className="h-full bg-primary-container rounded-full"
-              animate={{ width: `${((current + (phase === "correct" || phase === "done" ? 1 : 0)) / total) * 100}%` }}
-            />
-          </div>
-          <div className="flex gap-0.5">
-            {Array.from({ length: total }).map((_, i) => (
-              <span
-                key={i}
-                className={`material-symbols-outlined text-base ${i < stars ? "text-secondary-container" : "text-outline-variant"}`}
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                star
-              </span>
-            ))}
-          </div>
+          <ProgressBar value={progress} className="flex-1" />
+          <StarRating count={total} filled={stars} size="sm" />
         </div>
 
         <AnimatePresence mode="wait">

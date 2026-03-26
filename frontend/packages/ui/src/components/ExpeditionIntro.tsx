@@ -2,6 +2,8 @@ import { type ReactNode } from "react";
 import { motion } from "motion/react";
 import { ForscherSpeech } from "./ForscherSpeech";
 import { Button } from "../primitives/Button";
+import { IconButton } from "../primitives/IconButton";
+import { Avatar } from "../primitives/Avatar";
 import type { BiomConfig } from "./biom-scene/types";
 
 interface ExpeditionIntroProps {
@@ -23,15 +25,16 @@ export function ExpeditionIntro({ playerName, playerEmoji = "🦖", biom, scene,
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Minimal header: close + player avatar */}
         <header className="flex justify-between items-center px-4 py-3">
-          <button
+          <IconButton
+            icon="close"
+            variant="surface"
             onClick={onClose}
-            className="w-9 h-9 flex items-center justify-center bg-white/80 backdrop-blur-sm border-[3px] border-on-surface rounded-lg sticker-shadow active-press"
-          >
-            <span className="material-symbols-outlined text-on-surface text-lg">close</span>
-          </button>
-          <div className="w-9 h-9 rounded-full border-[3px] border-[#1B5E20] bg-primary-fixed flex items-center justify-center text-base shadow-md">
+            label="Schließen"
+            className="bg-white/80 backdrop-blur-sm"
+          />
+          <Avatar size="sm" className="shadow-md">
             {playerEmoji}
-          </div>
+          </Avatar>
         </header>
 
         <main className="flex-1 flex flex-col items-center justify-center px-4 max-w-sm mx-auto">

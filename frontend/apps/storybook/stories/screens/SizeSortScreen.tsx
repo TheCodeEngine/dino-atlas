@@ -17,6 +17,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { MinigameShell } from "../../../../packages/ui/src/components/MinigameShell";
 import { Button } from "../../../../packages/ui/src/primitives/Button";
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
 const DINOS = [
@@ -50,7 +51,7 @@ function SortableDino({ dino, idx, checked, correct }: { dino: typeof DINOS[0]; 
         <p className="text-xs font-black uppercase">{dino.name}</p>
         <p className="text-[10px] text-on-surface-variant">{dino.length}m lang</p>
       </div>
-      <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: "18px" }}>drag_indicator</span>
+      <Icon name="drag_indicator" size="md" className="text-on-surface-variant" />
     </div>
   );
 }
@@ -105,7 +106,7 @@ export function SizeSortScreen() {
       donePraise="Super gemacht! Du weißt welcher Dino am größten ist!"
     >
       <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant mb-2 flex items-center gap-1">
-        <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>drag_indicator</span>
+        <Icon name="drag_indicator" size="xs" />
         Ziehe die Dinos an die richtige Stelle
       </p>
 

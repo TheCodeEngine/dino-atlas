@@ -3,6 +3,7 @@ import { TopBar } from "../../../../packages/ui/src/components/TopBar";
 import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
 import { PlayerCard } from "../../../../packages/ui/src/components/PlayerCard";
 import { Button } from "../../../../packages/ui/src/primitives/Button";
+import { IconButton } from "../../../../packages/ui/src/primitives/IconButton";
 
 const PLAYERS = [
   { id: "oskar", name: "Oskar", age: 6, emoji: "🦖", hasPlayed: false },
@@ -19,9 +20,7 @@ export function PlayerSelectScreen() {
     <div className="bg-surface text-on-surface min-h-screen">
       <TopBar
         right={
-          <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-surface-container-high">
-            <span className="material-symbols-outlined text-on-surface-variant text-xl">settings</span>
-          </button>
+          <IconButton icon="settings" variant="ghost" label="Einstellungen" />
         }
       />
 

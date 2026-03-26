@@ -4,6 +4,9 @@ import { Divider } from "../../../../packages/ui/src/primitives/Divider";
 import { Button } from "../../../../packages/ui/src/primitives/Button";
 import { FormCard } from "../../../../packages/ui/src/components/FormCard";
 import { PageHeader } from "../../../../packages/ui/src/components/PageHeader";
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
+import { Avatar } from "../../../../packages/ui/src/primitives/Avatar";
+import { ProgressBar } from "../../../../packages/ui/src/primitives/ProgressBar";
 
 export function LoginScreen() {
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -92,8 +95,7 @@ function RegisterForm() {
     return (
       <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); setStep(2); }}>
         <div className="flex items-center gap-2 mb-4">
-          <div className="flex-1 h-1.5 rounded-full bg-primary-container" />
-          <div className="flex-1 h-1.5 rounded-full bg-surface-container-high" />
+          <ProgressBar value={50} className="flex-1" />
         </div>
 
         <TextInput label="Familien-Name" icon="family_restroom" type="text" placeholder="z.B. Familie Stoldt" />
@@ -111,8 +113,7 @@ function RegisterForm() {
   return (
     <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
       <div className="flex items-center gap-2 mb-2">
-        <div className="flex-1 h-1.5 rounded-full bg-primary-container" />
-        <div className="flex-1 h-1.5 rounded-full bg-primary-container" />
+        <ProgressBar value={100} className="flex-1" />
       </div>
 
       <p className="text-xs font-bold text-on-surface-variant mb-2">
@@ -127,10 +128,12 @@ function RegisterForm() {
               const next = AVATARS[(AVATARS.indexOf(kid.avatar) + 1) % AVATARS.length]!;
               updateKid(i, "avatar", next);
             }}
-            className="w-10 h-10 rounded-full border-[3px] border-on-surface bg-primary-fixed flex items-center justify-center text-xl flex-shrink-0 active:scale-90 transition-transform"
+            className="active:scale-90 transition-transform flex"
             title="Avatar ändern"
           >
-            {kid.avatar}
+            <Avatar size="md">
+              {kid.avatar}
+            </Avatar>
           </button>
           <div className="flex-1 min-w-0 space-y-1.5">
             <input
@@ -155,7 +158,7 @@ function RegisterForm() {
               onClick={() => removeKid(i)}
               className="w-7 h-7 rounded-full bg-error/10 text-error flex items-center justify-center flex-shrink-0 hover:bg-error/20"
             >
-              <span className="material-symbols-outlined text-[16px]">close</span>
+              <Icon name="close" size="sm" />
             </button>
           )}
         </div>
@@ -166,7 +169,7 @@ function RegisterForm() {
         onClick={addKid}
         className="w-full py-2 border-2 border-dashed border-outline-variant rounded-lg text-[11px] font-bold text-on-surface-variant hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-1"
       >
-        <span className="material-symbols-outlined text-[16px]">add</span>
+        <Icon name="add" size="sm" />
         Weiteres Kind hinzufügen
       </button>
 

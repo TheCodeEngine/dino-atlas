@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from "react";
+import { Icon } from "../primitives/Icon";
 
 export type AudioPlayerStatus = "idle" | "loading" | "playing" | "paused" | "error";
 
@@ -102,10 +103,8 @@ export function AudioPlayer({
     >
       {effectiveStatus === "loading" ? (
         <span className="block w-4 h-4 rounded-full border-2 border-white/35 border-t-white animate-spin" />
-      ) : effectivePlaying ? (
-        <span className="material-symbols-outlined" style={{ fontSize: "16px", fontVariationSettings: "'FILL' 1" }}>pause</span>
       ) : (
-        <span className="material-symbols-outlined" style={{ fontSize: "16px", fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+        <Icon name={effectivePlaying ? "pause" : "play_arrow"} size="sm" filled />
       )}
     </button>
   );

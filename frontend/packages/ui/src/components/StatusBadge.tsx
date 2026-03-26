@@ -1,3 +1,5 @@
+import { Icon } from "../primitives/Icon";
+
 interface StatusBadgeProps {
   label: string;
   variant?: "default" | "primary" | "secondary" | "tertiary" | "success" | "warning";
@@ -21,7 +23,7 @@ export function StatusBadge({ label, variant = "default", icon }: StatusBadgePro
         VARIANT_STYLES[variant],
       ].join(" ")}
     >
-      {icon && <span className="material-symbols-outlined text-sm">{icon}</span>}
+      {icon && <Icon name={icon} size="sm" />}
       {label}
     </span>
   );

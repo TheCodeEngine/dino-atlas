@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "../../../../packages/ui/src/primitives/Button";
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
 
 /**
  * Eltern-Reset
@@ -15,7 +16,7 @@ export function ParentResetScreen() {
   return (
     <div className="bg-surface text-on-surface min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-sm text-center">
-        <span className="material-symbols-outlined text-on-surface-variant mb-4" style={{ fontSize: "48px" }}>lock_open</span>
+        <Icon name="lock_open" size="xl" className="text-on-surface-variant mb-4" />
         <h1 className="text-xl font-black uppercase tracking-tight mb-1">Erwachsenen-Bereich</h1>
         <p className="text-xs text-on-surface-variant mb-6">Löse die Aufgabe um die Dinos aufzuwecken</p>
 

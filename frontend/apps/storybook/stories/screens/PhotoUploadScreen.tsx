@@ -2,6 +2,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
 import { Button } from "../../../../packages/ui/src/primitives/Button";
+import { IconButton } from "../../../../packages/ui/src/primitives/IconButton";
+import { Avatar } from "../../../../packages/ui/src/primitives/Avatar";
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
 type Phase = "camera" | "preview" | "analyzing" | "feedback";
@@ -35,11 +38,9 @@ export function PhotoUploadScreen() {
     <div className="bg-surface text-on-surface min-h-screen flex flex-col" style={{ backgroundImage: "none" }}>
       {/* Header */}
       <header className="flex justify-between items-center px-4 py-3">
-        <button className="w-9 h-9 flex items-center justify-center bg-surface-container-lowest border-[3px] border-on-surface rounded-lg sticker-shadow active-press">
-          <span className="material-symbols-outlined text-on-surface text-lg">close</span>
-        </button>
+        <IconButton icon="close" variant="surface" label="Schließen" />
         <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant">Offline-Auftrag</p>
-        <div className="w-9 h-9 rounded-full border-[3px] border-[#1B5E20] bg-primary-fixed flex items-center justify-center text-base">🦖</div>
+        <Avatar size="sm">🦖</Avatar>
       </header>
 
       <main className="flex-1 flex flex-col px-4 pb-6 max-w-sm mx-auto w-full">
@@ -55,7 +56,7 @@ export function PhotoUploadScreen() {
               <div className="flex-1 min-h-[300px] bg-on-surface rounded-xl border-[3px] border-on-surface sticker-shadow overflow-hidden relative flex items-center justify-center mb-3">
                 <div className="absolute inset-4 border-2 border-white/30 rounded-lg" />
                 <div className="text-center">
-                  <span className="material-symbols-outlined text-white/40" style={{ fontSize: "64px" }}>photo_camera</span>
+                  <Icon name="photo_camera" size="xl" className="text-white/40" />
                   <p className="text-xs font-bold text-white/30 mt-2">Kamera-Vorschau</p>
                 </div>
                 {/* Corner guides */}
@@ -93,7 +94,7 @@ export function PhotoUploadScreen() {
                   onClick={handleRetake}
                   className="flex-1 py-3 bg-surface-container-high text-on-surface border-[3px] border-on-surface rounded-lg sticker-shadow font-bold uppercase tracking-wider text-sm flex items-center justify-center gap-1.5 active-press"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>refresh</span>
+                  <Icon name="refresh" size="md" />
                   Nochmal
                 </button>
                 <div className="flex-[2]">
@@ -113,7 +114,7 @@ export function PhotoUploadScreen() {
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
               >
-                <span className="material-symbols-outlined text-primary" style={{ fontSize: "32px" }}>search</span>
+                <Icon name="search" size="xl" className="text-primary" />
               </motion.div>
               <p className="text-sm font-black uppercase text-on-surface">Der Forscher schaut sich</p>
               <p className="text-sm font-black uppercase text-on-surface">dein Bild an...</p>

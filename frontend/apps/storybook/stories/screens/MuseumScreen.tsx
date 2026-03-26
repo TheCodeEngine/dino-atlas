@@ -1,3 +1,8 @@
+import { Icon } from "../../../../packages/ui/src/primitives/Icon";
+import { Avatar } from "../../../../packages/ui/src/primitives/Avatar";
+import { ProgressBar } from "../../../../packages/ui/src/primitives/ProgressBar";
+import { StarRating } from "../../../../packages/ui/src/primitives/StarRating";
+
 const DINOS = [
   { id: "trex", name: "T-Rex", image: null, rarity: "legendary", discovered: true, stars: 3 },
   { id: "triceratops", name: "Triceratops", image: "/dinos/triceratops/comic.png", rarity: "rare", discovered: true, stars: 2 },
@@ -25,6 +30,7 @@ const RARITY_COLORS: Record<string, string> = {
 
 export function MuseumScreen() {
   const discovered = DINOS.filter((d) => d.discovered).length;
+  const percent = Math.round(discovered / DINOS.length * 100);
 
   return (
     <div className="bg-surface text-on-surface min-h-screen">
@@ -36,7 +42,7 @@ export function MuseumScreen() {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs font-black text-on-surface-variant">{discovered}/{DINOS.length}</span>
-          <div className="w-9 h-9 rounded-full border-[3px] border-[#1B5E20] bg-primary-fixed flex items-center justify-center text-base">🦖</div>
+          <Avatar size="sm">🦖</Avatar>
         </div>
       </header>
 
@@ -57,7 +63,7 @@ export function MuseumScreen() {
                   : "text-[#1C1C17] hover:bg-[#F6F3EA] transition-all hover:translate-x-0.5"
               }`}
             >
-              <span className="material-symbols-outlined text-[18px]">{item.icon}</span>{item.label}
+              <Icon name={item.icon} size="md" />{item.label}
             </a>
           ))}
         </nav>
@@ -68,7 +74,7 @@ export function MuseumScreen() {
         {/* Forscher */}
         <div className="flex items-center gap-2 py-3 max-w-3xl mx-auto">
           <div className="w-8 h-8 bg-primary-fixed border-[3px] border-on-surface rounded-lg sticker-shadow flex items-center justify-center flex-shrink-0">
-            <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>face</span>
+            <Icon name="face" size="sm" filled className="text-primary" />
           </div>
           <div className="bg-surface-container-lowest border-[3px] border-on-surface rounded-lg rounded-tl-none p-2 sticker-shadow flex-1">
             <p className="text-[11px] font-bold">Dein Museum waechst! Morgen finden wir bestimmt noch einen!</p>
@@ -79,17 +85,12 @@ export function MuseumScreen() {
         <div className="mb-4 max-w-3xl mx-auto">
           <div className="flex justify-between items-center mb-1">
             <span className="text-[10px] font-black uppercase tracking-wider text-primary">{discovered} von {DINOS.length} entdeckt</span>
-            <span className="text-[10px] font-bold text-on-surface-variant">{Math.round(discovered / DINOS.length * 100)}%</span>
+            <span className="text-[10px] font-bold text-on-surface-variant">{percent}%</span>
           </div>
-          <div className="h-2.5 bg-surface-container-high rounded-full border-2 border-on-surface overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-primary-container to-[#2E7D32] rounded-full"
-              style={{ width: `${(discovered / DINOS.length) * 100}%` }}
-            />
-          </div>
+          <ProgressBar value={percent} variant="gradient" />
         </div>
 
-        {/* Dino Grid — 3 cols mobile, 4 cols tablet, 5 cols desktop */}
+        {/* Dino Grid */}
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2.5 max-w-3xl mx-auto">
           {DINOS.map((dino) => (
             <button
@@ -132,17 +133,7 @@ export function MuseumScreen() {
 
               {/* Stars */}
               {dino.discovered && dino.stars > 0 && (
-                <div className="flex gap-px mt-0.5">
-                  {[1, 2, 3].map((s) => (
-                    <span
-                      key={s}
-                      className={`material-symbols-outlined text-[10px] lg:text-[12px] ${s <= dino.stars ? "text-secondary-container" : "text-outline-variant"}`}
-                      style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                      star
-                    </span>
-                  ))}
-                </div>
+                <StarRating count={3} filled={dino.stars} size="xs" className="mt-0.5" />
               )}
             </button>
           ))}
@@ -164,7 +155,7 @@ export function MuseumScreen() {
               item.active ? "bg-[#1B5E20] text-white shadow-[2px_2px_0px_0px_rgba(255,107,0,1)]" : "text-[#1C1C17]",
             ].join(" ")}
           >
-            <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+            <Icon name={item.icon} size="md" />
             <span className="font-bold text-[8px] uppercase">{item.label}</span>
           </a>
         ))}

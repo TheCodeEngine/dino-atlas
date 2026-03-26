@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Icon } from "../primitives/Icon";
 
 interface ImageView {
   id: string;
@@ -45,7 +46,7 @@ export function ImageSwitcher({ views, defaultView, alt, square = false }: Image
                   : "bg-surface-container-low text-on-surface-variant border-[2px] border-outline-variant",
               ].join(" ")}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>{view.icon}</span>
+              <Icon name={view.icon} size="xs" />
               {view.label}
             </button>
           ))}

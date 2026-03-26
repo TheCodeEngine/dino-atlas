@@ -14,10 +14,10 @@ const FOOD_OPTIONS = [
 ];
 
 function InteractiveDino({ name, image, diet }: { name: string; image: string; diet: string }) {
-  const [mood, setMood] = useState<"idle" | "happy" | "love" | "eating" | "reject">("idle");
+  const [mood, setMood] = useState<"idle" | "happy" | "love" | "eating" | "reject" | "done">("idle");
   const [hearts, setHearts] = useState<{ id: number; x: number; y: number }[]>([]);
-  const [fedCount, setFedCount] = useState(0);
   const [message, setMessage] = useState("");
+  const [wrongIds, setWrongIds] = useState<string[]>([]);
   const heartId = useRef(0);
   const haptics = useHaptics();
 
@@ -48,18 +48,25 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
   }
 
   function handleFeed(food: typeof FOOD_OPTIONS[0]) {
+    if (mood !== "idle") return;
     haptics.tap();
     if (food.correct) {
       setMood("eating");
-      setFedCount((c) => c + 1);
       setMessage(`${name} liebt ${food.label}! 😋`);
       haptics.success();
+      // After eating animation → happy done state
+      setTimeout(() => {
+        setMood("done");
+        setMessage(`${name} ist satt und glücklich!`);
+        spawnHearts();
+      }, 1200);
     } else {
+      setWrongIds((prev) => [...prev, food.id]);
       setMood("reject");
-      setMessage(`${name} mag kein ${food.label}! 🙅`);
+      setMessage(`Nein! ${name} frisst kein ${food.label}!`);
       haptics.error();
+      setTimeout(() => { setMood("idle"); setMessage(""); }, 1500);
     }
-    setTimeout(() => { setMood("idle"); setMessage(""); }, 1500);
   }
 
   return (
@@ -81,12 +88,15 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
             className="w-48 h-48 object-contain drop-shadow-lg"
             animate={
               mood === "love" ? { rotate: [0, -5, 5, -3, 0], scale: [1, 1.05, 1] }
-                : mood === "eating" ? { y: [0, -5, 0], scale: [1, 1.08, 1] }
+                : mood === "eating" ? { y: [0, -8, 0], scale: [1, 1.1, 1] }
                 : mood === "reject" ? { x: [0, -15, 15, -12, 8, -4, 0], rotate: [0, -3, 3, -2, 0] }
+                : mood === "done" ? { y: [0, -10, 0], scale: [1, 1.12, 1], rotate: [0, -3, 3, 0] }
                 : { y: [0, -2, 0] }
             }
             transition={
-              mood === "idle" ? { repeat: Infinity, duration: 3, ease: "easeInOut" } : { duration: 0.5 }
+              mood === "done" ? { repeat: Infinity, duration: 1.5, ease: "easeInOut" }
+                : mood === "idle" ? { repeat: Infinity, duration: 3, ease: "easeInOut" }
+                : { duration: 0.5 }
             }
           />
 
@@ -173,28 +183,48 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
           </AnimatePresence>
         </div>
 
-        {/* Food options */}
-        <div className="flex justify-center gap-3">
-          {FOOD_OPTIONS.map((food) => (
-            <motion.button
-              key={food.id}
-              onClick={() => handleFeed(food)}
-              className="flex flex-col items-center gap-1 px-4 py-3 bg-white/80 rounded-xl border-[3px] border-on-surface/20 sticker-shadow"
-              whileTap={{ scale: 0.85 }}
-              disabled={mood !== "idle"}
+        {/* Food options — wrong ones disappear, all gone when done */}
+        <AnimatePresence mode="popLayout">
+          {mood !== "done" && (
+            <motion.div
+              className="flex justify-center gap-3"
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
             >
-              <span className="text-3xl">{food.emoji}</span>
-              <span className="text-[10px] font-bold text-on-surface-variant">{food.label}</span>
-            </motion.button>
-          ))}
-        </div>
+              <AnimatePresence>
+                {FOOD_OPTIONS.filter((f) => !wrongIds.includes(f.id)).map((food) => (
+                  <motion.button
+                    key={food.id}
+                    layout
+                    onClick={() => handleFeed(food)}
+                    className="flex flex-col items-center gap-1 px-4 py-3 bg-white/80 rounded-xl border-[3px] border-on-surface/20 sticker-shadow"
+                    whileTap={{ scale: 0.85 }}
+                    disabled={mood !== "idle"}
+                    exit={{ opacity: 0, scale: 0.5, y: 10 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <span className="text-3xl">{food.emoji}</span>
+                    <span className="text-[10px] font-bold text-on-surface-variant">{food.label}</span>
+                  </motion.button>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Fed counter */}
-        {fedCount > 0 && (
-          <p className="text-center text-[10px] font-bold text-primary mt-2">
-            {fedCount}x gefüttert! {fedCount >= 3 ? "🎉 Satt und glücklich!" : ""}
-          </p>
-        )}
+        {/* Done state — dino is happy */}
+        <AnimatePresence>
+          {mood === "done" && (
+            <motion.p
+              className="text-center text-sm font-black text-primary"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", damping: 12 }}
+            >
+              🎉 Satt und glücklich! 🎉
+            </motion.p>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -42,8 +42,10 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
 
   function handlePet() {
     spawnHearts();
-    setMood("love");
     haptics.tap();
+    // Don't override done state - dino stays happy after feeding
+    if (mood === "done") return;
+    setMood("love");
     setTimeout(() => setMood("idle"), 800);
   }
 
@@ -183,38 +185,9 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
           </AnimatePresence>
         </div>
 
-        {/* Food options — wrong ones disappear, all gone when done */}
-        <AnimatePresence mode="popLayout">
-          {mood !== "done" && (
-            <motion.div
-              className="flex justify-center gap-3"
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <AnimatePresence>
-                {FOOD_OPTIONS.filter((f) => !wrongIds.includes(f.id)).map((food) => (
-                  <motion.button
-                    key={food.id}
-                    layout
-                    onClick={() => handleFeed(food)}
-                    className="flex flex-col items-center gap-1 px-4 py-3 bg-white/80 rounded-xl border-[3px] border-on-surface/20 sticker-shadow"
-                    whileTap={{ scale: 0.85 }}
-                    disabled={mood !== "idle"}
-                    exit={{ opacity: 0, scale: 0.5, y: 10 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <span className="text-3xl">{food.emoji}</span>
-                    <span className="text-[10px] font-bold text-on-surface-variant">{food.label}</span>
-                  </motion.button>
-                ))}
-              </AnimatePresence>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Done state — dino is happy */}
-        <AnimatePresence>
-          {mood === "done" && (
+        {/* Food or Done — single container, no nesting */}
+        <div className="min-h-[60px] flex items-center justify-center">
+          {mood === "done" ? (
             <motion.p
               className="text-center text-sm font-black text-primary"
               initial={{ opacity: 0, scale: 0.8 }}
@@ -223,8 +196,27 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
             >
               🎉 Satt und glücklich! 🎉
             </motion.p>
+          ) : (
+            <div className="flex justify-center gap-3">
+              {FOOD_OPTIONS.filter((f) => !wrongIds.includes(f.id)).map((food) => (
+                <motion.button
+                  key={food.id}
+                  layout
+                  onClick={() => handleFeed(food)}
+                  className="flex flex-col items-center gap-1 px-4 py-3 bg-white/80 rounded-xl border-[3px] border-on-surface/20 sticker-shadow"
+                  whileTap={{ scale: 0.85 }}
+                  disabled={mood !== "idle"}
+                  initial={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0 }}
+                  transition={{ layout: { duration: 0.3 } }}
+                >
+                  <span className="text-3xl">{food.emoji}</span>
+                  <span className="text-[10px] font-bold text-on-surface-variant">{food.label}</span>
+                </motion.button>
+              ))}
+            </div>
           )}
-        </AnimatePresence>
+        </div>
       </div>
     </div>
   );

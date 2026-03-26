@@ -42,7 +42,12 @@ const QUESTIONS = [
 
 type Phase = "question" | "correct" | "wrong" | "done";
 
-export function QuizScreen() {
+export interface QuizScreenProps {
+  onComplete?: (score: number, total: number) => void;
+  onClose?: () => void;
+}
+
+export function QuizScreen({ onComplete, onClose }: QuizScreenProps = {}) {
   const [current, setCurrent] = useState(0);
   const [stars, setStars] = useState(0);
   const [phase, setPhase] = useState<Phase>("question");
@@ -84,7 +89,7 @@ export function QuizScreen() {
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
-      <FullscreenHeader title="Dino-Quiz" playerEmoji="🦖" />
+      <FullscreenHeader title="Dino-Quiz" playerEmoji="🦖" onClose={onClose} />
 
       <main className="flex-1 flex flex-col px-4 pb-6 max-w-sm mx-auto w-full">
         {/* Progress + Stars */}

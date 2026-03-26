@@ -74,7 +74,8 @@ function FoodDropZone({ food, dinosHere, isOver }: { food: typeof FOODS[0]; dino
   );
 }
 
-export function FoodMatchScreen() {
+export interface FoodMatchScreenProps { onComplete?: (score: number) => void; onClose?: () => void; }
+export function FoodMatchScreen({ onComplete, onClose }: FoodMatchScreenProps = {}) {
   const [assignments, setAssignments] = useState<Record<string, string>>({});
   const [activeDino, setActiveDino] = useState<string | null>(null);
   const [overZone, setOverZone] = useState<string | null>(null);
@@ -117,7 +118,7 @@ export function FoodMatchScreen() {
   }
 
   return (
-    <MinigameShell
+    <MinigameShell onClose={onClose}
       title="Futter-Zuordnung"
       instruction="Ziehe jeden Dino zum richtigen Futter! Frisst er Pflanzen oder Fleisch?"
       done={done}

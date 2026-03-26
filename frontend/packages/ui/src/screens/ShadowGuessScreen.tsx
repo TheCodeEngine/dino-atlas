@@ -15,7 +15,8 @@ const ROUNDS = [
   },
 ];
 
-export function ShadowGuessScreen() {
+export interface ShadowGuessScreenProps { onComplete?: (score: number) => void; onClose?: () => void; }
+export function ShadowGuessScreen({ onComplete, onClose }: ShadowGuessScreenProps = {}) {
   const [round] = useState(0);
   const [result, setResult] = useState<"none" | "correct" | "wrong">("none");
   const [wrongIds, setWrongIds] = useState<string[]>([]);
@@ -40,7 +41,7 @@ export function ShadowGuessScreen() {
   const remaining = r.options.filter((o) => !wrongIds.includes(o.id));
 
   return (
-    <MinigameShell
+    <MinigameShell onClose={onClose}
       title="Schatten-Raten"
       instruction="Welcher Dino versteckt sich im Schatten?"
       done={result === "correct"}

@@ -79,7 +79,8 @@ function PeriodDropZone({ period, dinosHere, isOver }: { period: typeof PERIODS[
   );
 }
 
-export function TimelineSortScreen() {
+export interface TimelineSortScreenProps { onComplete?: (score: number) => void; onClose?: () => void; }
+export function TimelineSortScreen({ onComplete, onClose }: TimelineSortScreenProps = {}) {
   const [assignments, setAssignments] = useState<Record<string, string>>({});
   const [activeDino, setActiveDino] = useState<string | null>(null);
   const [overZone, setOverZone] = useState<string | null>(null);
@@ -120,7 +121,7 @@ export function TimelineSortScreen() {
   }
 
   return (
-    <MinigameShell
+    <MinigameShell onClose={onClose}
       title="Zeitleiste"
       instruction="In welcher Zeit hat jeder Dino gelebt? Ziehe sie in die richtige Epoche!"
       done={done}

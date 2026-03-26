@@ -56,7 +56,8 @@ function SortableDino({ dino, idx, checked, correct }: { dino: typeof DINOS[0]; 
   );
 }
 
-export function SizeSortScreen() {
+export interface SizeSortScreenProps { onComplete?: (score: number) => void; onClose?: () => void; }
+export function SizeSortScreen({ onComplete, onClose }: SizeSortScreenProps = {}) {
   const [order, setOrder] = useState(() => {
     const shuffled = [...DINOS];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -98,7 +99,7 @@ export function SizeSortScreen() {
   }
 
   return (
-    <MinigameShell
+    <MinigameShell onClose={onClose}
       title="Größen-Sortieren"
       instruction="Sortiere die Dinos! Der Größte nach oben, der Kleinste nach unten. Ziehe sie mit dem Finger!"
       done={checked && correct}

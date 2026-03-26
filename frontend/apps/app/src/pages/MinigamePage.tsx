@@ -10,38 +10,37 @@ export function MinigamePage() {
   const player = useAuthStore((s) => s.activePlayer);
   const queryClient = useQueryClient();
 
-  const handleComplete = async (score?: number, starsEarned?: number) => {
+  const handleComplete = async (score?: number) => {
     if (!player) return;
     try {
       await post("/minigames/complete", {
         player_id: player.id,
         game_type: type,
         score: score ?? 0,
-        stars_earned: starsEarned ?? 0,
+        stars_earned: 0,
         time_ms: 0,
       });
       queryClient.invalidateQueries({ queryKey: ["minigames"] });
       queryClient.invalidateQueries({ queryKey: ["budget"] });
     } catch {
-      // ignore — game result is nice-to-have
+      // non-critical
     }
     navigate("/minigames");
   };
 
   const handleClose = () => navigate("/minigames");
 
-  // Render the correct minigame based on route param
   switch (type) {
     case "quiz":
-      return <QuizScreen />;
+      return <QuizScreen onClose={handleClose} onComplete={(score, total) => handleComplete(score)} />;
     case "size_sort":
-      return <SizeSortScreen />;
+      return <SizeSortScreen onClose={handleClose} onComplete={handleComplete} />;
     case "timeline":
-      return <TimelineSortScreen />;
+      return <TimelineSortScreen onClose={handleClose} onComplete={handleComplete} />;
     case "food_match":
-      return <FoodMatchScreen />;
+      return <FoodMatchScreen onClose={handleClose} onComplete={handleComplete} />;
     case "shadow_guess":
-      return <ShadowGuessScreen />;
+      return <ShadowGuessScreen onClose={handleClose} onComplete={handleComplete} />;
     default:
       navigate("/minigames");
       return null;

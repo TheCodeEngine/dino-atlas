@@ -11,6 +11,7 @@ export { ProgressBar } from "./primitives/ProgressBar";
 export { Avatar } from "./primitives/Avatar";
 export { IconButton } from "./primitives/IconButton";
 export { StarRating } from "./primitives/StarRating";
+export { Skeleton } from "./primitives/Skeleton";
 
 // Components
 export { AudioPlayer } from "./components/AudioPlayer";
@@ -34,3 +35,33 @@ export { DesertScene, DESERT_CONFIG, JungleScene, JUNGLE_CONFIG, IceScene, ICE_C
 
 // Hooks
 export { useHaptics } from "./hooks/useHaptics";
+
+// Minigames
+export { ExcavationGame } from "./minigames-excavation/ExcavationGame";
+
+// Screens
+export {
+  DiscoveryScreen,
+  ExcavationScreen,
+  ExpeditionIntroScreen,
+  FoodMatchScreen,
+  HomeScreen,
+  IdentifyScreen,
+  LoginScreen,
+  MainDashboard,
+  MinigameSelectScreen,
+  MuseumDetailScreen,
+  MuseumScreen,
+  OfflineTaskScreen,
+  ParentDashboardScreen,
+  ParentResetScreen,
+  PhotoUploadScreen,
+  PlayerSelectScreen,
+  PuzzleScreen,
+  QuizScreen,
+  ShadowGuessScreen,
+  SizeSortScreen,
+  SleepyDinosScreen,
+  StoryTimeScreen,
+  TimelineSortScreen,
+} from "./screens";

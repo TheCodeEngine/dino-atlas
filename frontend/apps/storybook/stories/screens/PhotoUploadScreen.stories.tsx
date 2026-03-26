@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { PhotoUploadScreen } from "./PhotoUploadScreen";
+import { PhotoUploadScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Foto-Upload",

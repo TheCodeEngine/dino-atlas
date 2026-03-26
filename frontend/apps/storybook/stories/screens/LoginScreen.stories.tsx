@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { LoginScreen } from "./LoginScreen";
+import { LoginScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Login",

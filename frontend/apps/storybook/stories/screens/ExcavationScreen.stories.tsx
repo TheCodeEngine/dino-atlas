@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ExcavationScreen } from "./ExcavationScreen";
+import { ExcavationScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Ausbuddeln",

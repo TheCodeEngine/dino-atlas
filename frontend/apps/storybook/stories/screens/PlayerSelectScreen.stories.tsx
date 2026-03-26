@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { PlayerSelectScreen } from "./PlayerSelectScreen";
+import { PlayerSelectScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Spieler Auswahl",

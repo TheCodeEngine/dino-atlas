@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { TimelineSortScreen } from "./TimelineSortScreen";
+import { TimelineSortScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Mini-Spiele/Zeitleiste",

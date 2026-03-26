@@ -1,11 +1,9 @@
 /* Dino-Atlas Design System — "Sticker/Badge" Style */
-/* Extracted from designer prototypes (main.html, login.html) */
+/* Single source of truth for colors, fonts, shadows */
+/* Used by both Storybook (preview.css) and App (styles.css) */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
-
-:root {
-  /* ── Primary: Deep Green (Dschungel/Natur) ── */
+@theme {
+  /* ── Primary: Deep Green ── */
   --color-primary: #00450d;
   --color-primary-container: #1b5e20;
   --color-primary-fixed: #acf4a4;
@@ -15,7 +13,7 @@
   --color-on-primary-fixed: #002203;
   --color-on-primary-fixed-variant: #0c5216;
 
-  /* ── Secondary: Orange (Abenteuer/Akzent) ── */
+  /* ── Secondary: Orange ── */
   --color-secondary: #a04100;
   --color-secondary-container: #fe6b00;
   --color-secondary-fixed: #ffdbcc;
@@ -25,7 +23,7 @@
   --color-on-secondary-fixed: #351000;
   --color-on-secondary-fixed-variant: #7a3000;
 
-  /* ── Tertiary: Deep Blue (Wissenschaft) ── */
+  /* ── Tertiary: Deep Blue ── */
   --color-tertiary: #003e63;
   --color-tertiary-container: #005687;
   --color-tertiary-fixed: #cee5ff;
@@ -35,7 +33,7 @@
   --color-on-tertiary-fixed: #001d32;
   --color-on-tertiary-fixed-variant: #004a75;
 
-  /* ── Surface (Backgrounds) ── */
+  /* ── Surface ── */
   --color-surface: #fcf9f0;
   --color-surface-dim: #dddad1;
   --color-surface-bright: #fcf9f0;
@@ -48,7 +46,7 @@
   --color-surface-tint: #2a6b2c;
   --color-background: #fcf9f0;
 
-  /* ── On-Surface (Text) ── */
+  /* ── On-Surface ── */
   --color-on-surface: #1c1c17;
   --color-on-surface-variant: #41493e;
   --color-on-background: #1c1c17;
@@ -68,49 +66,26 @@
   --color-on-error: #ffffff;
   --color-on-error-container: #93000a;
 
-  /* ── Typography ── */
-  --font-headline: "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-label: "Plus Jakarta Sans", system-ui, sans-serif;
+  /* ── Font ── */
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
 
-  /* ── Sticker Shadows (Kern-Pattern) ── */
-  --shadow-sticker: 4px 4px 0px 0px #1c1c17;
-  --shadow-sticker-primary: 4px 4px 0px 0px #1b5e20;
-  --shadow-sticker-secondary: 4px 4px 0px 0px #ff6b00;
-  --shadow-sticker-sm: 2px 2px 0px 0px #1c1c17;
-
-  /* ── Borders ── */
-  --border-width: 4px;
-  --border-width-sm: 2px;
-  --border-color: #1c1c17;
-
-  /* ── Radii ── */
+  /* ── Border Radius ── */
   --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
-  --radius-full: 9999px;
-
-  /* ── Touch Targets (min 48px for kids) ── */
-  --touch-min: 48px;
-  --touch-comfortable: 56px;
-  --touch-large: 64px;
-
-  /* ── Background Pattern ── */
-  --bg-dot-color: #e5e2da;
-  --bg-dot-size: 1px;
-  --bg-dot-spacing: 24px;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
 }
 
 /* ── Base Styles ── */
 
 body {
-  font-family: var(--font-body);
-  background-color: var(--color-surface);
-  background-image: radial-gradient(var(--bg-dot-color) var(--bg-dot-size), transparent var(--bg-dot-size));
-  background-size: var(--bg-dot-spacing) var(--bg-dot-spacing);
-  color: var(--color-on-surface);
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  background-color: #fcf9f0;
+  background-image: radial-gradient(#e5e2da 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: #1c1c17;
 }
 
 /* ── Material Symbols ── */
@@ -119,32 +94,20 @@ body {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* ── Sticker Shadow Utilities ── */
+/* ── Sticker Shadows ── */
 
-.sticker-shadow {
-  box-shadow: var(--shadow-sticker);
-}
+.sticker-shadow { box-shadow: 4px 4px 0px 0px #1c1c17; }
+.sticker-shadow-primary { box-shadow: 4px 4px 0px 0px #1b5e20; }
+.sticker-shadow-secondary { box-shadow: 4px 4px 0px 0px #ff6b00; }
+.sticker-shadow-sm { box-shadow: 2px 2px 0px 0px #1c1c17; }
 
-.sticker-shadow-primary {
-  box-shadow: var(--shadow-sticker-primary);
-}
-
-.sticker-shadow-secondary {
-  box-shadow: var(--shadow-sticker-secondary);
-}
-
-.sticker-shadow-sm {
-  box-shadow: var(--shadow-sticker-sm);
-}
-
-/* ── Active Press Effect (Button drueckt sich rein) ── */
+/* ── Active Press Effect ── */
 
 .active-press:active {
-  transform: translate(4px, 4px);
-  box-shadow: 0px 0px 0px 0px var(--border-color);
-}
-
-.active-press-sm:active {
   transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px 0px var(--border-color);
+  box-shadow: 2px 2px 0px 0px #1c1c17;
+}
+.active-press-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #1b5e20;
 }

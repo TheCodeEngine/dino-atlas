@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ParentResetScreen } from "./ParentResetScreen";
+import { ParentResetScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Eltern-Reset",

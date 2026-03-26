@@ -3,6 +3,7 @@ pub mod dinos;
 pub mod expedition;
 pub mod museum;
 pub mod budget;
+pub mod players;
 
 use axum::{middleware, Router};
 use utoipa::OpenApi;
@@ -26,6 +27,7 @@ pub struct AppState {
         auth::register,
         auth::login,
         auth::me,
+        players::add_player,
         dinos::list_dinos,
         dinos::get_dino,
         expedition::get_active,
@@ -70,6 +72,7 @@ pub fn create_router(state: AppState) -> Router {
         .merge(expedition::routes())
         .merge(museum::routes())
         .merge(budget::routes())
+        .merge(players::routes())
         .layer(middleware::from_fn_with_state(
             state.clone(),
             crate::middleware::auth::auth_middleware,

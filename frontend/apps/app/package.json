@@ -9,10 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dino-atlas/minigames": "workspace:*",
     "@dino-atlas/types": "workspace:*",
     "@dino-atlas/ui": "workspace:*",
-    "@dino-atlas/minigames": "workspace:*",
     "@tanstack/react-query": "^5.62.0",
+    "motion": "^12.38.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router": "^7.1.0",

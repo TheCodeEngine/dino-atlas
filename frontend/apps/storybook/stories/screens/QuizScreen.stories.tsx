@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { QuizScreen } from "./QuizScreen";
+import { QuizScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Quiz",

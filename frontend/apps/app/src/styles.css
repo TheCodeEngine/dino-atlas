@@ -1,2 +1,4 @@
 @import "tailwindcss";
 @import "@dino-atlas/ui/styles";
+@source "../../../packages/ui/src/**/*.tsx";
+@source "../../../packages/minigames/src/**/*.tsx";

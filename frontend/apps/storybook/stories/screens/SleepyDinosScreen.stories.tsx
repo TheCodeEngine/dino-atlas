@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { SleepyDinosScreen } from "./SleepyDinosScreen";
+import { SleepyDinosScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Muede Dinos",

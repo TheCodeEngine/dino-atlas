@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ShadowGuessScreen } from "./ShadowGuessScreen";
+import { ShadowGuessScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Mini-Spiele/Schatten-Raten",

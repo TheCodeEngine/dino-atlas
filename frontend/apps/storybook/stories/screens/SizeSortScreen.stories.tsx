@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { SizeSortScreen } from "./SizeSortScreen";
+import { SizeSortScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Mini-Spiele/Größen-Sortieren",

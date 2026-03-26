@@ -56,7 +56,7 @@ export function PlayerSwitcher({ players, active, onChange }: PlayerSwitcherProp
 
             {/* Sheet */}
             <motion.div
-              className="relative w-full max-w-lg bg-surface-container-lowest border-t-[3px] border-x-[3px] border-on-surface rounded-t-2xl px-4 pt-3 pb-8"
+              className="relative w-full max-w-lg bg-surface-container-lowest border-t-[3px] border-x-[3px] border-on-surface rounded-t-2xl px-4 pt-3 pb-24"
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}

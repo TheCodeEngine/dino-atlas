@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { MinigameSelectScreen } from "./MinigameSelectScreen";
+import { MinigameSelectScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Mini-Spiel Auswahl",

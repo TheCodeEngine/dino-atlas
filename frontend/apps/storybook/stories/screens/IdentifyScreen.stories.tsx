@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { IdentifyScreen } from "./IdentifyScreen";
+import { IdentifyScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Dino Erkennen",

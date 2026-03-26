@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { FoodMatchScreen } from "./FoodMatchScreen";
+import { FoodMatchScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Mini-Spiele/Futter-Zuordnung",

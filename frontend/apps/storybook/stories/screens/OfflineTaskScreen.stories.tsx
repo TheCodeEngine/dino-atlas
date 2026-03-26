@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { OfflineTaskScreen } from "./OfflineTaskScreen";
+import { OfflineTaskScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Offline-Auftrag",

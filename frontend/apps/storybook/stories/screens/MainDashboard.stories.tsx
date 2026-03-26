@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { MainDashboard } from "./MainDashboard";
+import { MainDashboard } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Dashboard",

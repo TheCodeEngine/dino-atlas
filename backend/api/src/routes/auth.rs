@@ -13,13 +13,18 @@ use crate::pocketbase::models::*;
 use crate::routes::AppState;
 
 #[derive(Deserialize, ToSchema)]
+pub struct PlayerInput {
+    pub name: String,
+    pub emoji: String,
+    pub birth_year: i32,
+}
+
+#[derive(Deserialize, ToSchema)]
 pub struct RegisterRequest {
     pub email: String,
     pub password: String,
     pub family_name: String,
-    pub player_name: String,
-    pub player_emoji: String,
-    pub player_birth_year: i32,
+    pub players: Vec<PlayerInput>,
 }
 
 #[derive(Deserialize, ToSchema)]
@@ -93,6 +98,9 @@ pub(crate) async fn register(
     if req.email.is_empty() || req.password.len() < 8 {
         return Err(AppError::BadRequest("E-Mail und Passwort (min. 8 Zeichen) erforderlich".into()));
     }
+    if req.players.is_empty() {
+        return Err(AppError::BadRequest("Mindestens ein Kind erforderlich".into()));
+    }
 
     let family: PbFamily = state.pb.create("families", &serde_json::json!({
         "name": req.family_name,
@@ -100,14 +108,16 @@ pub(crate) async fn register(
 
     let auth = state.pb.auth_register(&req.email, &req.password, &family.id).await?;
 
-    let _player: PbPlayer = state.pb.create("players", &serde_json::json!({
-        "family_id": family.id,
-        "name": req.player_name,
-        "avatar_emoji": req.player_emoji,
-        "birth_year": req.player_birth_year,
-        "level": 1,
-        "dinos_discovered": 0,
-    })).await?;
+    for kid in &req.players {
+        let _player: PbPlayer = state.pb.create("players", &serde_json::json!({
+            "family_id": family.id,
+            "name": kid.name,
+            "avatar_emoji": kid.emoji,
+            "birth_year": kid.birth_year,
+            "level": 1,
+            "dinos_discovered": 0,
+        })).await?;
+    }
 
     let cookie = make_auth_cookie(&auth.token);
     Ok((

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ParentDashboardScreen } from "./ParentDashboardScreen";
+import { ParentDashboardScreen } from "@dino-atlas/ui";
 
 const meta = {
   title: "Screens/Eltern-Dashboard",

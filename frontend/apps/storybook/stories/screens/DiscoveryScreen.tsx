@@ -150,16 +150,15 @@ function MapCarousel({ dinoImage }: { dinoImage: string }) {
 // ── Museum CTA with animation ───────────────────────────────────
 
 function MuseumCTA({ dinoImage, dinoName }: { dinoImage: string; dinoName: string }) {
-  const [phase, setPhase] = useState<"idle" | "launch" | "fly" | "land" | "done">("idle");
+  const [phase, setPhase] = useState<"idle" | "run" | "enter" | "done">("idle");
   const haptics = useHaptics();
 
   function handleClick() {
     if (phase !== "idle") return;
     haptics.success();
-    setPhase("launch");
-    setTimeout(() => setPhase("fly"), 600);
-    setTimeout(() => setPhase("land"), 1800);
-    setTimeout(() => setPhase("done"), 2400);
+    setPhase("run");
+    setTimeout(() => setPhase("enter"), 2500);
+    setTimeout(() => setPhase("done"), 3200);
   }
 
   return (
@@ -167,139 +166,160 @@ function MuseumCTA({ dinoImage, dinoName }: { dinoImage: string; dinoName: strin
       <AnimatePresence>
         {phase !== "idle" && (
           <motion.div
-            className="fixed inset-0 z-50 overflow-hidden flex flex-col"
+            className="fixed inset-0 z-50 overflow-hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             style={{ backgroundImage: "none" }}
           >
-            {/* Sky with gradient */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#4a90d9] via-[#87CEEB] to-[#c8e6ff]" />
+            {/* Sky */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#3d7cc9] via-[#7ec8e3] to-[#b5dfef]" />
 
-            {/* Clouds */}
-            {[20, 45, 70].map((left, i) => (
-              <motion.span
-                key={i}
-                className="absolute text-4xl opacity-60"
-                style={{ top: `${12 + i * 8}%`, left: `${left}%` }}
-                animate={{ x: [0, 30, 0] }}
-                transition={{ duration: 4 + i, repeat: Infinity, ease: "easeInOut" }}
-              >☁️</motion.span>
-            ))}
-
-            {/* Ground with grass */}
+            {/* Sun */}
             <motion.div
-              className="absolute bottom-0 left-0 right-0 h-[35%]"
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="absolute top-[8%] right-[15%] w-16 h-16 rounded-full bg-[#FFD93D]"
+              style={{ boxShadow: "0 0 40px 15px rgba(255,217,61,0.4)" }}
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 3, repeat: Infinity }}
+            />
+
+            {/* Background mountains (parallax slow) */}
+            <motion.div
+              className="absolute bottom-[30%] left-0 right-0 h-[20%]"
+              animate={phase === "run" ? { x: [0, -60] } : {}}
+              transition={{ duration: 2.5, ease: "linear" }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-[#3a6b2e] via-[#4a8c3f] to-[#6ab04c]" />
-              <div className="absolute top-0 left-0 right-0 flex justify-around -translate-y-2">
-                {Array.from({ length: 10 }).map((_, i) => (
-                  <span key={i} className="text-lg" style={{ transform: `rotate(${(i % 3 - 1) * 15}deg)` }}>
-                    {i % 3 === 0 ? "🌿" : i % 3 === 1 ? "🌱" : "🍃"}
-                  </span>
-                ))}
-              </div>
+              {[0, 80, 170, 260, 350, 440].map((x, i) => (
+                <div
+                  key={i}
+                  className="absolute bottom-0"
+                  style={{ left: `${x}px`, width: 0, height: 0, borderLeft: `${40 + i * 5}px solid transparent`, borderRight: `${40 + i * 5}px solid transparent`, borderBottom: `${50 + i * 8}px solid ${i % 2 === 0 ? "#5a9e4b" : "#4a8c3f"}` }}
+                />
+              ))}
             </motion.div>
 
-            {/* Museum building */}
+            {/* Mid-ground trees (parallax medium) */}
             <motion.div
-              className="absolute bottom-[35%] left-1/2 -translate-x-1/2 flex flex-col items-center"
-              initial={{ y: 200, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.6, type: "spring", damping: 15 }}
+              className="absolute bottom-[28%] left-0 flex gap-12"
+              animate={phase === "run" ? { x: [100, -200] } : {}}
+              transition={{ duration: 2.5, ease: "linear" }}
             >
-              {/* Roof */}
-              <div className="w-0 h-0 border-l-[60px] border-r-[60px] border-b-[30px] border-l-transparent border-r-transparent border-b-[#d4a56a] mb-[-2px]" />
-              {/* Building */}
-              <div className="bg-[#f5e6c8] border-[4px] border-on-surface w-28 h-28 flex flex-col items-center justify-between py-2 shadow-xl relative">
-                <span className="material-symbols-outlined text-primary-container" style={{ fontSize: "32px", fontVariationSettings: "'FILL' 1" }}>museum</span>
-                <p className="text-[8px] font-black uppercase text-on-surface-variant tracking-wider">Dino Museum</p>
-                {/* Door */}
+              {Array.from({ length: 8 }).map((_, i) => (
+                <span key={i} className="text-3xl">{i % 2 === 0 ? "🌲" : "🌳"}</span>
+              ))}
+            </motion.div>
+
+            {/* Ground */}
+            <div className="absolute bottom-0 left-0 right-0 h-[30%] bg-gradient-to-t from-[#2d5a1e] via-[#3d7a2e] to-[#5aad3e]" />
+
+            {/* Foreground grass (parallax fast - 3D effect) */}
+            <motion.div
+              className="absolute bottom-[27%] left-0 flex gap-4 z-20"
+              animate={phase === "run" ? { x: [200, -400] } : {}}
+              transition={{ duration: 2.5, ease: "linear" }}
+            >
+              {Array.from({ length: 20 }).map((_, i) => (
+                <span key={i} className="text-2xl" style={{ transform: `rotate(${(i % 3 - 1) * 20}deg)` }}>
+                  {i % 4 === 0 ? "🌿" : i % 4 === 1 ? "🌾" : i % 4 === 2 ? "🍃" : "🌱"}
+                </span>
+              ))}
+            </motion.div>
+
+            {/* Dust particles */}
+            {phase === "run" && Array.from({ length: 6 }).map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-2 h-2 rounded-full bg-[#c8a96a]/60 z-10"
+                style={{ bottom: `${28 + Math.random() * 4}%`, left: "35%" }}
+                initial={{ opacity: 0, x: 0 }}
+                animate={{ opacity: [0, 0.8, 0], x: -(30 + Math.random() * 40), y: -(10 + Math.random() * 20) }}
+                transition={{ duration: 0.6, delay: i * 0.3, repeat: 4, ease: "easeOut" }}
+              />
+            ))}
+
+            {/* Museum (appears from right) */}
+            <motion.div
+              className="absolute bottom-[30%] right-4 flex flex-col items-center z-10"
+              initial={{ x: 200 }}
+              animate={phase === "run" ? { x: [200, 0] } : { x: 0 }}
+              transition={{ duration: 2, delay: 0.5, ease: "easeOut" }}
+            >
+              <div className="w-0 h-0 border-l-[50px] border-r-[50px] border-b-[24px] border-l-transparent border-r-transparent border-b-[#d4a56a] mb-[-2px]" />
+              <div className="bg-[#f5e6c8] border-[3px] border-on-surface w-24 h-24 flex flex-col items-center justify-between py-1.5 shadow-xl">
+                <span className="material-symbols-outlined text-primary-container" style={{ fontSize: "24px", fontVariationSettings: "'FILL' 1" }}>museum</span>
+                <p className="text-[7px] font-black uppercase text-on-surface-variant">Museum</p>
                 <motion.div
-                  className="w-10 h-12 bg-[#8B4513] border-[3px] border-on-surface rounded-t-lg"
-                  animate={phase === "land" || phase === "done" ? { scaleX: [1, 0.05] } : {}}
-                  transition={{ duration: 0.3 }}
+                  className="w-9 h-11 bg-[#6B3410] border-[2px] border-on-surface rounded-t-lg"
+                  animate={phase === "enter" || phase === "done" ? { scaleX: [1, 0.05] } : {}}
+                  transition={{ duration: 0.25 }}
                   style={{ transformOrigin: "left" }}
                 />
               </div>
             </motion.div>
 
-            {/* Flying Dino */}
+            {/* Dino running on ground */}
             <motion.div
-              className="absolute z-10"
-              initial={{ left: "10%", bottom: "30%" }}
+              className="absolute bottom-[30%] z-10"
+              style={{ marginBottom: "-4px" }}
+              initial={{ left: "-15%" }}
               animate={
-                phase === "launch" ? { bottom: "65%", scale: 1.3, rotate: -15 }
-                : phase === "fly" ? { left: "50%", bottom: "50%", scale: 1, rotate: [0, -5, 5, 0] }
-                : phase === "land" ? { left: "50%", bottom: "38%", scale: 0.4, opacity: 0 }
+                phase === "run" ? { left: "60%" }
+                : phase === "enter" ? { left: "72%", scale: 0.3, opacity: 0 }
                 : {}
               }
               transition={
-                phase === "launch" ? { duration: 0.5, ease: "easeOut" }
-                : phase === "fly" ? { duration: 1, ease: "easeInOut", rotate: { duration: 0.3, repeat: 3 } }
-                : { duration: 0.5, ease: "easeIn" }
+                phase === "run" ? { duration: 2.5, ease: [0.25, 0.1, 0.25, 1] }
+                : { duration: 0.4, ease: "easeIn" }
               }
-              style={{ marginLeft: "-40px" }}
             >
-              <img src={dinoImage} alt="" className="w-20 h-20 object-contain drop-shadow-xl" />
-              {/* Trail sparkles during flight */}
-              {phase === "fly" && Array.from({ length: 5 }).map((_, i) => (
-                <motion.span
-                  key={i}
-                  className="absolute text-lg"
-                  style={{ left: `${-20 - i * 15}px`, top: `${10 + (i % 2) * 20}px` }}
-                  initial={{ opacity: 1, scale: 1 }}
-                  animate={{ opacity: 0, scale: 0, x: -20 }}
-                  transition={{ duration: 0.8, delay: i * 0.15, repeat: Infinity }}
-                >✨</motion.span>
-              ))}
+              <motion.img
+                src={dinoImage}
+                alt=""
+                className="w-16 h-16 object-contain drop-shadow-lg -translate-y-full"
+                style={{ scaleX: -1 }}
+                animate={phase === "run" ? { y: [0, -12, 0] } : {}}
+                transition={{ duration: 0.35, repeat: 7, ease: "easeInOut" }}
+              />
             </motion.div>
 
-            {/* Done overlay */}
+            {/* Done state */}
             {phase === "done" && (
               <motion.div
-                className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-20"
+                className="absolute inset-0 flex flex-col items-center justify-center z-30"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
-                {/* Radial glow */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent" />
-
+                <div className="absolute inset-0 bg-on-surface/30" />
                 <motion.div
-                  className="flex flex-col items-center"
+                  className="flex flex-col items-center relative"
                   initial={{ scale: 0 }}
-                  animate={{ scale: [0, 1.15, 1] }}
-                  transition={{ type: "spring", damping: 10 }}
+                  animate={{ scale: [0, 1.2, 1] }}
+                  transition={{ type: "spring", damping: 8 }}
                 >
-                  <span className="text-6xl mb-2">🏛️</span>
-                  <p className="text-2xl font-black text-white uppercase tracking-tight" style={{ textShadow: "0 3px 0 rgba(0,0,0,0.4), 0 0 20px rgba(255,255,255,0.3)" }}>
+                  <span className="text-7xl mb-3">🏛️</span>
+                  <p className="text-3xl font-black text-white uppercase" style={{ textShadow: "0 4px 0 rgba(0,0,0,0.5), 0 0 30px rgba(255,255,255,0.4)" }}>
                     Im Museum!
                   </p>
                 </motion.div>
 
-                {/* Confetti burst */}
-                {["🎉", "⭐", "✨", "🦕", "🌟", "🎊", "💫", "🎉"].map((e, i) => (
+                {["🎉", "⭐", "✨", "🦕", "🌟", "🎊", "💫", "🎉", "⭐", "✨"].map((e, i) => (
                   <motion.span
                     key={i}
-                    className="absolute text-3xl"
-                    style={{ left: `${8 + i * 12}%`, top: `${20 + (i % 3) * 18}%` }}
+                    className="absolute text-3xl z-40"
+                    style={{ left: `${5 + i * 10}%`, top: `${15 + (i % 4) * 15}%` }}
                     initial={{ scale: 0, rotate: 0 }}
-                    animate={{ scale: [0, 1.5, 0], rotate: [0, 180], y: [0, -40, 20] }}
-                    transition={{ delay: i * 0.08, duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                    animate={{ scale: [0, 1.8, 0], rotate: [0, 360], y: [0, -60] }}
+                    transition={{ delay: i * 0.06, duration: 1.5, repeat: Infinity, repeatDelay: 1.2 }}
                   >{e}</motion.span>
                 ))}
 
-                {/* Continue button */}
                 <motion.button
-                  className="mt-8 px-8 py-3 bg-white text-primary-container border-[3px] border-on-surface rounded-xl sticker-shadow font-black uppercase tracking-wider text-sm flex items-center gap-2"
-                  initial={{ opacity: 0, y: 20 }}
+                  className="mt-10 px-8 py-3 bg-white text-primary-container border-[3px] border-on-surface rounded-xl sticker-shadow font-black uppercase tracking-wider text-sm flex items-center gap-2 relative z-40"
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 }}
-                  whileTap={{ scale: 0.95 }}
+                  transition={{ delay: 0.6, type: "spring" }}
+                  whileTap={{ scale: 0.93 }}
                   onClick={() => setPhase("idle")}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>check</span>

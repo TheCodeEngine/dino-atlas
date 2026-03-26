@@ -1,14 +1,19 @@
 const DINOS = [
-  { id: "trex", name: "T-Rex", emoji: "🦖", rarity: "legendary", discovered: true, stars: 3 },
-  { id: "triceratops", name: "Triceratops", emoji: "🦕", rarity: "rare", discovered: true, stars: 2 },
-  { id: "stegosaurus", name: "Stegosaurus", emoji: "🦕", rarity: "uncommon", discovered: true, stars: 1 },
-  { id: "velociraptor", name: "Velociraptor", emoji: "🦖", rarity: "rare", discovered: true, stars: 0 },
-  { id: "brachiosaurus", name: "Brachiosaurus", emoji: "🦕", rarity: "epic", discovered: false, stars: 0 },
-  { id: "ankylosaurus", name: "Ankylosaurus", emoji: "🦕", rarity: "uncommon", discovered: false, stars: 0 },
-  { id: "pteranodon", name: "Pteranodon", emoji: "🦅", rarity: "rare", discovered: false, stars: 0 },
-  { id: "spinosaurus", name: "Spinosaurus", emoji: "🦖", rarity: "epic", discovered: false, stars: 0 },
-  { id: "parasaurolophus", name: "Parasaurolophus", emoji: "🦕", rarity: "common", discovered: false, stars: 0 },
+  { id: "trex", name: "T-Rex", image: null, rarity: "legendary", discovered: true, stars: 3 },
+  { id: "triceratops", name: "Triceratops", image: "/dinos/triceratops/comic.png", rarity: "rare", discovered: true, stars: 2 },
+  { id: "stegosaurus", name: "Stegosaurus", image: null, rarity: "uncommon", discovered: true, stars: 1 },
+  { id: "velociraptor", name: "Velociraptor", image: null, rarity: "rare", discovered: true, stars: 0 },
+  { id: "brachiosaurus", name: "Brachiosaurus", image: null, rarity: "epic", discovered: false, stars: 0 },
+  { id: "ankylosaurus", name: "Ankylosaurus", image: null, rarity: "uncommon", discovered: false, stars: 0 },
+  { id: "pteranodon", name: "Pteranodon", image: null, rarity: "rare", discovered: false, stars: 0 },
+  { id: "spinosaurus", name: "Spinosaurus", image: null, rarity: "epic", discovered: false, stars: 0 },
+  { id: "parasaurolophus", name: "Parasauro.", image: null, rarity: "common", discovered: false, stars: 0 },
 ];
+
+const EMOJIS: Record<string, string> = {
+  trex: "🦖", triceratops: "🦕", stegosaurus: "🦕", velociraptor: "🦖",
+  brachiosaurus: "🦕", ankylosaurus: "🦕", pteranodon: "🦅", spinosaurus: "🦖", parasaurolophus: "🦕",
+};
 
 const RARITY_COLORS: Record<string, string> = {
   common: "bg-surface-container-high text-on-surface-variant",
@@ -35,19 +40,43 @@ export function MuseumScreen() {
         </div>
       </header>
 
-      <main className="pt-18 pb-20 px-3">
-        {/* Header */}
-        <div className="pt-16 pb-3 flex items-center gap-2">
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex flex-col fixed left-0 top-14 h-[calc(100vh-3.5rem)] z-40 bg-[#FCF9F0] border-r-[3px] border-[#1B5E20] w-48 p-2.5">
+        <nav className="flex-1 space-y-1">
+          {[
+            { icon: "home", label: "Camp", active: false },
+            { icon: "museum", label: "Museum", active: true },
+            { icon: "landscape", label: "Grabung", active: false },
+            { icon: "military_tech", label: "Abzeichen", active: false },
+          ].map((item) => (
+            <a
+              key={item.label}
+              className={`flex items-center gap-2 p-2 rounded-lg font-bold uppercase tracking-wider text-[11px] cursor-pointer ${
+                item.active
+                  ? "bg-[#1B5E20] text-white shadow-[3px_3px_0px_0px_rgba(255,107,0,1)]"
+                  : "text-[#1C1C17] hover:bg-[#F6F3EA] transition-all hover:translate-x-0.5"
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">{item.icon}</span>{item.label}
+            </a>
+          ))}
+        </nav>
+      </aside>
+
+      {/* Main */}
+      <main className="lg:ml-48 pt-16 pb-20 lg:pb-4 px-3 lg:px-6">
+        {/* Forscher */}
+        <div className="flex items-center gap-2 py-3 max-w-3xl mx-auto">
           <div className="w-8 h-8 bg-primary-fixed border-[3px] border-on-surface rounded-lg sticker-shadow flex items-center justify-center flex-shrink-0">
             <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>face</span>
           </div>
-          <div className="bg-surface-container-lowest border-[3px] border-on-surface rounded-lg rounded-tl-none p-2.5 sticker-shadow flex-1">
-            <p className="text-xs font-bold">Dein Museum waechst! Morgen finden wir bestimmt noch einen!</p>
+          <div className="bg-surface-container-lowest border-[3px] border-on-surface rounded-lg rounded-tl-none p-2 sticker-shadow flex-1">
+            <p className="text-[11px] font-bold">Dein Museum waechst! Morgen finden wir bestimmt noch einen!</p>
           </div>
         </div>
 
         {/* Progress */}
-        <div className="mb-4 px-1">
+        <div className="mb-4 max-w-3xl mx-auto">
           <div className="flex justify-between items-center mb-1">
             <span className="text-[10px] font-black uppercase tracking-wider text-primary">{discovered} von {DINOS.length} entdeckt</span>
             <span className="text-[10px] font-bold text-on-surface-variant">{Math.round(discovered / DINOS.length * 100)}%</span>
@@ -60,37 +89,42 @@ export function MuseumScreen() {
           </div>
         </div>
 
-        {/* Dino Grid */}
-        <div className="grid grid-cols-3 gap-2.5">
+        {/* Dino Grid — 3 cols mobile, 4 cols tablet, 5 cols desktop */}
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2.5 max-w-3xl mx-auto">
           {DINOS.map((dino) => (
             <button
               key={dino.id}
               className={[
-                "flex flex-col items-center p-3 rounded-lg border-[3px] transition-all",
+                "flex flex-col items-center p-2 lg:p-3 rounded-lg border-[3px] transition-all",
                 dino.discovered
                   ? "bg-surface-container-lowest border-on-surface sticker-shadow active-press"
-                  : "bg-surface-container-high border-outline-variant opacity-60",
+                  : "bg-surface-container-high border-outline-variant opacity-50",
               ].join(" ")}
             >
-              {/* Emoji or silhouette */}
+              {/* Avatar */}
               <div className={[
-                "w-14 h-14 rounded-full border-[3px] flex items-center justify-center text-2xl mb-1.5",
+                "w-12 h-12 lg:w-16 lg:h-16 rounded-full border-[3px] flex items-center justify-center text-xl lg:text-2xl mb-1",
                 dino.discovered ? "border-on-surface bg-primary-fixed" : "border-outline-variant bg-surface-container-highest",
               ].join(" ")}>
-                {dino.discovered ? dino.emoji : "?"}
+                {dino.discovered
+                  ? dino.image
+                    ? <img src={dino.image} alt={dino.name} className="w-full h-full object-contain rounded-full" />
+                    : EMOJIS[dino.id] ?? "🦕"
+                  : "?"
+                }
               </div>
 
               {/* Name */}
               <span className={[
-                "text-[10px] font-black uppercase tracking-wider text-center leading-tight",
+                "text-[9px] lg:text-[10px] font-black uppercase tracking-wider text-center leading-tight",
                 dino.discovered ? "text-on-surface" : "text-on-surface-variant",
               ].join(" ")}>
                 {dino.discovered ? dino.name : "???"}
               </span>
 
-              {/* Rarity Badge */}
+              {/* Rarity */}
               <span className={[
-                "mt-1 px-1.5 py-px rounded text-[8px] font-black uppercase",
+                "mt-0.5 px-1.5 py-px rounded text-[7px] lg:text-[8px] font-black uppercase",
                 RARITY_COLORS[dino.rarity],
               ].join(" ")}>
                 {dino.rarity}
@@ -98,11 +132,11 @@ export function MuseumScreen() {
 
               {/* Stars */}
               {dino.discovered && dino.stars > 0 && (
-                <div className="flex gap-px mt-1">
+                <div className="flex gap-px mt-0.5">
                   {[1, 2, 3].map((s) => (
                     <span
                       key={s}
-                      className={`material-symbols-outlined text-[12px] ${s <= dino.stars ? "text-secondary-container" : "text-outline-variant"}`}
+                      className={`material-symbols-outlined text-[10px] lg:text-[12px] ${s <= dino.stars ? "text-secondary-container" : "text-outline-variant"}`}
                       style={{ fontVariationSettings: "'FILL' 1" }}
                     >
                       star
@@ -115,8 +149,8 @@ export function MuseumScreen() {
         </div>
       </main>
 
-      {/* BottomNav */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-14 bg-[#FCF9F0] border-t-[3px] border-[#1B5E20]">
+      {/* BottomNav Mobile */}
+      <nav className="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-14 bg-[#FCF9F0] border-t-[3px] border-[#1B5E20]">
         {[
           { icon: "home", label: "Camp", active: false },
           { icon: "museum", label: "Museum", active: true },

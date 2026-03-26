@@ -4,7 +4,7 @@
 export { GameWrapper } from "./shared/GameWrapper";
 
 // Games (will be added as they're built)
-// export { ExcavationGame } from "./excavation";
+export { ExcavationGame } from "./excavation";
 // export { PuzzleGame } from "./puzzle";
 // export { IdentifyGame } from "./identify";
 // export { QuizGame } from "./quiz";

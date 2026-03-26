@@ -16,6 +16,7 @@ export { PlayerCard } from "./components/PlayerCard";
 export { StatusBadge } from "./components/StatusBadge";
 export { ActionCard } from "./components/ActionCard";
 export { BottomNav } from "./components/BottomNav";
+export { AppShell } from "./components/AppShell";
 export { PlayerSwitcher } from "./components/PlayerSwitcher";
 export { TimeSlider } from "./components/TimeSlider";
 export { ImageSwitcher } from "./components/ImageSwitcher";

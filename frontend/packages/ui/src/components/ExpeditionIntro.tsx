@@ -1,6 +1,5 @@
 import { type ReactNode } from "react";
 import { motion } from "motion/react";
-import { TopBar } from "./TopBar";
 import { ForscherSpeech } from "./ForscherSpeech";
 import { Button } from "../primitives/Button";
 import type { BiomConfig } from "./biom-scene/types";
@@ -9,28 +8,33 @@ interface ExpeditionIntroProps {
   playerName: string;
   playerEmoji?: string;
   biom: BiomConfig;
-  /** The biom background scene component */
   scene: ReactNode;
   onStart?: () => void;
+  onClose?: () => void;
 }
 
-export function ExpeditionIntro({ playerName, playerEmoji = "🦖", biom, scene, onStart }: ExpeditionIntroProps) {
+export function ExpeditionIntro({ playerName, playerEmoji = "🦖", biom, scene, onStart, onClose }: ExpeditionIntroProps) {
   return (
-    <div className="bg-surface text-on-surface min-h-screen flex flex-col relative overflow-hidden">
+    <div className="bg-surface text-on-surface min-h-screen flex flex-col relative overflow-hidden" style={{ backgroundImage: "none" }}>
       {/* Biom background */}
       <div className="absolute inset-0">{scene}</div>
 
       {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
-        <TopBar
-          right={
-            <div className="w-9 h-9 rounded-full border-[3px] border-[#1B5E20] bg-primary-fixed flex items-center justify-center text-base">
-              {playerEmoji}
-            </div>
-          }
-        />
+        {/* Minimal header: close + player avatar */}
+        <header className="flex justify-between items-center px-4 py-3">
+          <button
+            onClick={onClose}
+            className="w-9 h-9 flex items-center justify-center bg-white/80 backdrop-blur-sm border-[3px] border-on-surface rounded-lg sticker-shadow active-press"
+          >
+            <span className="material-symbols-outlined text-on-surface text-lg">close</span>
+          </button>
+          <div className="w-9 h-9 rounded-full border-[3px] border-[#1B5E20] bg-primary-fixed flex items-center justify-center text-base shadow-md">
+            {playerEmoji}
+          </div>
+        </header>
 
-        <main className="flex-1 flex flex-col items-center justify-center px-4 max-w-sm mx-auto pt-14">
+        <main className="flex-1 flex flex-col items-center justify-center px-4 max-w-sm mx-auto">
           <motion.div
             className={`w-20 h-20 ${biom.color} border-[3px] border-on-surface rounded-full flex items-center justify-center sticker-shadow mb-2`}
             initial={{ scale: 0 }}

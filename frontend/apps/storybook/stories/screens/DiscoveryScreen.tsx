@@ -70,9 +70,9 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
       </p>
 
       <div className="bg-gradient-to-br from-primary-fixed/40 to-tertiary-fixed/30 rounded-xl border-[3px] border-on-surface sticker-shadow p-5">
-        {/* Dino touch area */}
+        {/* Dino touch area — touch-none prevents scroll hijack */}
         <div
-          className="relative flex items-center justify-center mb-4 cursor-pointer select-none h-52"
+          className="relative flex items-center justify-center mb-4 cursor-pointer select-none h-52 touch-none"
           onPointerDown={handlePet}
         >
           <motion.img
@@ -82,7 +82,7 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
             animate={
               mood === "love" ? { rotate: [0, -5, 5, -3, 0], scale: [1, 1.05, 1] }
                 : mood === "eating" ? { y: [0, -5, 0], scale: [1, 1.08, 1] }
-                : mood === "reject" ? { x: [0, -8, 8, -6, 4, 0] }
+                : mood === "reject" ? { x: [0, -15, 15, -12, 8, -4, 0], rotate: [0, -3, 3, -2, 0] }
                 : { y: [0, -2, 0] }
             }
             transition={
@@ -123,14 +123,24 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
             </motion.span>
           )}
           {mood === "reject" && (
-            <motion.span
-              className="absolute -top-2 right-2 text-4xl"
-              initial={{ scale: 0 }}
-              animate={{ scale: [0, 1.3, 1] }}
-              transition={{ duration: 0.3 }}
-            >
-              😖
-            </motion.span>
+            <>
+              {/* Big red X flies toward viewer */}
+              <motion.div
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
+                initial={{ scale: 0.2, opacity: 0 }}
+                animate={{ scale: [0.2, 2.5, 2], opacity: [0, 1, 0.9] }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              >
+                <span className="text-7xl font-black text-error drop-shadow-[0_4px_12px_rgba(186,26,26,0.5)]">✕</span>
+              </motion.div>
+              {/* Shake ring */}
+              <motion.div
+                className="absolute inset-0 rounded-full border-4 border-error/40 pointer-events-none"
+                initial={{ scale: 0.5, opacity: 0.8 }}
+                animate={{ scale: 1.5, opacity: 0 }}
+                transition={{ duration: 0.6 }}
+              />
+            </>
           )}
         </div>
 

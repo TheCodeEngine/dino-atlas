@@ -1,9 +1,11 @@
 mod config;
 mod error;
-mod domain;
-mod adapters;
 mod routes;
 mod middleware;
+
+// Shared domain & adapters come from dino-atlas-core
+// use dino_atlas_core::domain;
+// use dino_atlas_core::adapters;
 
 use axum::{Router, routing::get};
 use tower_http::cors::{CorsLayer, Any};
@@ -31,7 +33,7 @@ async fn main() {
         .layer(TraceLayer::new_for_http());
 
     let addr = format!("0.0.0.0:{}", config.port);
-    tracing::info!("Dino-Atlas backend listening on {}", addr);
+    tracing::info!("Dino-Atlas API listening on {}", addr);
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();

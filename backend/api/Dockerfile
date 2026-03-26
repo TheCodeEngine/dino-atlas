@@ -11,12 +11,12 @@ FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
-RUN cargo build --release
+RUN cargo build --release --bin dino-atlas-api
 
 FROM alpine:3.21
 RUN apk add --no-cache ca-certificates && adduser -D -s /bin/false appuser
 WORKDIR /app
-COPY --from=builder /app/target/release/dino-atlas-backend .
+COPY --from=builder /app/target/release/dino-atlas-api .
 USER appuser
 EXPOSE 3001
-CMD ["./dino-atlas-backend"]
+CMD ["./dino-atlas-api"]

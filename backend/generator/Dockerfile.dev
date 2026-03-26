@@ -1,0 +1,15 @@
+FROM rust:1.87
+WORKDIR /app
+RUN cargo install cargo-watch --locked
+COPY Cargo.toml ./
+COPY core/Cargo.toml core/Cargo.toml
+COPY api/Cargo.toml api/Cargo.toml
+COPY generator/Cargo.toml generator/Cargo.toml
+RUN mkdir -p core/src api/src generator/src \
+    && echo 'pub mod domain; pub mod adapters;' > core/src/lib.rs \
+    && echo 'fn main() {}' > api/src/main.rs \
+    && echo 'fn main() {}' > generator/src/main.rs \
+    && cargo build -p dino-atlas-generator \
+    && rm -rf core/src api/src generator/src
+COPY . .
+CMD ["cargo", "watch", "-p", "dino-atlas-generator", "-x", "run"]

@@ -13,7 +13,7 @@ services:
       - "80:80"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+      - ./services/traefik/dynamic:/etc/traefik/dynamic:ro
     networks:
       - frontend
 
@@ -46,11 +46,11 @@ services:
       - frontend
     profiles: [landing]
 
-  # ── Rust Backend ──
-  backend:
+  # ── Rust API ──
+  api:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: api/Dockerfile
     environment:
       - POCKETBASE_URL=${POCKETBASE_URL:-http://pocketbase:8090}
       - POCKETBASE_ADMIN_EMAIL=${POCKETBASE_ADMIN_EMAIL:?Set POCKETBASE_ADMIN_EMAIL in .env}
@@ -58,22 +58,22 @@ services:
       - JWT_SECRET=${JWT_SECRET:?Set JWT_SECRET in .env (min 32 chars)}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - VALKEY_URL=redis://valkey:6379
-      - TTS_URL=http://tts-api:3100
+      - TTS_URL=http://tts:3100
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost,http://localhost:5173}
       - PORT=3001
       - RUST_LOG=${RUST_LOG:-info}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend-auth.rule=PathPrefix(`/api/v1/auth`)"
-      - "traefik.http.routers.backend-auth.entrypoints=web"
-      - "traefik.http.routers.backend-auth.priority=20"
-      - "traefik.http.routers.backend-auth.middlewares=auth-rate-limit@file"
-      - "traefik.http.routers.backend-auth.service=backend"
-      - "traefik.http.routers.backend.rule=PathPrefix(`/api/v1`)"
-      - "traefik.http.routers.backend.entrypoints=web"
-      - "traefik.http.routers.backend.priority=10"
-      - "traefik.http.routers.backend.middlewares=api-rate-limit@file"
-      - "traefik.http.services.backend.loadbalancer.server.port=3001"
+      - "traefik.http.routers.api-auth.rule=PathPrefix(`/api/v1/auth`)"
+      - "traefik.http.routers.api-auth.entrypoints=web"
+      - "traefik.http.routers.api-auth.priority=20"
+      - "traefik.http.routers.api-auth.middlewares=auth-rate-limit@file"
+      - "traefik.http.routers.api-auth.service=api"
+      - "traefik.http.routers.api.rule=PathPrefix(`/api/v1`)"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.routers.api.priority=10"
+      - "traefik.http.routers.api.middlewares=api-rate-limit@file"
+      - "traefik.http.services.api.loadbalancer.server.port=3001"
     depends_on:
       - pocketbase
       - valkey
@@ -84,28 +84,30 @@ services:
   # ── Generator Worker ──
   generator:
     build:
-      context: ./generator
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: generator/Dockerfile
     environment:
       - POCKETBASE_URL=${POCKETBASE_URL:-http://pocketbase:8090}
       - POCKETBASE_ADMIN_EMAIL=${POCKETBASE_ADMIN_EMAIL}
       - POCKETBASE_ADMIN_PASSWORD=${POCKETBASE_ADMIN_PASSWORD}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - VALKEY_URL=redis://valkey:6379
-      - TTS_URL=http://tts-api:3100
+      - TTS_URL=http://tts:3100
       - RUST_LOG=${RUST_LOG:-info}
     depends_on:
       - pocketbase
       - valkey
-      - tts-api
+      - tts
     networks:
       - backend
 
-  # ── TTS Service ──
-  tts-api:
+  # ── TTS Service (Piper) ──
+  tts:
     build:
-      context: ./tts-api
+      context: ./services/tts
       dockerfile: Dockerfile
+    environment:
+      - PB_URL=http://pocketbase:8090
     volumes:
       - tts-cache:/app/cache
       - tts-models:/app/models

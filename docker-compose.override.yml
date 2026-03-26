@@ -12,29 +12,27 @@ services:
     labels:
       - "traefik.http.services.app.loadbalancer.server.port=5173"
 
-  backend:
+  api:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: api/Dockerfile.dev
     volumes:
-      - ./backend/src:/app/src
-      - ./backend/Cargo.toml:/app/Cargo.toml
+      - ./backend:/app
       - cargo-cache:/usr/local/cargo/registry
       - target-cache:/app/target
 
   generator:
     build:
-      context: ./generator
-      dockerfile: Dockerfile.dev
+      context: ./backend
+      dockerfile: generator/Dockerfile.dev
     volumes:
-      - ./generator/src:/app/src
-      - ./generator/Cargo.toml:/app/Cargo.toml
+      - ./backend:/app
       - generator-cargo-cache:/usr/local/cargo/registry
       - generator-target-cache:/app/target
 
-  tts-api:
+  tts:
     volumes:
-      - ./tts-api/src:/app/src
+      - ./services/tts/src:/app/src
 
   storybook:
     build:

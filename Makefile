@@ -9,7 +9,7 @@ dev-storybook:
 	docker compose --profile dev up
 
 infra-up:
-	docker compose up -d pocketbase valkey traefik tts-api
+	docker compose up -d pocketbase valkey traefik tts
 
 infra-down:
 	docker compose down
@@ -17,7 +17,7 @@ infra-down:
 # ── Database ──
 
 seed:
-	cd pocketbase/seed && bash import.sh
+	cd services/pocketbase/seed && bash import.sh
 
 reset:
 	docker compose down -v pocketbase
@@ -37,7 +37,7 @@ build-prod:
 # ── Testing ──
 
 test-backend:
-	cd backend && cargo test
+	cd backend && cargo test --workspace
 
 test-frontend:
 	cd frontend && pnpm test
@@ -55,15 +55,17 @@ clean:
 	docker compose down -v
 	cd frontend && pnpm clean 2>/dev/null || true
 	cd backend && cargo clean 2>/dev/null || true
-	cd generator && cargo clean 2>/dev/null || true
 
 # ── Logs ──
 
 logs:
 	docker compose logs -f
 
-logs-backend:
-	docker compose logs -f backend
+logs-api:
+	docker compose logs -f api
 
 logs-generator:
 	docker compose logs -f generator
+
+logs-tts:
+	docker compose logs -f tts

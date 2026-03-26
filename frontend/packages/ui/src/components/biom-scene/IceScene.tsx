@@ -33,6 +33,7 @@ export const ICE_CONFIG = {
   id: "ice",
   name: "Gletscher der Arktis",
   emoji: "🧊",
+  color: "bg-tertiary-container",
   hint: "Im Eis schimmert etwas Dunkles!",
   hintSub: "Ein eingefrorener Knochen?",
   hintEmoji: "🦴",

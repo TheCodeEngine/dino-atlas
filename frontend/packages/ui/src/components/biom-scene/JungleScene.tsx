@@ -39,6 +39,7 @@ export const JUNGLE_CONFIG = {
   id: "jungle",
   name: "Regenwald von Südamerika",
   emoji: "🌴",
+  color: "bg-primary-container",
   hint: "Zwischen den Wurzeln schimmert etwas!",
   hintSub: "Ein uralter Knochen im Dschungelboden?",
   hintEmoji: "🦴",

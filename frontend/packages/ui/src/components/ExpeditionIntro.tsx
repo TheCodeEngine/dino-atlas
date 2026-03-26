@@ -28,7 +28,7 @@ export function ExpeditionIntro({ playerName, biom, scene, onStart }: Expedition
 
         <main className="flex-1 flex flex-col items-center justify-center px-4 max-w-sm mx-auto pt-14">
           <motion.div
-            className="w-20 h-20 bg-secondary-container border-[3px] border-on-surface rounded-full flex items-center justify-center sticker-shadow mb-2"
+            className={`w-20 h-20 ${biom.color} border-[3px] border-on-surface rounded-full flex items-center justify-center sticker-shadow mb-2`}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", damping: 10, delay: 0.2 }}

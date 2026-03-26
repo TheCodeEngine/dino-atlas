@@ -34,6 +34,7 @@ export const DESERT_CONFIG = {
   id: "desert",
   name: "Wüste von Nordamerika",
   emoji: "🏜️",
+  color: "bg-secondary-container",
   hint: "Etwas ragt aus dem Sand!",
   hintSub: "Ob das ein Dino-Knochen ist?",
   hintEmoji: "🦴",

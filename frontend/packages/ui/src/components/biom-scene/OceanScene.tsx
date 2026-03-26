@@ -43,6 +43,7 @@ export const OCEAN_CONFIG = {
   id: "ocean",
   name: "Tiefsee des Pazifik",
   emoji: "🌊",
+  color: "bg-tertiary-container",
   hint: "Am Meeresboden liegt etwas Großes!",
   hintSub: "Ein Skelett aus der Urzeit?",
   hintEmoji: "🦴",

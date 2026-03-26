@@ -16,3 +16,4 @@ export { PlayerCard } from "./components/PlayerCard";
 export { StatusBadge } from "./components/StatusBadge";
 export { ActionCard } from "./components/ActionCard";
 export { BottomNav } from "./components/BottomNav";
+export { PlayerSwitcher } from "./components/PlayerSwitcher";

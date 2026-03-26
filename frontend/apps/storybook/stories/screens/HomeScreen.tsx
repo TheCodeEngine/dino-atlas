@@ -1,10 +1,21 @@
+import { useState } from "react";
 import { TopBar } from "../../../../packages/ui/src/components/TopBar";
-import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
 import { BottomNav } from "../../../../packages/ui/src/components/BottomNav";
 import { StatusBadge } from "../../../../packages/ui/src/components/StatusBadge";
+import { PlayerSwitcher } from "../../../../packages/ui/src/components/PlayerSwitcher";
 
-const PLAYER = { name: "Oskar", emoji: "🦖", level: 3 };
-const BUDGET = { expeditions: 1, minigames: 2, stories: 1 };
+const PLAYERS = [
+  { id: "oskar", name: "Oskar", emoji: "🦖" },
+  { id: "karl", name: "Karl", emoji: "🦕" },
+  { id: "charlotte", name: "Charlotte", emoji: "🦎" },
+];
+
+const PLAYER_DATA: Record<string, { level: number; dinos: number; minigames: number }> = {
+  oskar: { level: 3, dinos: 4, minigames: 2 },
+  karl: { level: 2, dinos: 2, minigames: 3 },
+  charlotte: { level: 1, dinos: 1, minigames: 0 },
+};
+
 const HAS_OFFLINE_TASK = true;
 const LAST_DINO = { name: "Triceratops", image: "/dinos/triceratops/comic.png" };
 
@@ -16,15 +27,21 @@ const NAV = [
 ];
 
 export function HomeScreen() {
+  const [activePlayer, setActivePlayer] = useState("oskar");
+  const data = PLAYER_DATA[activePlayer]!;
+  const player = PLAYERS.find((p) => p.id === activePlayer)!;
+
   return (
     <div className="bg-surface text-on-surface min-h-screen pb-16">
       <TopBar
         right={
           <div className="flex items-center gap-2">
-            <StatusBadge label={`Lv.${PLAYER.level}`} variant="primary" />
-            <div className="w-9 h-9 rounded-full border-[3px] border-[#1B5E20] bg-primary-fixed flex items-center justify-center text-base">
-              {PLAYER.emoji}
-            </div>
+            <StatusBadge label={`Lv.${data.level}`} variant="primary" />
+            <PlayerSwitcher
+              players={PLAYERS}
+              active={activePlayer}
+              onChange={setActivePlayer}
+            />
           </div>
         }
       />
@@ -43,7 +60,9 @@ export function HomeScreen() {
                 </span>
               </div>
               <div className="flex-1 text-white min-w-0">
-                <p className="text-xs font-black uppercase tracking-wider text-white/70">Expedition</p>
+                <p className="text-xs font-black uppercase tracking-wider text-white/70">
+                  {player.name}'s Expedition
+                </p>
                 <p className="text-xl font-black uppercase tracking-tight leading-tight">Neuer Dino wartet!</p>
               </div>
               <span className="material-symbols-outlined text-white/80" style={{ fontSize: "24px" }}>arrow_forward</span>
@@ -56,12 +75,12 @@ export function HomeScreen() {
           <button className="bg-surface-container-lowest rounded-lg border-[3px] border-on-surface sticker-shadow active-press p-3 flex flex-col items-center gap-1">
             <span className="material-symbols-outlined text-primary-container" style={{ fontSize: "22px", fontVariationSettings: "'FILL' 1" }}>museum</span>
             <p className="text-[10px] font-black uppercase text-on-surface">Museum</p>
-            <p className="text-[9px] font-bold text-on-surface-variant">4 Dinos</p>
+            <p className="text-[9px] font-bold text-on-surface-variant">{data.dinos} Dinos</p>
           </button>
           <button className="bg-surface-container-lowest rounded-lg border-[3px] border-on-surface sticker-shadow active-press p-3 flex flex-col items-center gap-1">
             <span className="material-symbols-outlined text-tertiary-container" style={{ fontSize: "22px", fontVariationSettings: "'FILL' 1" }}>stadia_controller</span>
             <p className="text-[10px] font-black uppercase text-on-surface">Spiele</p>
-            <p className="text-[9px] font-bold text-on-surface-variant">{BUDGET.minigames} übrig</p>
+            <p className="text-[9px] font-bold text-on-surface-variant">{data.minigames} übrig</p>
           </button>
           <button className="bg-surface-container-lowest rounded-lg border-[3px] border-on-surface sticker-shadow active-press p-3 flex flex-col items-center gap-1">
             <span className="material-symbols-outlined text-secondary-container" style={{ fontSize: "22px", fontVariationSettings: "'FILL' 1" }}>auto_stories</span>

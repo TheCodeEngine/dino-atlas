@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useHaptics } from "../hooks/useHaptics";
+import { Avatar } from "../primitives/Avatar";
+import { Icon } from "../primitives/Icon";
 
 export interface Player {
   id: string;
@@ -30,10 +32,12 @@ export function PlayerSwitcher({ players, active, onChange }: PlayerSwitcherProp
       {/* Avatar button */}
       <motion.button
         onClick={() => { setOpen(true); haptics.tap(); }}
-        className="w-10 h-10 rounded-full border-[3px] border-[#1B5E20] bg-primary-fixed flex items-center justify-center text-lg"
+        className="flex"
         whileTap={{ scale: 0.85 }}
       >
-        {current?.emoji ?? "?"}
+        <Avatar size="md">
+          {current?.emoji ?? "?"}
+        </Avatar>
       </motion.button>
 
       {/* Bottom Sheet */}
@@ -81,16 +85,12 @@ export function PlayerSwitcher({ players, active, onChange }: PlayerSwitcherProp
                         : "bg-surface-container-low border-[3px] border-on-surface sticker-shadow",
                     ].join(" ")}
                   >
-                    <div
-                      className={[
-                        "w-11 h-11 rounded-full border-[3px] flex items-center justify-center text-xl flex-shrink-0",
-                        player.id === active
-                          ? "border-[#1B5E20] bg-white"
-                          : "border-on-surface bg-primary-fixed",
-                      ].join(" ")}
+                    <Avatar
+                      size="lg"
+                      state={player.id === active ? "selected" : "default"}
                     >
                       {player.emoji}
-                    </div>
+                    </Avatar>
                     <p className="text-sm font-black uppercase tracking-wider flex-1">{player.name}</p>
                     {player.id === active && (
                       <motion.span
@@ -99,7 +99,7 @@ export function PlayerSwitcher({ players, active, onChange }: PlayerSwitcherProp
                         transition={{ type: "spring", damping: 12, stiffness: 400 }}
                         className="w-7 h-7 bg-[#1B5E20] text-white rounded-full flex items-center justify-center"
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>check</span>
+                        <Icon name="check" size="sm" />
                       </motion.span>
                     )}
                   </motion.button>

@@ -1,3 +1,5 @@
+import { Icon } from "../primitives/Icon";
+
 interface ActionCardProps {
   icon: string;
   iconFilled?: boolean;
@@ -49,12 +51,7 @@ export function ActionCard({
     >
       <div className="flex items-center gap-3">
         <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${styles.iconBg}`}>
-          <span
-            className={`material-symbols-outlined ${styles.iconColor}`}
-            style={{ fontSize: "18px", fontVariationSettings: iconFilled ? "'FILL' 1" : undefined }}
-          >
-            {icon}
-          </span>
+          <Icon name={icon} size="md" filled={iconFilled} className={styles.iconColor} />
         </div>
         <div className="text-left">
           <p className="font-black uppercase tracking-wider text-[11px]">{title}</p>
@@ -65,7 +62,7 @@ export function ActionCard({
         {badge && (
           <span className="bg-white/20 px-1.5 py-0.5 rounded text-[9px] font-black">{badge}</span>
         )}
-        <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>chevron_right</span>
+        <Icon name="chevron_right" size="md" />
       </div>
     </button>
   );

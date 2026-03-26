@@ -1,3 +1,6 @@
+import { Avatar } from "../primitives/Avatar";
+import { Icon } from "../primitives/Icon";
+
 interface PlayerCardProps {
   name: string;
   age: number;
@@ -23,18 +26,12 @@ export function PlayerCard({ name, age, emoji, state = "default", onClick }: Pla
       ].join(" ")}
     >
       {/* Avatar */}
-      <div
-        className={[
-          "w-11 h-11 rounded-full border-[3px] flex items-center justify-center text-xl flex-shrink-0",
-          isTired
-            ? "border-outline-variant bg-surface-container-high"
-            : isSelected
-              ? "border-[#1B5E20] bg-white"
-              : "border-on-surface bg-primary-fixed",
-        ].join(" ")}
+      <Avatar
+        size="lg"
+        state={isTired ? "disabled" : isSelected ? "selected" : "default"}
       >
         {emoji}
-      </div>
+      </Avatar>
 
       {/* Info */}
       <div className="flex-1 text-left min-w-0">
@@ -45,16 +42,16 @@ export function PlayerCard({ name, age, emoji, state = "default", onClick }: Pla
       {/* Status */}
       {isTired ? (
         <span className="flex items-center gap-1 bg-surface-container-highest text-on-surface-variant px-2 py-0.5 rounded-full text-[10px] font-bold">
-          <span className="material-symbols-outlined text-sm">bedtime</span>
+          <Icon name="bedtime" size="sm" />
           Müde
         </span>
       ) : isSelected ? (
         <span className="w-7 h-7 bg-[#1B5E20] text-white rounded-full flex items-center justify-center">
-          <span className="material-symbols-outlined text-base">check</span>
+          <Icon name="check" size="sm" />
         </span>
       ) : (
         <span className="w-7 h-7 border-2 border-outline-variant rounded-full flex items-center justify-center">
-          <span className="material-symbols-outlined text-base text-outline-variant">add</span>
+          <Icon name="add" size="sm" className="text-outline-variant" />
         </span>
       )}
     </button>

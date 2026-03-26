@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import { Icon } from "../primitives/Icon";
 
 interface ForscherSpeechProps {
   text: string;
@@ -33,12 +34,7 @@ export function ForscherSpeech({ text, subtext, icon = "face", playable = true, 
   return (
     <div className="flex items-start gap-2.5">
       <div className="flex-shrink-0 w-10 h-10 bg-primary-fixed border-[3px] border-on-surface rounded-lg sticker-shadow flex items-center justify-center">
-        <span
-          className="material-symbols-outlined text-lg text-primary"
-          style={{ fontVariationSettings: "'FILL' 1" }}
-        >
-          {icon}
-        </span>
+        <Icon name={icon} size="md" filled className="text-primary" />
       </div>
       <div className="bg-surface-container-lowest border-[3px] border-on-surface rounded-lg rounded-tl-none p-3 sticker-shadow flex-1">
         <div className="flex items-start gap-2">
@@ -55,12 +51,7 @@ export function ForscherSpeech({ text, subtext, icon = "face", playable = true, 
               whileTap={{ scale: 0.85 }}
               aria-label={playing ? "Pause" : "Vorlesen"}
             >
-              <span
-                className="material-symbols-outlined"
-                style={{ fontSize: "16px", fontVariationSettings: "'FILL' 1" }}
-              >
-                {playing ? "pause" : "volume_up"}
-              </span>
+              <Icon name={playing ? "pause" : "volume_up"} size="sm" filled />
             </motion.button>
           )}
         </div>

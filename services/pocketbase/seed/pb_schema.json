@@ -1,0 +1,211 @@
+[
+  {
+    "name": "families",
+    "type": "base",
+    "fields": [
+      { "name": "name", "type": "text", "required": true }
+    ]
+  },
+  {
+    "name": "users",
+    "type": "auth",
+    "fields": [
+      { "name": "family_id", "type": "relation", "options": { "collectionId": "families", "maxSelect": 1 } }
+    ]
+  },
+  {
+    "name": "players",
+    "type": "base",
+    "fields": [
+      { "name": "family_id", "type": "relation", "required": true, "options": { "collectionId": "families", "maxSelect": 1 } },
+      { "name": "name", "type": "text", "required": true },
+      { "name": "avatar_emoji", "type": "text", "required": true },
+      { "name": "birth_year", "type": "number", "required": true },
+      { "name": "interests", "type": "json" },
+      { "name": "level", "type": "number", "options": { "min": 1 } },
+      { "name": "dinos_discovered", "type": "number" },
+      { "name": "minigames_remaining", "type": "number" }
+    ]
+  },
+  {
+    "name": "dino_species",
+    "type": "base",
+    "fields": [
+      { "name": "slug", "type": "text", "required": true, "options": { "pattern": "^[a-z0-9-]+$" } },
+      { "name": "display_name_de", "type": "text", "required": true },
+      { "name": "scientific_name", "type": "text", "required": true },
+      { "name": "period", "type": "select", "required": true, "options": { "values": ["Trias", "Jura", "Kreide"] } },
+      { "name": "period_start_mya", "type": "number" },
+      { "name": "period_end_mya", "type": "number" },
+      { "name": "diet", "type": "select", "required": true, "options": { "values": ["Pflanzenfresser", "Fleischfresser", "Allesfresser"] } },
+      { "name": "length_m", "type": "number" },
+      { "name": "weight_kg", "type": "number" },
+      { "name": "continent", "type": "text" },
+      { "name": "continent_position", "type": "json" },
+      { "name": "rarity", "type": "select", "options": { "values": ["common", "uncommon", "rare", "epic", "legendary"] } },
+      { "name": "kid_summary", "type": "text" },
+      { "name": "fun_fact", "type": "text" },
+      { "name": "size_comparison", "type": "text" },
+      { "name": "image_comic", "type": "file", "options": { "maxSelect": 1, "mimeTypes": ["image/png"] } },
+      { "name": "image_real", "type": "file", "options": { "maxSelect": 1, "mimeTypes": ["image/png"] } },
+      { "name": "image_skeleton", "type": "file", "options": { "maxSelect": 1, "mimeTypes": ["image/png"] } },
+      { "name": "image_shadow", "type": "file", "options": { "maxSelect": 1, "mimeTypes": ["image/png"] } },
+      { "name": "audio_name", "type": "file", "options": { "maxSelect": 1, "mimeTypes": ["audio/mpeg"] } },
+      { "name": "audio_steckbrief", "type": "file", "options": { "maxSelect": 1, "mimeTypes": ["audio/mpeg"] } },
+      { "name": "facts", "type": "json" },
+      { "name": "quiz_questions", "type": "json" },
+      { "name": "food_options", "type": "json" },
+      { "name": "identify_hints", "type": "json" }
+    ],
+    "indexes": [
+      { "name": "idx_slug", "columns": ["slug"], "unique": true }
+    ]
+  },
+  {
+    "name": "expeditions",
+    "type": "base",
+    "fields": [
+      { "name": "player_id", "type": "relation", "required": true, "options": { "collectionId": "players", "maxSelect": 1 } },
+      { "name": "dino_species_id", "type": "relation", "required": true, "options": { "collectionId": "dino_species", "maxSelect": 1 } },
+      { "name": "date", "type": "date", "required": true },
+      { "name": "biom", "type": "select", "options": { "values": ["desert", "jungle", "ice", "ocean"] } },
+      { "name": "status", "type": "select", "required": true, "options": { "values": ["intro", "excavation", "puzzle", "identify", "discovery", "offline", "complete"] } },
+      { "name": "excavation_time_ms", "type": "number" },
+      { "name": "puzzle_time_ms", "type": "number" },
+      { "name": "identify_attempts", "type": "number" },
+      { "name": "offline_task_type", "type": "select", "options": { "values": ["draw", "build", "measure", "find"] } },
+      { "name": "offline_task_accepted", "type": "bool" }
+    ],
+    "indexes": [
+      { "name": "idx_player_date", "columns": ["player_id", "date"] }
+    ]
+  },
+  {
+    "name": "museum_entries",
+    "type": "base",
+    "fields": [
+      { "name": "player_id", "type": "relation", "required": true, "options": { "collectionId": "players", "maxSelect": 1 } },
+      { "name": "dino_species_id", "type": "relation", "required": true, "options": { "collectionId": "dino_species", "maxSelect": 1 } },
+      { "name": "discovered_at", "type": "date" },
+      { "name": "stars", "type": "number", "options": { "min": 0, "max": 3 } },
+      { "name": "artwork_photo", "type": "file", "options": { "maxSelect": 1, "mimeTypes": ["image/png", "image/jpeg"] } },
+      { "name": "artwork_ai_feedback", "type": "text" },
+      { "name": "favorite", "type": "bool" }
+    ],
+    "indexes": [
+      { "name": "idx_player_dino", "columns": ["player_id", "dino_species_id"], "unique": true }
+    ]
+  },
+  {
+    "name": "minigame_sessions",
+    "type": "base",
+    "fields": [
+      { "name": "player_id", "type": "relation", "required": true, "options": { "collectionId": "players", "maxSelect": 1 } },
+      { "name": "game_type", "type": "select", "required": true, "options": { "values": ["quiz", "size_sort", "timeline", "food_match", "shadow_guess"] } },
+      { "name": "dino_species_ids", "type": "json" },
+      { "name": "score", "type": "number" },
+      { "name": "stars_earned", "type": "number", "options": { "min": 0, "max": 3 } },
+      { "name": "time_ms", "type": "number" },
+      { "name": "completed_at", "type": "date" }
+    ]
+  },
+  {
+    "name": "stories",
+    "type": "base",
+    "fields": [
+      { "name": "family_id", "type": "relation", "required": true, "options": { "collectionId": "families", "maxSelect": 1 } },
+      { "name": "date", "type": "date", "required": true },
+      { "name": "title", "type": "text" },
+      { "name": "player_dinos", "type": "json" },
+      { "name": "story_text", "type": "text" },
+      { "name": "audio_url", "type": "file", "options": { "maxSelect": 1, "mimeTypes": ["audio/mpeg"] } },
+      { "name": "timestamps", "type": "json" }
+    ],
+    "indexes": [
+      { "name": "idx_family_date", "columns": ["family_id", "date"], "unique": true }
+    ]
+  },
+  {
+    "name": "daily_budgets",
+    "type": "base",
+    "fields": [
+      { "name": "player_id", "type": "relation", "required": true, "options": { "collectionId": "players", "maxSelect": 1 } },
+      { "name": "date", "type": "date", "required": true },
+      { "name": "expeditions_used", "type": "number" },
+      { "name": "expeditions_max", "type": "number" },
+      { "name": "minigames_used", "type": "number" },
+      { "name": "minigames_max", "type": "number" },
+      { "name": "evening_session_done", "type": "bool" },
+      { "name": "is_tired", "type": "bool" }
+    ],
+    "indexes": [
+      { "name": "idx_player_date", "columns": ["player_id", "date"], "unique": true }
+    ]
+  },
+  {
+    "name": "budget_resets",
+    "type": "base",
+    "fields": [
+      { "name": "player_id", "type": "relation", "required": true, "options": { "collectionId": "players", "maxSelect": 1 } },
+      { "name": "date", "type": "date", "required": true },
+      { "name": "reset_by_user_id", "type": "relation", "options": { "collectionId": "users", "maxSelect": 1 } },
+      { "name": "math_question", "type": "text" },
+      { "name": "math_answer_given", "type": "text" },
+      { "name": "reset_at", "type": "date" }
+    ]
+  },
+  {
+    "name": "offline_tasks",
+    "type": "base",
+    "fields": [
+      { "name": "expedition_id", "type": "relation", "required": true, "options": { "collectionId": "expeditions", "maxSelect": 1 } },
+      { "name": "task_type", "type": "select", "required": true, "options": { "values": ["draw", "build", "measure", "find"] } },
+      { "name": "dino_species_id", "type": "relation", "options": { "collectionId": "dino_species", "maxSelect": 1 } },
+      { "name": "accepted_at", "type": "date" },
+      { "name": "photo_uploaded", "type": "bool" },
+      { "name": "photo", "type": "file", "options": { "maxSelect": 1, "mimeTypes": ["image/png", "image/jpeg"] } },
+      { "name": "ai_feedback", "type": "text" }
+    ]
+  },
+  {
+    "name": "ai_models",
+    "type": "base",
+    "fields": [
+      { "name": "provider", "type": "text", "required": true },
+      { "name": "model_id", "type": "text", "required": true },
+      { "name": "display_name", "type": "text" },
+      { "name": "capabilities", "type": "json" },
+      { "name": "price_per_1m_input_tokens_usd", "type": "number" },
+      { "name": "price_per_1m_output_tokens_usd", "type": "number" },
+      { "name": "price_per_image_usd", "type": "number" },
+      { "name": "is_active", "type": "bool" }
+    ]
+  },
+  {
+    "name": "ai_model_routing",
+    "type": "base",
+    "fields": [
+      { "name": "operation", "type": "text", "required": true },
+      { "name": "model_id", "type": "relation", "required": true, "options": { "collectionId": "ai_models", "maxSelect": 1 } },
+      { "name": "priority", "type": "number" }
+    ]
+  },
+  {
+    "name": "ai_usage_log",
+    "type": "base",
+    "fields": [
+      { "name": "job_id", "type": "text" },
+      { "name": "triggered_by", "type": "select", "options": { "values": ["admin", "app", "worker"] } },
+      { "name": "trigger_context", "type": "text" },
+      { "name": "model_id", "type": "text" },
+      { "name": "operation", "type": "text" },
+      { "name": "input_tokens", "type": "number" },
+      { "name": "output_tokens", "type": "number" },
+      { "name": "image_count", "type": "number" },
+      { "name": "cost_estimate_usd", "type": "number" },
+      { "name": "duration_ms", "type": "number" },
+      { "name": "success", "type": "bool" },
+      { "name": "error_message", "type": "text" }
+    ]
+  }
+]

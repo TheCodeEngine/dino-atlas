@@ -5,6 +5,12 @@ export { Button } from "./primitives/Button";
 export { TextInput } from "./primitives/TextInput";
 export { Divider } from "./primitives/Divider";
 export { TabBar } from "./primitives/TabBar";
+export { Icon } from "./primitives/Icon";
+export { Card } from "./primitives/Card";
+export { ProgressBar } from "./primitives/ProgressBar";
+export { Avatar } from "./primitives/Avatar";
+export { IconButton } from "./primitives/IconButton";
+export { StarRating } from "./primitives/StarRating";
 
 // Components
 export { AudioPlayer } from "./components/AudioPlayer";

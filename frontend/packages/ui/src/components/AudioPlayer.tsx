@@ -10,6 +10,7 @@ export interface AudioPlayerProps {
   duration?: number;
   onPlay?: () => void;
   onPause?: () => void;
+  compact?: boolean;
 }
 
 function formatTime(seconds: number): string {
@@ -30,6 +31,7 @@ export function AudioPlayer({
   duration,
   onPlay,
   onPause,
+  compact = false,
 }: AudioPlayerProps) {
   const isPlaying = status === "playing";
   const isLoading = status === "loading";
@@ -37,21 +39,15 @@ export function AudioPlayer({
   const isActive = status === "playing" || status === "paused";
 
   const sentences = splitSentences(text);
-  const currentIdx = isActive
-    ? Math.min(Math.floor(progress * sentences.length), sentences.length - 1)
-    : -1;
 
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const sentenceRefs = useRef<(HTMLSpanElement | null)[]>([]);
-
-  // Demo mode: simulate playback when no real audio
+  // Demo mode
   const [demoProgress, setDemoProgress] = useState(0);
   const [demoPlaying, setDemoPlaying] = useState(false);
   const isDemo = !onPlay;
   const effectiveProgress = isDemo ? demoProgress : progress;
-  const effectiveStatus = isDemo ? (demoPlaying ? "playing" : "idle") : status;
   const effectivePlaying = isDemo ? demoPlaying : isPlaying;
   const effectiveActive = isDemo ? demoPlaying : isActive;
+  const effectiveStatus = isDemo ? (demoPlaying ? "playing" as const : "idle" as const) : status;
   const effectiveIdx = effectiveActive
     ? Math.min(Math.floor(effectiveProgress * sentences.length), sentences.length - 1)
     : -1;
@@ -67,7 +63,9 @@ export function AudioPlayer({
     return () => clearInterval(interval);
   }, [demoPlaying]);
 
-  // Auto-scroll to current sentence
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const sentenceRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
   useEffect(() => {
     const el = sentenceRefs.current[effectiveIdx];
     const container = scrollRef.current;
@@ -80,7 +78,7 @@ export function AudioPlayer({
 
   function handleClick() {
     if (isDemo) {
-      if (demoPlaying) { setDemoPlaying(false); }
+      if (demoPlaying) setDemoPlaying(false);
       else { setDemoProgress(0); setDemoPlaying(true); }
       return;
     }
@@ -88,19 +86,61 @@ export function AudioPlayer({
     else onPlay?.();
   }
 
+  const playBtn = (
+    <button
+      onClick={handleClick}
+      disabled={effectiveStatus === "loading"}
+      className={[
+        "w-8 h-8 rounded-full grid place-items-center flex-shrink-0 text-white transition-all active:scale-90",
+        effectiveStatus === "loading"
+          ? "bg-primary-container/50 cursor-wait"
+          : isError
+            ? "bg-error"
+            : "bg-primary-container",
+      ].join(" ")}
+      aria-label={effectivePlaying ? "Pause" : "Vorlesen"}
+    >
+      {effectiveStatus === "loading" ? (
+        <span className="block w-4 h-4 rounded-full border-2 border-white/35 border-t-white animate-spin" />
+      ) : effectivePlaying ? (
+        <span className="material-symbols-outlined" style={{ fontSize: "16px", fontVariationSettings: "'FILL' 1" }}>pause</span>
+      ) : (
+        <span className="material-symbols-outlined" style={{ fontSize: "16px", fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+      )}
+    </button>
+  );
+
+  // Compact mode: just controls bar, no text
+  if (compact) {
+    return (
+      <div className="flex items-center gap-2.5">
+        {playBtn}
+        <div className="flex-1 h-1 rounded-full bg-surface-container-high overflow-hidden">
+          <div
+            className="h-full rounded-full bg-primary-container transition-[width] duration-200"
+            style={{ width: `${Math.min(effectiveProgress * 100, 100)}%` }}
+          />
+        </div>
+        <span className="text-[10px] font-bold text-on-surface-variant whitespace-nowrap">
+          {duration ? formatTime(isDemo ? effectiveProgress * duration : currentTime) + " / " + formatTime(duration) : ""}
+        </span>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col gap-3 p-3 bg-surface-container-lowest border-[3px] border-on-surface rounded-xl sticker-shadow">
+    <div className="flex flex-col gap-2 p-3 bg-surface-container-lowest border-[3px] border-on-surface rounded-xl sticker-shadow">
       {/* Karaoke text area */}
       <div
-        className="h-[100px] overflow-hidden relative"
+        className="h-[90px] overflow-hidden relative"
         style={{
-          maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
         }}
       >
         <div
           ref={scrollRef}
-          className="flex flex-col gap-1 h-full overflow-y-scroll py-4 scrollbar-none"
+          className="flex flex-col gap-0.5 h-full overflow-y-scroll py-3 scrollbar-none"
           style={{ scrollbarWidth: "none" }}
         >
           {sentences.map((sentence, i) => (
@@ -108,9 +148,9 @@ export function AudioPlayer({
               key={i}
               ref={(el) => { sentenceRefs.current[i] = el; }}
               className={[
-                "block text-sm leading-relaxed flex-shrink-0 transition-all duration-250",
-                i < effectiveIdx ? "text-on-surface-variant/35" : "",
-                i === effectiveIdx ? "text-primary-container font-bold text-[15px]" : "",
+                "block text-[13px] leading-snug flex-shrink-0 transition-all duration-200",
+                i < effectiveIdx ? "text-on-surface-variant/30" : "",
+                i === effectiveIdx ? "text-primary-container font-bold" : "",
                 i > effectiveIdx || !effectiveActive ? "text-on-surface-variant/50" : "",
               ].filter(Boolean).join(" ")}
             >
@@ -121,49 +161,20 @@ export function AudioPlayer({
       </div>
 
       {/* Controls */}
-      <div className="flex items-center gap-3">
-        {/* Play/Pause button */}
-        <button
-          onClick={handleClick}
-          disabled={effectiveStatus === "loading"}
-          className={[
-            "w-10 h-10 rounded-full grid place-items-center flex-shrink-0 text-white font-bold transition-all",
-            effectiveStatus === "loading"
-              ? "bg-primary-container/50 cursor-wait"
-              : isError
-                ? "bg-error shadow-[0_6px_16px_rgba(186,26,26,0.28)] active:scale-95"
-                : "bg-primary-container shadow-[0_6px_16px_rgba(27,94,32,0.28)] hover:scale-105 active:scale-95",
-          ].join(" ")}
-          aria-label={effectivePlaying ? "Pause" : "Vorlesen"}
-        >
-          {effectiveStatus === "loading" ? (
-            <span className="block w-5 h-5 rounded-full border-[3px] border-white/35 border-t-white animate-spin" />
-          ) : isError ? (
-            <span className="material-symbols-outlined text-lg">refresh</span>
-          ) : effectivePlaying ? (
-            <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>pause</span>
-          ) : (
-            <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-          )}
-        </button>
-
-        {/* Progress bar */}
-        <div className="flex-1 h-[5px] rounded-full bg-surface-container-high overflow-hidden">
+      <div className="flex items-center gap-2.5">
+        {playBtn}
+        <div className="flex-1 h-1 rounded-full bg-surface-container-high overflow-hidden">
           <div
             className="h-full rounded-full bg-primary-container transition-[width] duration-200"
             style={{ width: `${Math.min(effectiveProgress * 100, 100)}%` }}
           />
         </div>
-
-        {/* Time */}
-        <span className="text-[11px] font-extrabold text-on-surface-variant whitespace-nowrap min-w-[3rem] text-right">
+        <span className="text-[10px] font-bold text-on-surface-variant whitespace-nowrap">
           {effectiveStatus === "loading"
             ? "…"
             : duration
-              ? `${formatTime(isDemo ? effectiveProgress * (duration ?? 60) : currentTime)} / ${formatTime(duration)}`
-              : effectiveActive
-                ? formatTime(isDemo ? effectiveProgress * 60 : currentTime)
-                : ""}
+              ? `${formatTime(isDemo ? effectiveProgress * duration : currentTime)} / ${formatTime(duration)}`
+              : ""}
         </span>
       </div>
     </div>

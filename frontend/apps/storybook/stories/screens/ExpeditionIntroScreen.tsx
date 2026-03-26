@@ -5,6 +5,7 @@ export function ExpeditionIntroScreen() {
   return (
     <ExpeditionIntro
       playerName="Oskar"
+      playerEmoji="🦖"
       biom={DESERT_CONFIG}
       scene={<DesertScene />}
     />

@@ -12,17 +12,17 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Wueste: Story = {
-  args: { playerName: "Oskar", biom: DESERT_CONFIG, scene: <DesertScene /> },
+  args: { playerName: "Oskar", playerEmoji: "🦖", biom: DESERT_CONFIG, scene: <DesertScene /> },
 };
 
 export const Regenwald: Story = {
-  args: { playerName: "Karl", biom: JUNGLE_CONFIG, scene: <JungleScene /> },
+  args: { playerName: "Karl", playerEmoji: "🦕", biom: JUNGLE_CONFIG, scene: <JungleScene /> },
 };
 
 export const Eis: Story = {
-  args: { playerName: "Charlotte", biom: ICE_CONFIG, scene: <IceScene /> },
+  args: { playerName: "Charlotte", playerEmoji: "🦎", biom: ICE_CONFIG, scene: <IceScene /> },
 };
 
 export const Ozean: Story = {
-  args: { playerName: "Oskar", biom: OCEAN_CONFIG, scene: <OceanScene /> },
+  args: { playerName: "Oskar", playerEmoji: "🦖", biom: OCEAN_CONFIG, scene: <OceanScene /> },
 };

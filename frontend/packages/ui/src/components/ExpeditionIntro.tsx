@@ -2,19 +2,19 @@ import { type ReactNode } from "react";
 import { motion } from "motion/react";
 import { TopBar } from "./TopBar";
 import { ForscherSpeech } from "./ForscherSpeech";
-import { StatusBadge } from "./StatusBadge";
 import { Button } from "../primitives/Button";
 import type { BiomConfig } from "./biom-scene/types";
 
 interface ExpeditionIntroProps {
   playerName: string;
+  playerEmoji?: string;
   biom: BiomConfig;
   /** The biom background scene component */
   scene: ReactNode;
   onStart?: () => void;
 }
 
-export function ExpeditionIntro({ playerName, biom, scene, onStart }: ExpeditionIntroProps) {
+export function ExpeditionIntro({ playerName, playerEmoji = "🦖", biom, scene, onStart }: ExpeditionIntroProps) {
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col relative overflow-hidden">
       {/* Biom background */}
@@ -23,7 +23,11 @@ export function ExpeditionIntro({ playerName, biom, scene, onStart }: Expedition
       {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         <TopBar
-          right={<StatusBadge label={playerName} variant="primary" icon="person" />}
+          right={
+            <div className="w-9 h-9 rounded-full border-[3px] border-[#1B5E20] bg-primary-fixed flex items-center justify-center text-base">
+              {playerEmoji}
+            </div>
+          }
         />
 
         <main className="flex-1 flex flex-col items-center justify-center px-4 max-w-sm mx-auto pt-14">

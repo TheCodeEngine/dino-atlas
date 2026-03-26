@@ -34,19 +34,19 @@ export function MuseumTransition({ dinoImage, dinoName, scene, onComplete, child
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            style={{ backgroundImage: "none" }}
+            style={{ backgroundImage: "none", background: "#4a90d9" }}
           >
             {/* Scene (sky, ground, dino, museum) */}
             {scene(phase, dinoImage)}
 
-            {/* Done overlay */}
+            {/* Done overlay — covers everything */}
             {phase === "done" && (
               <motion.div
                 className="absolute inset-0 z-50 flex flex-col items-center justify-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
-                <div className="absolute inset-0 bg-on-surface/40" />
+                <div className="absolute inset-0 bg-primary-container/90" />
 
                 <motion.div
                   className="relative flex flex-col items-center"

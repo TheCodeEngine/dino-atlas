@@ -2,11 +2,205 @@ import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { AudioPlayer } from "../../../../packages/ui/src/components/AudioPlayer";
 import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
-import { StatusBadge } from "../../../../packages/ui/src/components/StatusBadge";
 import { ImageSwitcher } from "../../../../packages/ui/src/components/ImageSwitcher";
-import { TimeSlider } from "../../../../packages/ui/src/components/TimeSlider";
-import { Button } from "../../../../packages/ui/src/primitives/Button";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
+
+// ── Map Carousel: Wann → Wo damals → Wo heute ──────────────────
+
+const MAP_CARDS = [
+  {
+    id: "wann",
+    title: "Wann hat er gelebt?",
+    subtitle: "Kreidezeit · 68–66 Mio. Jahre",
+    icon: "schedule",
+    color: "from-[#7ab648]/20 to-[#7ab648]/5",
+    content: (
+      <div className="relative">
+        {/* Timeline bar */}
+        <div className="flex gap-1 mb-2">
+          <div className="flex-1 h-6 rounded bg-[#e8604c]/30 flex items-center justify-center text-[8px] font-black text-[#e8604c]/60">TRIAS</div>
+          <div className="flex-1 h-6 rounded bg-[#5ba67a]/30 flex items-center justify-center text-[8px] font-black text-[#5ba67a]/60">JURA</div>
+          <div className="flex-1 h-6 rounded bg-[#7ab648] flex items-center justify-center text-[8px] font-black text-white">KREIDE</div>
+        </div>
+        <div className="flex justify-between text-[7px] font-bold text-on-surface-variant">
+          <span>252 Mio.</span>
+          <span className="font-black text-primary-container">← hier! →</span>
+          <span>66 Mio.</span>
+        </div>
+        <p className="text-[10px] text-on-surface-variant text-center mt-2 font-semibold">
+          Ganz am Ende — einer der allerletzten Dinos! ☄️
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: "damals",
+    title: "Wo hat er gelebt?",
+    subtitle: "Kreidezeit-Kontinente",
+    icon: "public",
+    color: "from-primary-fixed/30 to-primary-fixed/5",
+    content: (
+      <div className="relative rounded-lg overflow-hidden border-2 border-on-surface/20">
+        <img src="/maps/kreide.png" alt="Kreidezeit" className="w-full h-auto" />
+        {/* Dino position */}
+        <div className="absolute" style={{ left: "22%", top: "32%", transform: "translate(-50%,-100%)" }}>
+          <img src="/dinos/triceratops/comic.png" alt="" className="w-10 h-10 object-contain drop-shadow-md" />
+          <div className="w-2.5 h-2.5 bg-secondary-container border-2 border-on-surface rounded-full mx-auto -mt-1" />
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "heute",
+    title: "Wo findet man ihn heute?",
+    subtitle: "Skelett-Fundorte",
+    icon: "location_on",
+    color: "from-tertiary-fixed/30 to-tertiary-fixed/5",
+    content: (
+      <div className="relative rounded-lg overflow-hidden border-2 border-on-surface/20">
+        <img src="/maps/heute.png" alt="Heute" className="w-full h-auto" />
+        {[
+          { left: "18%", top: "38%" },
+          { left: "22%", top: "33%" },
+          { left: "15%", top: "42%" },
+        ].map((pos, i) => (
+          <div
+            key={i}
+            className="absolute w-3 h-3 bg-secondary-container border-2 border-on-surface rounded-full shadow-md"
+            style={{ left: pos.left, top: pos.top, transform: "translate(-50%,-50%)" }}
+          />
+        ))}
+        <div className="absolute bottom-1.5 left-1.5 bg-on-surface/70 text-white px-1.5 py-0.5 rounded text-[8px] font-black uppercase">
+          USA & Kanada
+        </div>
+      </div>
+    ),
+  },
+];
+
+function MapCarousel({ dinoImage }: { dinoImage: string }) {
+  const [activeMap, setActiveMap] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div className="mb-4">
+      <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant flex items-center gap-1 px-4 mb-2">
+        <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>explore</span>
+        Entdecke mehr — wische durch
+      </p>
+      <div
+        ref={scrollRef}
+        className="flex gap-2.5 overflow-x-auto px-4 pb-2 snap-x snap-mandatory"
+        style={{ scrollbarWidth: "none" }}
+        onScroll={() => {
+          if (!scrollRef.current) return;
+          const idx = Math.round(scrollRef.current.scrollLeft / (scrollRef.current.scrollWidth / MAP_CARDS.length));
+          setActiveMap(Math.min(idx, MAP_CARDS.length - 1));
+        }}
+      >
+        {MAP_CARDS.map((card) => (
+          <div
+            key={card.id}
+            className={`flex-shrink-0 w-[300px] snap-center rounded-xl border-[3px] border-on-surface sticker-shadow bg-gradient-to-br ${card.color} p-3`}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 bg-white/80 rounded-lg flex items-center justify-center">
+                <span className="material-symbols-outlined text-on-surface" style={{ fontSize: "16px" }}>{card.icon}</span>
+              </div>
+              <div>
+                <p className="text-xs font-black text-on-surface">{card.title}</p>
+                <p className="text-[9px] text-on-surface-variant font-semibold">{card.subtitle}</p>
+              </div>
+            </div>
+            {card.content}
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-center gap-1.5 mt-2">
+        {MAP_CARDS.map((_, i) => (
+          <div key={i} className={`h-1.5 rounded-full transition-all ${i === activeMap ? "w-4 bg-primary-container" : "w-1.5 bg-outline-variant"}`} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Museum CTA with animation ───────────────────────────────────
+
+function MuseumCTA({ dinoImage, dinoName }: { dinoImage: string; dinoName: string }) {
+  const [launched, setLaunched] = useState(false);
+  const haptics = useHaptics();
+
+  return (
+    <div className="mx-4 relative overflow-hidden">
+      <AnimatePresence>
+        {launched && (
+          <motion.div
+            className="absolute inset-0 z-10 flex items-center justify-center bg-primary-container rounded-xl"
+            initial={{ scale: 0, borderRadius: "100%" }}
+            animate={{ scale: 1, borderRadius: "12px" }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          >
+            <motion.div
+              className="flex flex-col items-center"
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, type: "spring", damping: 12 }}
+            >
+              <motion.img
+                src={dinoImage}
+                alt=""
+                className="w-20 h-20 object-contain"
+                animate={{ y: [0, -15, 0], rotate: [0, -5, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+              />
+              <motion.p
+                className="text-white font-black uppercase tracking-wider text-sm mt-2"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                Ab ins Museum! 🏛️
+              </motion.p>
+              {/* Sparkles */}
+              {["⭐", "✨", "🌟", "✨", "⭐"].map((e, i) => (
+                <motion.span
+                  key={i}
+                  className="absolute text-xl"
+                  style={{ left: `${15 + i * 18}%`, top: `${20 + (i % 3) * 20}%` }}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: [0, 1.2, 0.8], opacity: [0, 1, 0] }}
+                  transition={{ delay: 0.4 + i * 0.12, duration: 1, repeat: Infinity, repeatDelay: 0.5 }}
+                >
+                  {e}
+                </motion.span>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <button
+        onClick={() => { setLaunched(true); haptics.success(); }}
+        className="w-full bg-gradient-to-br from-primary-container to-[#2E7D32] rounded-xl border-[3px] border-on-surface sticker-shadow active-press overflow-hidden text-left"
+      >
+        <div className="flex items-center gap-3 p-3">
+          <motion.img
+            src={dinoImage}
+            alt={dinoName}
+            className="w-14 h-14 object-contain flex-shrink-0"
+            whileTap={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+          />
+          <div className="flex-1 text-white min-w-0">
+            <p className="text-[10px] font-black uppercase tracking-wider text-white/70">Dein neuer Freund</p>
+            <p className="text-base font-black uppercase tracking-tight leading-tight">Ab ins Museum!</p>
+          </div>
+          <span className="material-symbols-outlined text-white/80" style={{ fontSize: "24px" }}>arrow_forward</span>
+        </div>
+      </button>
+    </div>
+  );
+}
 
 // ── Interactive Dino Component ──────────────────────────────────
 
@@ -43,10 +237,11 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
     }, 1500);
   }, []);
 
-  function handlePet() {
+  function handlePet(e: React.PointerEvent) {
+    e.preventDefault();
+    e.stopPropagation();
     spawnHearts();
     haptics.tap();
-    // Don't override done state - dino stays happy after feeding
     if (mood === "done") return;
     setMood("love");
     setTimeout(() => setMood("idle"), 800);
@@ -268,7 +463,10 @@ export function DiscoveryScreen() {
         <button className="w-9 h-9 flex items-center justify-center bg-surface-container-lowest border-[3px] border-on-surface rounded-lg sticker-shadow active-press">
           <span className="material-symbols-outlined text-on-surface text-lg">close</span>
         </button>
-        <StatusBadge label="Neu entdeckt!" variant="warning" icon="new_releases" />
+        <span className="bg-secondary-container text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase whitespace-nowrap flex items-center gap-1">
+          <span className="material-symbols-outlined" style={{ fontSize: "14px", fontVariationSettings: "'FILL' 1" }}>new_releases</span>
+          Neu entdeckt!
+        </span>
       </header>
 
       {/* Scrollable */}
@@ -336,47 +534,8 @@ export function DiscoveryScreen() {
           </div>
         </div>
 
-        {/* Time Slider with real maps */}
-        <div className="px-4 mb-4">
-          <TimeSlider
-            period="Kreide"
-            startMya={68}
-            endMya={66}
-            dinoImage="/dinos/triceratops/comic.png"
-            dinoMapPosition={{ left: "22%", top: "35%" }}
-          />
-        </div>
-
-        {/* Fundorte heute */}
-        <div className="px-4 mb-4">
-          <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant flex items-center gap-1 mb-2">
-            <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>location_on</span>
-            Wo findet man Skelette heute?
-          </p>
-          <div className="bg-surface-container-lowest rounded-xl border-[3px] border-on-surface sticker-shadow overflow-hidden">
-            <div className="relative">
-              <img src="/maps/heute.png" alt="Heutige Fundorte" className="w-full h-auto" />
-              {/* Pins in USA/Canada */}
-              {[
-                { left: "18%", top: "38%" },
-                { left: "22%", top: "33%" },
-                { left: "15%", top: "42%" },
-              ].map((pos, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-3 h-3 bg-secondary-container border-2 border-on-surface rounded-full shadow-md"
-                  style={{ left: pos.left, top: pos.top, transform: "translate(-50%,-50%)" }}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.3 + i * 0.15, type: "spring", damping: 12 }}
-                />
-              ))}
-              <div className="absolute bottom-2 left-2 bg-on-surface/70 text-white px-2 py-0.5 rounded text-[9px] font-black uppercase">
-                Fundorte · USA & Kanada
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Map Carousel: Wann → Wo damals → Wo heute */}
+        <MapCarousel dinoImage="/dinos/triceratops/comic.png" />
 
         {/* Interactive Dino Friend */}
         <InteractiveDino name={DINO.name} image={DINO.images.comic} diet="Pflanzenfresser" />
@@ -386,10 +545,8 @@ export function DiscoveryScreen() {
           <ForscherSpeech text="Streichle deinen neuen Freund! Und füttere ihn mit dem richtigen Futter!" />
         </div>
 
-        {/* Museum CTA */}
-        <div className="mx-4">
-          <Button variant="primary" fullWidth icon="museum">Ab ins Museum!</Button>
-        </div>
+        {/* Museum CTA with animation */}
+        <MuseumCTA dinoImage={DINO.images.comic} dinoName={DINO.name} />
       </main>
     </div>
   );

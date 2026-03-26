@@ -123,36 +123,16 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
             ))}
           </AnimatePresence>
 
-          {/* Mood indicator */}
-          {mood === "eating" && (
-            <motion.span
-              className="absolute -top-2 right-2 text-4xl"
-              initial={{ scale: 0, rotate: -20 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: "spring", damping: 10 }}
-            >
-              😋
-            </motion.span>
-          )}
+          {/* Reject: big red X */}
           {mood === "reject" && (
-            <>
-              {/* Big red X flies toward viewer */}
-              <motion.div
-                className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
-                initial={{ scale: 0.2, opacity: 0 }}
-                animate={{ scale: [0.2, 2.5, 2], opacity: [0, 1, 0.9] }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-              >
-                <span className="text-7xl font-black text-error drop-shadow-[0_4px_12px_rgba(186,26,26,0.5)]">✕</span>
-              </motion.div>
-              {/* Shake ring */}
-              <motion.div
-                className="absolute inset-0 rounded-full border-4 border-error/40 pointer-events-none"
-                initial={{ scale: 0.5, opacity: 0.8 }}
-                animate={{ scale: 1.5, opacity: 0 }}
-                transition={{ duration: 0.6 }}
-              />
-            </>
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
+              initial={{ scale: 0.2, opacity: 0 }}
+              animate={{ scale: [0.2, 2.5, 2], opacity: [0, 1, 0.9] }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+              <span className="text-7xl font-black text-error drop-shadow-[0_4px_12px_rgba(186,26,26,0.5)]">✕</span>
+            </motion.div>
           )}
         </div>
 

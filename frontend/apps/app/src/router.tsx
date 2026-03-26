@@ -12,6 +12,7 @@ import { PuzzlePage } from "@/pages/PuzzlePage";
 import { IdentifyPage } from "@/pages/IdentifyPage";
 import { DiscoveryPage } from "@/pages/DiscoveryPage";
 import { MuseumPage } from "@/pages/MuseumPage";
+import { MuseumDetailPage } from "@/pages/MuseumDetailPage";
 
 export const router = createBrowserRouter([
   // Public
@@ -36,7 +37,8 @@ export const router = createBrowserRouter([
             ],
           },
 
-          // Fullscreen (no nav) — Expedition flow
+          // Fullscreen (no nav)
+          { path: "/museum/:slug", element: <MuseumDetailPage /> },
           { path: "/expedition/intro", element: <ExpeditionIntroPage /> },
           { path: "/expedition/excavation", element: <ExcavationPage /> },
           { path: "/expedition/puzzle", element: <PuzzlePage /> },

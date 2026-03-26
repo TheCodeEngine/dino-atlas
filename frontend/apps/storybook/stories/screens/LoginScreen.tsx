@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { TextInput } from "../../../../packages/ui/src/primitives/TextInput";
 import { Divider } from "../../../../packages/ui/src/primitives/Divider";
+import { Button } from "../../../../packages/ui/src/primitives/Button";
+import { FormCard } from "../../../../packages/ui/src/components/FormCard";
+import { PageHeader } from "../../../../packages/ui/src/components/PageHeader";
 
 export function LoginScreen() {
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -8,48 +11,14 @@ export function LoginScreen() {
   return (
     <div className="bg-surface text-on-surface min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm">
-        {/* Card */}
-        <div className="bg-surface-container-lowest rounded-xl border-[3px] border-on-surface sticker-shadow overflow-hidden">
-          {/* Tabs */}
-          <div className="flex border-b-[3px] border-on-surface">
-            <button
-              onClick={() => setTab("login")}
-              className={`flex-1 py-2.5 text-[11px] font-black uppercase tracking-wider border-r-[3px] border-on-surface transition-colors ${
-                tab === "login" ? "bg-white text-on-surface" : "bg-surface-container-high text-on-surface-variant"
-              }`}
-            >
-              Login
-            </button>
-            <button
-              onClick={() => setTab("register")}
-              className={`flex-1 py-2.5 text-[11px] font-black uppercase tracking-wider transition-colors ${
-                tab === "register" ? "bg-white text-on-surface" : "bg-surface-container-high text-on-surface-variant"
-              }`}
-            >
-              Registrieren
-            </button>
-          </div>
-
-          {/* Form */}
-          <div className="p-5">
-            {/* Header */}
-            <div className="mb-6 text-center">
-              <img src="/logo.png" alt="Dino-Atlas" className="w-14 h-14 object-contain mx-auto mb-2" />
-              <h2 className="text-xl font-black uppercase tracking-tight text-on-surface mb-0.5">
-                {tab === "login" ? "Willkommen zurück!" : "Neue Familie"}
-              </h2>
-              <p className="text-xs text-on-surface-variant font-medium">
-                {tab === "login"
-                  ? "Bereit für deine nächste Entdeckung?"
-                  : "Erstelle dein Forscher-Team!"}
-              </p>
-            </div>
-
-            {tab === "login" ? <LoginForm /> : <RegisterForm />}
-          </div>
-
-          {/* Footer */}
-          <div className="bg-surface-container-high p-3 text-center border-t-[3px] border-on-surface">
+        <FormCard
+          tabs={[
+            { id: "login", label: "Login" },
+            { id: "register", label: "Registrieren" },
+          ]}
+          activeTab={tab}
+          onTabChange={(id) => setTab(id as "login" | "register")}
+          footer={
             <p className="text-[11px] font-semibold text-on-surface-variant">
               {tab === "login" ? (
                 <>Neu hier?{" "}<button onClick={() => setTab("register")} className="text-primary font-black uppercase tracking-wider hover:underline">Familie registrieren</button></>
@@ -57,8 +26,15 @@ export function LoginScreen() {
                 <>Schon dabei?{" "}<button onClick={() => setTab("login")} className="text-primary font-black uppercase tracking-wider hover:underline">Einloggen</button></>
               )}
             </p>
-          </div>
-        </div>
+          }
+        >
+          <PageHeader
+            logoSrc="/logo.png"
+            title={tab === "login" ? "Willkommen zurück!" : "Neue Familie"}
+            subtitle={tab === "login" ? "Bereit für deine nächste Entdeckung?" : "Erstelle dein Forscher-Team!"}
+          />
+          {tab === "login" ? <LoginForm /> : <RegisterForm />}
+        </FormCard>
 
         <p className="mt-4 text-center text-[9px] font-semibold text-outline uppercase tracking-wider">
           &copy; Dino-Atlas Expeditionen
@@ -75,22 +51,12 @@ function LoginForm() {
       <TextInput label="Passwort" icon="lock" type="password" placeholder="••••••••" />
 
       <div className="flex justify-end">
-        <a href="#" className="text-[11px] font-semibold text-secondary hover:underline">
-          Passwort vergessen?
-        </a>
+        <a href="#" className="text-[11px] font-semibold text-secondary hover:underline">Passwort vergessen?</a>
       </div>
 
       <div className="pt-1 flex flex-col gap-2.5">
-        <button
-          type="submit"
-          className="w-full py-2.5 bg-[#1B5E20] text-white border-[3px] border-on-primary-fixed-variant rounded-lg sticker-shadow-primary font-bold uppercase tracking-wider active-press-primary flex items-center justify-center gap-1.5 text-sm"
-        >
-          Expedition starten
-          <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-        </button>
-
+        <Button variant="primary" fullWidth icon="arrow_forward">Expedition starten</Button>
         <Divider text="Oder" />
-
         <button
           type="button"
           disabled
@@ -109,22 +75,112 @@ function LoginForm() {
   );
 }
 
+const AVATARS = ["🦖", "🦕", "🦎", "🐊", "🐢", "🦅"];
+
 function RegisterForm() {
+  const [step, setStep] = useState(1);
+  const [kids, setKids] = useState([
+    { name: "Oskar", birthYear: "2020", avatar: "🦖" },
+  ]);
+
+  const addKid = () => setKids([...kids, { name: "", birthYear: "", avatar: AVATARS[kids.length % AVATARS.length]! }]);
+  const removeKid = (i: number) => setKids(kids.filter((_, idx) => idx !== i));
+  const updateKid = (i: number, field: string, value: string) =>
+    setKids(kids.map((k, idx) => (idx === i ? { ...k, [field]: value } : k)));
+
+  if (step === 1) {
+    return (
+      <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); setStep(2); }}>
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex-1 h-1.5 rounded-full bg-primary-container" />
+          <div className="flex-1 h-1.5 rounded-full bg-surface-container-high" />
+        </div>
+
+        <TextInput label="Familien-Name" icon="family_restroom" type="text" placeholder="z.B. Familie Stoldt" />
+        <TextInput label="Email" icon="mail" type="email" placeholder="eltern@beispiel.de" />
+        <TextInput label="Passwort" icon="lock" type="password" placeholder="Mind. 8 Zeichen" />
+        <TextInput label="Passwort bestätigen" icon="lock" type="password" placeholder="Nochmal eingeben" />
+
+        <div className="pt-1">
+          <Button variant="primary" fullWidth icon="arrow_forward">Weiter: Kinder anlegen</Button>
+        </div>
+      </form>
+    );
+  }
+
   return (
     <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
-      <TextInput label="Familien-Name" icon="family_restroom" type="text" placeholder="Familie Stoldt" />
-      <TextInput label="Email" icon="mail" type="email" placeholder="eltern@beispiel.de" />
-      <TextInput label="Passwort" icon="lock" type="password" placeholder="Mind. 8 Zeichen" />
-      <TextInput label="Passwort bestätigen" icon="lock" type="password" placeholder="Nochmal eingeben" />
+      <div className="flex items-center gap-2 mb-2">
+        <div className="flex-1 h-1.5 rounded-full bg-primary-container" />
+        <div className="flex-1 h-1.5 rounded-full bg-primary-container" />
+      </div>
 
-      <div className="pt-1">
+      <p className="text-xs font-bold text-on-surface-variant mb-2">
+        Wer sind deine Forscher? Du kannst später weitere hinzufügen.
+      </p>
+
+      {kids.map((kid, i) => (
+        <div key={i} className="flex items-start gap-2 p-2.5 bg-surface-container-low rounded-lg border-2 border-outline-variant">
+          <button
+            type="button"
+            onClick={() => {
+              const next = AVATARS[(AVATARS.indexOf(kid.avatar) + 1) % AVATARS.length]!;
+              updateKid(i, "avatar", next);
+            }}
+            className="w-10 h-10 rounded-full border-[3px] border-on-surface bg-primary-fixed flex items-center justify-center text-xl flex-shrink-0 active:scale-90 transition-transform"
+            title="Avatar ändern"
+          >
+            {kid.avatar}
+          </button>
+          <div className="flex-1 min-w-0 space-y-1.5">
+            <input
+              type="text"
+              value={kid.name}
+              onChange={(e) => updateKid(i, "name", e.target.value)}
+              placeholder="Name"
+              className="w-full px-2 py-1.5 bg-white border-2 border-on-surface rounded text-sm font-bold placeholder:text-outline/40"
+            />
+            <input
+              type="number"
+              value={kid.birthYear}
+              onChange={(e) => updateKid(i, "birthYear", e.target.value)}
+              placeholder="Geburtsjahr"
+              className="w-full px-2 py-1.5 bg-white border-2 border-on-surface rounded text-sm font-bold placeholder:text-outline/40"
+              min="2015" max="2025"
+            />
+          </div>
+          {kids.length > 1 && (
+            <button
+              type="button"
+              onClick={() => removeKid(i)}
+              className="w-7 h-7 rounded-full bg-error/10 text-error flex items-center justify-center flex-shrink-0 hover:bg-error/20"
+            >
+              <span className="material-symbols-outlined text-[16px]">close</span>
+            </button>
+          )}
+        </div>
+      ))}
+
+      <button
+        type="button"
+        onClick={addKid}
+        className="w-full py-2 border-2 border-dashed border-outline-variant rounded-lg text-[11px] font-bold text-on-surface-variant hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-1"
+      >
+        <span className="material-symbols-outlined text-[16px]">add</span>
+        Weiteres Kind hinzufügen
+      </button>
+
+      <div className="flex gap-2 pt-1">
         <button
-          type="submit"
-          className="w-full py-2.5 bg-[#1B5E20] text-white border-[3px] border-on-primary-fixed-variant rounded-lg sticker-shadow-primary font-bold uppercase tracking-wider active-press-primary flex items-center justify-center gap-1.5 text-sm"
+          type="button"
+          onClick={() => setStep(1)}
+          className="px-4 py-2.5 bg-surface-container-high text-on-surface border-[3px] border-on-surface rounded-lg font-bold uppercase tracking-wider text-xs sticker-shadow active-press"
         >
-          Familie gründen
-          <span className="material-symbols-outlined text-[18px]">group_add</span>
+          Zurück
         </button>
+        <div className="flex-1">
+          <Button variant="primary" fullWidth icon="group_add">Familie gründen</Button>
+        </div>
       </div>
     </form>
   );

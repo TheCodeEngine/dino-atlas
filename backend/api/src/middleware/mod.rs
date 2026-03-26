@@ -1,1 +1,1 @@
-// Middleware — JWT auth, request logging, etc.
+pub mod auth;

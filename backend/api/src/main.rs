@@ -1,18 +1,16 @@
 mod config;
 mod error;
-mod routes;
 mod middleware;
+mod pocketbase;
+mod routes;
 
-// Shared domain & adapters come from dino-atlas-core
-// use dino_atlas_core::domain;
-// use dino_atlas_core::adapters;
-
-use axum::{Router, routing::get};
-use tower_http::cors::{CorsLayer, Any};
+use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::EnvFilter;
 
 use config::Config;
+use pocketbase::client::PbClient;
+use routes::{AppState, create_router};
 
 #[tokio::main]
 async fn main() {
@@ -22,13 +20,20 @@ async fn main() {
 
     let config = Config::from_env();
 
-    let cors = CorsLayer::new()
-        .allow_origin(Any)
-        .allow_methods(Any)
-        .allow_headers(Any);
+    let pb = PbClient::new(&config);
+    let state = AppState { pb };
 
-    let app = Router::new()
-        .route("/api/v1/health", get(health))
+    let cors = CorsLayer::new()
+        .allow_origin(
+            config.allowed_origins.iter()
+                .filter_map(|o| o.parse().ok())
+                .collect::<Vec<_>>(),
+        )
+        .allow_methods(tower_http::cors::Any)
+        .allow_headers(tower_http::cors::Any)
+        .allow_credentials(true);
+
+    let app = create_router(state)
         .layer(cors)
         .layer(TraceLayer::new_for_http());
 
@@ -37,8 +42,4 @@ async fn main() {
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
-}
-
-async fn health() -> &'static str {
-    "ok"
 }

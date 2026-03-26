@@ -10,10 +10,10 @@ const preview: Preview = {
       },
     },
     backgrounds: {
-      default: "sand",
+      default: "surface",
       values: [
-        { name: "sand", value: "#fdf8f0" },
-        { name: "dark", value: "#292524" },
+        { name: "surface", value: "#fcf9f0" },
+        { name: "dark", value: "#31312b" },
         { name: "white", value: "#ffffff" },
       ],
     },

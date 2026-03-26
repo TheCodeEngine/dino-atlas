@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dino Explorer | Expedition Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: radial-gradient(#E5E2DA 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sticker-shadow {
+            box-shadow: 4px 4px 0px 0px #1C1C17;
+        }
+        .sticker-shadow-primary {
+            box-shadow: 4px 4px 0px 0px #1B5E20;
+        }
+        .sticker-shadow-secondary {
+            box-shadow: 4px 4px 0px 0px #FF6B00;
+        }
+        .active-press:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px 0px #1C1C17;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-primary-fixed-variant": "#0c5216",
+                "on-primary-fixed": "#002203",
+                "surface-container-low": "#f6f3ea",
+                "inverse-primary": "#91d78a",
+                "secondary-fixed": "#ffdbcc",
+                "surface": "#fcf9f0",
+                "surface-container-high": "#ebe8df",
+                "surface-container-lowest": "#ffffff",
+                "surface-tint": "#2a6b2c",
+                "tertiary-fixed": "#cee5ff",
+                "surface-container-highest": "#e5e2da",
+                "primary-fixed-dim": "#91d78a",
+                "on-tertiary-fixed-variant": "#004a75",
+                "inverse-surface": "#31312b",
+                "surface-container": "#f1eee5",
+                "on-tertiary-fixed": "#001d32",
+                "on-surface-variant": "#41493e",
+                "on-secondary-fixed-variant": "#7a3000",
+                "on-secondary": "#ffffff",
+                "tertiary-fixed-dim": "#96ccff",
+                "outline": "#717a6d",
+                "on-primary-container": "#90d689",
+                "inverse-on-surface": "#f4f1e8",
+                "on-tertiary": "#ffffff",
+                "tertiary": "#003e63",
+                "surface-bright": "#fcf9f0",
+                "primary": "#00450d",
+                "on-secondary-container": "#572000",
+                "on-tertiary-container": "#93cbff",
+                "error": "#ba1a1a",
+                "error-container": "#ffdad6",
+                "secondary-container": "#fe6b00",
+                "surface-dim": "#dddad1",
+                "on-error-container": "#93000a",
+                "on-primary": "#ffffff",
+                "tertiary-container": "#005687",
+                "on-secondary-fixed": "#351000",
+                "background": "#fcf9f0",
+                "primary-container": "#1b5e20",
+                "on-surface": "#1c1c17",
+                "secondary-fixed-dim": "#ffb693",
+                "outline-variant": "#c0c9bb",
+                "on-background": "#1c1c17",
+                "primary-fixed": "#acf4a4",
+                "on-error": "#ffffff",
+                "surface-variant": "#e5e2da",
+                "secondary": "#a04100"
+              },
+              fontFamily: {
+                "headline": ["Plus Jakarta Sans"],
+                "body": ["Plus Jakarta Sans"],
+                "label": ["Plus Jakarta Sans"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface selection:bg-secondary-fixed min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-20 bg-[#FCF9F0] dark:bg-stone-900 border-b-4 border-[#1B5E20] dark:border-green-800 shadow-[4px_4px_0px_0px_rgba(28,28,23,1)]">
+<div class="flex items-center gap-4">
+<span class="text-2xl font-black text-[#1B5E20] dark:text-green-500 uppercase tracking-tighter font-['Plus_Jakarta_Sans']">Dino Explorer</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex gap-4">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest border-2 border-on-surface rounded-lg sticker-shadow active-press">
+<span class="material-symbols-outlined text-[#1B5E20]">monetization_on</span>
+<span class="font-bold">2,450</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest border-2 border-on-surface rounded-lg sticker-shadow active-press">
+<span class="material-symbols-outlined text-secondary">bolt</span>
+<span class="font-bold">85%</span>
+</button>
+</div>
+<img alt="Young Explorer Profile Avatar" class="w-12 h-12 rounded-full border-4 border-[#1B5E20] object-cover" data-alt="portrait of a young smiling adventurer wearing a khaki explorers hat and vest against a soft jungle background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMs_ozPbMlC9xB5SyW588RdoV8xEfT3u65SgUivfTojEL5Y9wyd-r9DDWWh6pyUeq0m1TTg8RDLaMkhQPPMeothfp8UwlXqTmHsUMueAAl_cxgmLmeszi7l0NgbEy6_T4b39QzUz3yCVijUuit0vDvu_NYDHTQ2pPgbGEBHjLIPB9-2xW4_aVe3B0QQkdEUSPfMuVf2wpSfkhuCjA68xF02pNnS1yzTbW1NZ0ClcIgK2zxJ8mRGIvBqOo0khLiBxyVD5uHFNASwog"/>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col fixed left-0 top-20 h-[calc(100vh-5rem)] z-40 bg-[#FCF9F0] dark:bg-stone-900 border-r-4 border-[#1B5E20] w-64 p-4">
+<div class="mb-8 p-4 bg-surface-container-high rounded-xl border-2 border-outline-variant">
+<p class="font-['Plus_Jakarta_Sans'] font-bold text-sm uppercase tracking-widest text-[#1B5E20]">Junior Ranger</p>
+<p class="text-xs text-on-surface-variant">Level 12 Paleontologist</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 p-3 bg-[#1B5E20] text-white rounded-lg shadow-[4px_4px_0px_0px_rgba(255,107,0,1)] font-bold uppercase tracking-widest text-sm" href="#">
+<span class="material-symbols-outlined">home</span> Camp
+            </a>
+<a class="flex items-center gap-3 p-3 text-[#1C1C17] hover:bg-[#F6F3EA] rounded-lg font-bold uppercase tracking-widest text-sm transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">menu_book</span> Lexicon
+            </a>
+<a class="flex items-center gap-3 p-3 text-[#1C1C17] hover:bg-[#F6F3EA] rounded-lg font-bold uppercase tracking-widest text-sm transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">landscape</span> Dig Site
+            </a>
+<a class="flex items-center gap-3 p-3 text-[#1C1C17] hover:bg-[#F6F3EA] rounded-lg font-bold uppercase tracking-widest text-sm transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">military_tech</span> Badges
+            </a>
+</nav>
+<button class="mt-auto w-full py-4 bg-secondary-container text-white border-4 border-on-secondary-container rounded-xl sticker-shadow font-extrabold uppercase tracking-widest active-press">
+            New Discovery
+        </button>
+</aside>
+<!-- Main Content -->
+<main class="md:ml-64 pt-28 pb-24 px-6 max-w-7xl mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Hero/Expedition Map -->
+<section class="lg:col-span-8 flex flex-col gap-6">
+<div class="relative bg-surface-container-lowest rounded-2xl border-4 border-on-surface p-2 sticker-shadow h-[450px] overflow-hidden group">
+<div class="absolute inset-0 z-0 bg-cover bg-center opacity-90" data-alt="top-down high contrast stylized topographic map of a wilderness area with green forests, brown mountains and blue rivers" data-location="Mesozoic Valley" style="background-image: url('https://placeholder.pics/svg/300')">
+</div>
+<!-- Map Overlay UI -->
+<div class="relative z-10 p-6 h-full flex flex-col justify-between pointer-events-none">
+<div class="flex justify-between items-start pointer-events-auto">
+<h1 class="text-4xl font-extrabold tracking-tight text-on-surface bg-surface/90 px-4 py-2 rounded-lg border-2 border-on-surface sticker-shadow">Expedition Map</h1>
+<div class="flex gap-2">
+<span class="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold border-2 border-on-surface">3 ACTIVE SITES</span>
+</div>
+</div>
+<!-- Markers -->
+<div class="absolute inset-0 pointer-events-auto">
+<!-- Volcano Peak -->
+<div class="absolute top-1/4 left-1/3 group/marker">
+<button class="flex flex-col items-center gap-2 transform transition-transform hover:scale-110">
+<div class="w-10 h-10 bg-secondary-container border-4 border-on-surface rounded-full flex items-center justify-center sticker-shadow">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">volcano</span>
+</div>
+<span class="bg-on-surface text-white px-2 py-1 text-[10px] font-black uppercase rounded shadow-lg">Volcano Peak</span>
+</button>
+</div>
+<!-- Verdant Jungle -->
+<div class="absolute bottom-1/3 right-1/4 group/marker">
+<button class="flex flex-col items-center gap-2 transform transition-transform hover:scale-110">
+<div class="w-10 h-10 bg-primary-container border-4 border-on-surface rounded-full flex items-center justify-center sticker-shadow">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">forest</span>
+</div>
+<span class="bg-on-surface text-white px-2 py-1 text-[10px] font-black uppercase rounded shadow-lg">Verdant Jungle</span>
+</button>
+</div>
+<!-- Bone Yard -->
+<div class="absolute top-1/2 left-2/3 group/marker">
+<button class="flex flex-col items-center gap-2 transform transition-transform hover:scale-110">
+<div class="w-10 h-10 bg-tertiary-container border-4 border-on-surface rounded-full flex items-center justify-center sticker-shadow">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">skeleton</span>
+</div>
+<span class="bg-on-surface text-white px-2 py-1 text-[10px] font-black uppercase rounded shadow-lg">Bone Yard</span>
+</button>
+</div>
+</div>
+<div class="flex justify-end pointer-events-auto">
+<button class="bg-surface-container-lowest text-on-surface px-6 py-3 border-4 border-on-surface rounded-xl font-black uppercase tracking-tighter sticker-shadow active-press">
+                                Full Screen Map
+                            </button>
+</div>
+</div>
+</div>
+<!-- Field Notes -->
+<div class="flex flex-col gap-4">
+<h2 class="text-xl font-extrabold uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">edit_note</span> Field Notes
+                    </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest p-4 rounded-xl border-4 border-primary sticker-shadow flex items-start gap-4">
+<div class="bg-primary-fixed p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Explorer Sarah found a T-Rex horn!</p>
+<p class="text-xs text-on-surface-variant">2 minutes ago • Bone Yard</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl border-4 border-secondary sticker-shadow flex items-start gap-4">
+<div class="bg-secondary-fixed p-2 rounded-lg">
+<span class="material-symbols-outlined text-secondary">military_tech</span>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">New badge earned: Master Shovel!</p>
+<p class="text-xs text-on-surface-variant">1 hour ago • Camp</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Sidebar Content -->
+<section class="lg:col-span-4 flex flex-col gap-8">
+<!-- Daily Dino Feature -->
+<div class="bg-surface-container-lowest rounded-2xl border-4 border-on-surface sticker-shadow overflow-hidden flex flex-col">
+<div class="h-48 bg-cover bg-center border-b-4 border-on-surface" data-alt="dramatic low angle photo of a triceratops museum skeleton with cinematic lighting against a dark background" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAkxUBKnMg1Dl0EbWfxgrOKIMjKmVwuQaOLJZTJvc7W5sx4TSFUrmlKWMLOnXdWcBGG_xdtUT39pVlAWVeExul7IlZBrX_R3JkmyOtL8tTGbfwSpF7zMbmkan1KPrD7RWWkqbhAOGrHHB9HcFoiQgCs38g7tSMxvy4sstV8-si0hWcPjq7x_4woDy4zT3Wk8YwzRBGbV0HZXqiDB38Di1AHLBhdEh36sSbvCeyCPCvn8gQ7CD0IRWWAV03wApZdLkPA2e2J0Q_GipM')">
+</div>
+<div class="p-6">
+<div class="flex justify-between items-center mb-2">
+<span class="text-[10px] font-black uppercase tracking-[0.2em] text-secondary">Featured Specimen</span>
+<span class="bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded text-[10px] font-black uppercase">Herbivore</span>
+</div>
+<h3 class="text-2xl font-black uppercase mb-2">Triceratops</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed mb-6">
+                            Three horns and a massive bony frill make this 9-ton herbivore one of the most recognizable titans of the Cretaceous.
+                        </p>
+<button class="w-full py-3 bg-[#1B5E20] text-white border-4 border-on-primary-fixed-variant rounded-xl sticker-shadow font-extrabold uppercase tracking-widest active-press flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">menu_book</span> Read Lexicon
+                        </button>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="flex flex-col gap-4">
+<h2 class="text-xl font-extrabold uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">flash_on</span> Quick Actions
+                    </h2>
+<div class="flex flex-col gap-4">
+<button class="flex items-center justify-between p-4 bg-tertiary text-white rounded-xl border-4 border-on-tertiary-fixed-variant sticker-shadow active-press">
+<div class="flex items-center gap-4">
+<div class="bg-tertiary-fixed p-2 rounded-lg">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">construction</span>
+</div>
+<div class="text-left">
+<p class="font-black uppercase tracking-widest text-sm">Quick Dig</p>
+<p class="text-[10px] opacity-80 uppercase font-bold">Cost: 20 Bolts</p>
+</div>
+</div>
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+<button class="flex items-center justify-between p-4 bg-surface-container-highest text-on-surface rounded-xl border-4 border-on-surface sticker-shadow active-press">
+<div class="flex items-center gap-4">
+<div class="bg-surface-container-low p-2 rounded-lg border-2 border-on-surface">
+<span class="material-symbols-outlined text-on-surface">backpack</span>
+</div>
+<div class="text-left">
+<p class="font-black uppercase tracking-widest text-sm">My Gear</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold">12 Items Collected</p>
+</div>
+</div>
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe h-20 bg-[#FCF9F0] dark:bg-stone-950 border-t-4 border-[#1B5E20] rounded-t-xl shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center bg-[#1B5E20] text-white rounded-xl p-2 shadow-[2px_2px_0px_0px_rgba(255,107,0,1)] active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-['Plus_Jakarta_Sans'] font-bold text-[10px] uppercase">Camp</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1C1C17] dark:text-stone-400 p-2 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-['Plus_Jakarta_Sans'] font-bold text-[10px] uppercase">Lexicon</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1C1C17] dark:text-stone-400 p-2 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">landscape</span>
+<span class="font-['Plus_Jakarta_Sans'] font-bold text-[10px] uppercase">Dig Site</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#1C1C17] dark:text-stone-400 p-2 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">military_tech</span>
+<span class="font-['Plus_Jakarta_Sans'] font-bold text-[10px] uppercase">Badges</span>
+</a>
+</nav>
+</body></html>

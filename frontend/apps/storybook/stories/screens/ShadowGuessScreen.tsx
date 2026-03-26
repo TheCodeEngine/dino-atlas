@@ -51,32 +51,30 @@ export function ShadowGuessScreen() {
       {/* Shadow display */}
       <div className="flex justify-center mb-4">
         <motion.div
-          className={`w-full aspect-square max-w-[280px] rounded-xl border-[3px] flex items-center justify-center p-8 ${
-            "border-on-surface bg-surface-container-high sticker-shadow"
-          }`}
+          className="w-full aspect-square max-w-[250px] rounded-xl border-[3px] border-on-surface bg-surface-container-high sticker-shadow flex items-center justify-center p-6"
           animate={result === "wrong" ? { x: [0, -5, 5, -3, 0] } : {}}
         >
           <img src={r.shadow} alt="Schatten" className="w-full h-full object-contain drop-shadow-lg" />
         </motion.div>
+      </div>
 
-        {/* Options */}
-        <div className="flex gap-2.5 justify-center">
-          <AnimatePresence>
-            {remaining.map((opt) => (
-              <motion.button
-                key={opt.id}
-                onClick={() => handleGuess(opt.id)}
-                className="flex flex-col items-center gap-1 p-2 bg-surface-container-lowest border-[3px] border-on-surface rounded-xl sticker-shadow"
-                whileTap={{ scale: 0.9 }}
-                layout
-                exit={{ scale: 0, opacity: 0 }}
-              >
-                <img src={opt.image} alt={opt.name} className="w-16 h-16 object-contain" />
-                <span className="text-[9px] font-black uppercase">{opt.name}</span>
-              </motion.button>
-            ))}
-          </AnimatePresence>
-        </div>
+      {/* Options */}
+      <div className="flex gap-2.5 justify-center">
+        <AnimatePresence>
+          {remaining.map((opt) => (
+            <motion.button
+              key={opt.id}
+              onClick={() => handleGuess(opt.id)}
+              className="flex flex-col items-center gap-1 p-2 bg-surface-container-lowest border-[3px] border-on-surface rounded-xl sticker-shadow"
+              whileTap={{ scale: 0.9 }}
+              layout
+              exit={{ scale: 0, opacity: 0 }}
+            >
+              <img src={opt.image} alt={opt.name} className="w-16 h-16 object-contain" />
+              <span className="text-[9px] font-black uppercase">{opt.name}</span>
+            </motion.button>
+          ))}
+        </AnimatePresence>
       </div>
     </MinigameShell>
   );

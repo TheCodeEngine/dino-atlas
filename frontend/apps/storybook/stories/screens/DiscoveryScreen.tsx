@@ -250,8 +250,21 @@ const DINO = {
   ],
 };
 
+const IMAGE_VIEWS = [
+  { id: "real", label: "Echt", icon: "photo_camera" },
+  { id: "comic", label: "Comic", icon: "brush" },
+  { id: "skeleton", label: "Skelett", icon: "skeleton" },
+] as const;
+
+const IMAGE_URLS: Record<string, string> = {
+  real: "/dinos/triceratops/real.png",
+  comic: "/dinos/triceratops/comic.png",
+  skeleton: "/dinos/triceratops/skeleton.png",
+};
+
 export function DiscoveryScreen() {
   const [activeFact, setActiveFact] = useState(0);
+  const [activeImage, setActiveImage] = useState<string>("real");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -269,9 +282,36 @@ export function DiscoveryScreen() {
 
       {/* Scrollable */}
       <main className="flex-1 overflow-y-auto pb-6 max-w-md mx-auto w-full">
-        {/* Hero: Echtes Bild */}
-        <div className="mx-4 rounded-xl border-[3px] border-on-surface sticker-shadow overflow-hidden mb-3">
-          <img src={DINO.images.real} alt={DINO.name} className="w-full h-44 object-cover" />
+        {/* Hero Image */}
+        <div className="mx-4 mb-2">
+          <div className={`rounded-xl border-[3px] border-on-surface sticker-shadow overflow-hidden ${
+            activeImage === "skeleton" ? "bg-[#2C1A0E]" : activeImage === "comic" ? "bg-gradient-to-br from-primary-fixed/30 to-tertiary-fixed/20" : ""
+          }`}>
+            <img
+              src={IMAGE_URLS[activeImage]}
+              alt={`${DINO.name} — ${activeImage}`}
+              className={`w-full ${activeImage === "comic" ? "h-44 object-contain py-2" : "h-44 object-cover"}`}
+            />
+          </div>
+
+          {/* Thumbnails */}
+          <div className="flex justify-center gap-2 mt-2">
+            {IMAGE_VIEWS.map((view) => (
+              <button
+                key={view.id}
+                onClick={() => setActiveImage(view.id)}
+                className={[
+                  "flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all",
+                  activeImage === view.id
+                    ? "bg-primary-container text-white border-[2px] border-on-surface shadow-[2px_2px_0px_0px_#1c1c17]"
+                    : "bg-surface-container-low text-on-surface-variant border-[2px] border-outline-variant",
+                ].join(" ")}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>{view.icon}</span>
+                {view.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Name */}

@@ -103,33 +103,39 @@ export function SizeSortScreen() {
       <FullscreenHeader title="Größen-Sortieren" playerEmoji="🦖" />
 
       <main className="flex-1 flex flex-col px-4 pb-6 max-w-sm mx-auto w-full">
-        <div className="mb-3">
-          <ForscherSpeech text="Sortiere die Dinos! Der Größte nach oben, der Kleinste nach unten. Ziehe sie mit dem Finger!" />
-        </div>
-
-        <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant mb-2 flex items-center gap-1">
-          <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>drag_indicator</span>
-          Ziehe die Dinos an die richtige Stelle
-        </p>
-
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={order.map((d) => d.id)} strategy={verticalListSortingStrategy}>
-            <div className="flex flex-col gap-2 mb-4">
-              {order.map((dino, idx) => (
-                <SortableDino key={dino.id} dino={dino} idx={idx} checked={checked} correct={correct} />
-              ))}
+        {!(checked && correct) ? (
+          <>
+            <div className="mb-3">
+              <ForscherSpeech text="Sortiere die Dinos! Der Größte nach oben, der Kleinste nach unten. Ziehe sie mit dem Finger!" />
             </div>
-          </SortableContext>
-        </DndContext>
 
-        {!checked && (
-          <Button variant="primary" fullWidth icon="check" onClick={handleCheck}>Überprüfen!</Button>
-        )}
+            <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant mb-2 flex items-center gap-1">
+              <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>drag_indicator</span>
+              Ziehe die Dinos an die richtige Stelle
+            </p>
 
-        {checked && correct && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
-            <p className="text-lg font-black text-primary-container mb-3">🎉 Richtig sortiert!</p>
-            <Button variant="primary" fullWidth icon="check">Fertig!</Button>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={order.map((d) => d.id)} strategy={verticalListSortingStrategy}>
+                <div className="flex flex-col gap-2 mb-4">
+                  {order.map((dino, idx) => (
+                    <SortableDino key={dino.id} dino={dino} idx={idx} checked={checked} correct={correct} />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+
+            {!checked && (
+              <Button variant="primary" fullWidth icon="check" onClick={handleCheck}>Überprüfen!</Button>
+            )}
+          </>
+        ) : (
+          <motion.div className="flex-1 flex flex-col items-center justify-center text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <span className="text-6xl mb-4">🎉</span>
+            <h2 className="text-2xl font-black uppercase mb-3">Richtig sortiert!</h2>
+            <ForscherSpeech text="Super gemacht! Du weißt welcher Dino am größten ist!" />
+            <div className="w-full mt-4">
+              <Button variant="primary" fullWidth icon="check">Fertig!</Button>
+            </div>
           </motion.div>
         )}
       </main>

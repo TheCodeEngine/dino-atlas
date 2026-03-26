@@ -57,7 +57,7 @@ export function MuseumTransition({ dinoImage, dinoName, scene, onComplete, child
             {scene(phase, dinoImage)}
 
             {/* Museum building (shared across all variants) */}
-            <MuseumBuilding phase={phase} />
+            {phase !== "done" && <MuseumBuilding phase={phase} />}
 
             {/* Done overlay (shared) */}
             {phase === "done" && (
@@ -252,27 +252,93 @@ function DoneOverlay({ dinoImage, dinoName, onComplete }: { dinoImage: string; d
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#08131d]/8 to-[#061019]/26" />
       <div
         className="absolute inset-0"
-        style={{ background: "radial-gradient(circle at 68% 34%, rgba(255,220,136,0.18) 0%, rgba(255,220,136,0) 24%)" }}
+        style={{
+          background:
+            "linear-gradient(180deg, #10213d 0%, #234974 28%, #4f83b4 56%, #c59b5e 84%, #f0cf95 100%)",
+        }}
       />
-      <div className="absolute inset-x-0 bottom-0 h-[34%] bg-gradient-to-t from-[#061019]/14 to-transparent" />
+      <div
+        className="absolute inset-0 opacity-45"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 18% 18%, rgba(255,255,255,0.18), transparent 22%), radial-gradient(circle at 78% 24%, rgba(255,214,132,0.18), transparent 24%), radial-gradient(circle at 50% 38%, rgba(255,243,202,0.16), transparent 28%)",
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#2a1907]/18" />
 
-      {Array.from({ length: 4 }).map((_, i) => (
+      <div className="absolute inset-x-0 top-0 h-[56%] overflow-hidden">
+        <div className="absolute left-[-12%] top-[8%] h-44 w-44 rounded-full border-[22px] border-[#f3d28a]/16" />
+        <div className="absolute right-[-10%] top-[18%] h-36 w-36 rounded-full border-[18px] border-[#f7e3b8]/10" />
+        <div className="absolute left-[-8%] bottom-[10%] h-40 w-28 rounded-t-[8rem] bg-[#18324e]/18" />
+        <div className="absolute right-[-6%] bottom-[8%] h-44 w-32 rounded-t-[8rem] bg-[#18324e]/18" />
+        <div className="absolute left-[8%] bottom-[8%] h-28 w-20 rounded-t-[4rem] bg-[#173450]/20" />
+        <div className="absolute right-[10%] bottom-[6%] h-32 w-24 rounded-t-[4rem] bg-[#173450]/20" />
+
+        <motion.div
+          className="absolute left-1/2 top-[10%] h-56 w-24 -translate-x-1/2 blur-2xl"
+          style={{ background: "linear-gradient(180deg, rgba(255,244,207,0.75) 0%, rgba(255,244,207,0) 100%)" }}
+          animate={{ opacity: [0.5, 0.86, 0.58], scaleY: [0.92, 1.08, 1] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute left-[32%] top-[14%] h-44 w-12 origin-top rounded-full blur-xl"
+          style={{ background: "linear-gradient(180deg, rgba(255,238,193,0.38) 0%, rgba(255,238,193,0) 100%)" }}
+          animate={{ rotate: [-16, -8, -14], opacity: [0.18, 0.42, 0.18] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute right-[32%] top-[14%] h-44 w-12 origin-top rounded-full blur-xl"
+          style={{ background: "linear-gradient(180deg, rgba(255,238,193,0.38) 0%, rgba(255,238,193,0) 100%)" }}
+          animate={{ rotate: [16, 8, 14], opacity: [0.18, 0.42, 0.18] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        <div className="absolute left-1/2 top-[18%] h-32 w-32 -translate-x-1/2 rounded-full bg-[#ffd77e]/30 blur-3xl" />
+        <motion.div
+          className="absolute left-1/2 top-[19%] flex h-[6.8rem] w-[6.8rem] -translate-x-1/2 items-center justify-center rounded-full border-[4px] border-on-surface bg-[#fff4d9]"
+          animate={{ y: [0, -4, 0], boxShadow: ["0 14px 0 #1c1c17", "0 18px 0 #1c1c17", "0 14px 0 #1c1c17"] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <div className="absolute inset-[0.45rem] rounded-full border-[2px] border-dashed border-[#d5ad5f]" />
+          <img src={dinoImage} alt="" className="relative h-16 w-16 object-contain drop-shadow-md" />
+        </motion.div>
+
+        <div className="absolute left-1/2 top-[41%] flex -translate-x-1/2 items-center gap-2 rounded-full border-[2px] border-on-surface bg-white/82 px-3 py-1">
+          <span className="material-symbols-outlined text-primary-container" style={{ fontSize: "16px", fontVariationSettings: "'FILL' 1" }}>
+            museum
+          </span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface">Neue Vitrine</span>
+        </div>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 h-[36%] bg-gradient-to-t from-[#8b6132]/44 via-[#d2a15d]/24 to-transparent" />
+      <div
+        className="absolute inset-x-[-6%] bottom-0 h-[17%]"
+        style={{
+          background: "linear-gradient(180deg, #efddb4 0%, #d9af6d 44%, #b88443 100%)",
+          clipPath: "polygon(0 100%, 100% 100%, 100% 26%, 74% 18%, 50% 8%, 28% 18%, 0 26%)",
+        }}
+      />
+      <div
+        className="absolute inset-x-[14%] bottom-[15.3%] h-[1.15rem] rounded-full bg-[#6c4a27]/35 blur-[2px]"
+      />
+
+      {Array.from({ length: 7 }).map((_, i) => (
         <motion.div
           key={i}
           className="absolute z-40 rounded-full bg-white/75 blur-[1px]"
           style={{
-            left: `${18 + i * 12}%`,
-            top: `${20 + (i % 2) * 8}%`,
+            left: `${10 + i * 12}%`,
+            top: `${12 + (i % 3) * 8}%`,
             width: `${5 + (i % 2) * 3}px`,
             height: `${5 + (i % 2) * 3}px`,
             boxShadow: "0 0 16px rgba(255,229,164,0.55)",
           }}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: [0, 1.05, 0.2], opacity: [0, 0.95, 0], y: [0, -20] }}
-          transition={{ delay: i * 0.12, duration: 1.2, repeat: Infinity, repeatDelay: 1.3 }}
+          transition={{ delay: i * 0.1, duration: 1.2, repeat: Infinity, repeatDelay: 1.3 }}
         />
       ))}
 

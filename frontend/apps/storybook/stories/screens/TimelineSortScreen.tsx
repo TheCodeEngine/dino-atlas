@@ -125,11 +125,11 @@ export function TimelineSortScreen() {
       <FullscreenHeader title="Zeitleiste" playerEmoji="🦖" />
 
       <main className="flex-1 flex flex-col px-4 pb-6 max-w-sm mx-auto w-full">
-        <div className="mb-3">
-          <ForscherSpeech text="In welcher Zeit hat jeder Dino gelebt? Ziehe sie in die richtige Epoche!" />
-        </div>
-
         {!done ? (
+          <>
+          <div className="mb-3">
+            <ForscherSpeech text="In welcher Zeit hat jeder Dino gelebt? Ziehe sie in die richtige Epoche!" />
+          </div>
           <DndContext
             sensors={sensors}
             onDragStart={handleDragStart}
@@ -176,11 +176,13 @@ export function TimelineSortScreen() {
               })()}
             </DragOverlay>
           </DndContext>
+          </>
         ) : (
-          <motion.div className="text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <p className="text-lg font-black text-primary-container mb-3">🎉 Alle richtig zugeordnet!</p>
+          <motion.div className="flex-1 flex flex-col items-center justify-center text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <span className="text-6xl mb-4">🎉</span>
+            <h2 className="text-2xl font-black uppercase mb-3">Alle richtig!</h2>
             <ForscherSpeech text="Du weißt genau wann jeder Dino gelebt hat! Klasse!" />
-            <div className="mt-4">
+            <div className="w-full mt-4">
               <Button variant="primary" fullWidth icon="check">Fertig!</Button>
             </div>
           </motion.div>

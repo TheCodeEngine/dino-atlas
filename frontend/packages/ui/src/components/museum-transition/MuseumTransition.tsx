@@ -96,80 +96,186 @@ export function MuseumTransition({ dinoImage, dinoName, scene, onComplete, child
 
 /** Museum building — shared across all transition variants */
 function MuseumBuilding({ phase }: { phase: TransitionPhase }) {
+  const isRunning = phase === "run";
   const isArriving = phase === "enter" || phase === "done";
 
   return (
     <motion.div
-      className="absolute bottom-[28.5%] right-[4%] z-20 flex flex-col items-center"
-      initial={{ x: 220, y: 12, scale: 0.84, opacity: 0.7 }}
+      className="absolute z-20"
+      style={{ right: "8%", bottom: "35.5%" }}
+      initial={{ x: 180, y: 18, scale: 0.74, opacity: 0 }}
       animate={
-        phase === "run"
-          ? { x: [220, 0], y: [12, 0], scale: [0.84, 1], opacity: [0.7, 1] }
-          : { x: 0, y: 0, scale: 1, opacity: 1 }
+        isRunning
+          ? { x: [180, 0], y: [18, 0], scale: [0.74, 0.96], opacity: [0, 1] }
+          : { x: 0, y: 0, scale: 0.96, opacity: 1 }
       }
       transition={
-        phase === "run"
-          ? { duration: 2.2, delay: 0.25, ease: [0.16, 1, 0.3, 1] }
+        isRunning
+          ? { duration: 2.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }
           : { duration: 0.35, ease: "easeOut" }
       }
     >
       <motion.div
-        className="absolute bottom-[3.6rem] h-24 w-36 rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(255,229,165,0.85) 0%, rgba(255,229,165,0) 72%)" }}
+        className="absolute rounded-full blur-3xl"
+        style={{
+          left: "50%",
+          bottom: "0.9rem",
+          width: "10rem",
+          height: "5.75rem",
+          transform: "translateX(-50%)",
+          background: "radial-gradient(circle, rgba(255,229,165,0.85) 0%, rgba(255,229,165,0) 72%)",
+        }}
         animate={isArriving ? { scale: [0.75, 1.2, 1], opacity: [0.18, 0.75, 0.48] } : { scale: 0.82, opacity: 0.18 }}
         transition={isArriving ? { duration: 0.45, ease: "easeOut" } : { duration: 0.3, ease: "easeOut" }}
       />
 
       <motion.div
-        className="absolute bottom-[3rem] left-1/2 h-24 w-16 -translate-x-1/2 blur-xl"
-        style={{ background: "linear-gradient(180deg, rgba(255,249,224,0.75) 0%, rgba(255,236,176,0.45) 45%, rgba(255,236,176,0) 100%)" }}
+        className="absolute left-1/2 blur-xl"
+        style={{
+          bottom: "1.4rem",
+          width: "4rem",
+          height: "6rem",
+          transform: "translateX(-50%)",
+          background: "linear-gradient(180deg, rgba(255,249,224,0.75) 0%, rgba(255,236,176,0.45) 45%, rgba(255,236,176,0) 100%)",
+        }}
         animate={isArriving ? { opacity: [0.12, 0.92, 0.52], scaleY: [0.75, 1.18, 1] } : { opacity: 0.08, scaleY: 0.78 }}
         transition={isArriving ? { duration: 0.42, ease: "easeOut" } : { duration: 0.28, ease: "easeOut" }}
       />
 
-      <div className="relative flex flex-col items-center">
-        <div className="h-3 w-36 rounded-t-[28px] border-[3px] border-on-surface bg-[#83532a]" />
-        <div className="relative -mt-1 flex h-24 w-32 items-end justify-center overflow-hidden border-[3px] border-on-surface bg-gradient-to-b from-[#f7efd9] to-[#dfbf8a] rounded-t-[18px]">
-          <div className="absolute inset-x-3 top-2 h-2 rounded-full bg-white/45" />
-          <div className="absolute top-3 left-1/2 flex -translate-x-1/2 items-center justify-center rounded-full border-[2px] border-on-surface bg-[#fff8e4] px-3 py-1">
+      <div className="relative" style={{ width: "8.9rem" }}>
+        <div
+          className="absolute left-1/2"
+          style={{
+            top: "-1.85rem",
+            width: "3.75rem",
+            height: "2.2rem",
+            transform: "translateX(-50%)",
+            background: "linear-gradient(180deg, #f8eecf 0%, #d6b16a 100%)",
+            border: "3px solid #1c1c17",
+            borderBottom: "0",
+            borderRadius: "999px 999px 0 0",
+          }}
+        />
+        <div
+          className="absolute left-1/2"
+          style={{
+            top: "-0.5rem",
+            width: "8.5rem",
+            height: "1.7rem",
+            transform: "translateX(-50%)",
+            background: "linear-gradient(180deg, #f7d08b 0%, #bd8240 100%)",
+            border: "3px solid #1c1c17",
+            clipPath: "polygon(50% 0, 100% 100%, 0 100%)",
+          }}
+        />
+
+        <div
+          className="relative overflow-hidden"
+          style={{
+            height: "6.4rem",
+            border: "3px solid #1c1c17",
+            borderRadius: "1.35rem 1.35rem 1rem 1rem",
+            background: "linear-gradient(180deg, #fff9ea 0%, #f1d7a1 55%, #d0a160 100%)",
+            boxShadow: "0 16px 24px rgba(0,0,0,0.18)",
+          }}
+        >
+          <div className="absolute inset-x-3 top-2 h-2 rounded-full bg-white/50" />
+          <div
+            className="absolute left-1/2 flex items-center justify-center rounded-full"
+            style={{
+              top: "0.65rem",
+              width: "3.8rem",
+              height: "1.6rem",
+              transform: "translateX(-50%)",
+              border: "2px solid #1c1c17",
+              background: "#fff8e4",
+            }}
+          >
             <span
               className="material-symbols-outlined text-primary-container"
-              style={{ fontSize: "17px", fontVariationSettings: "'FILL' 1" }}
+              style={{ fontSize: "16px", fontVariationSettings: "'FILL' 1" }}
             >
               museum
             </span>
           </div>
-          <p className="absolute bottom-[4.15rem] text-[8px] font-black uppercase tracking-[0.22em] text-[#7a5327]">
+          <p
+            className="absolute left-1/2 text-[8px] font-black uppercase tracking-[0.22em] text-[#7a5327]"
+            style={{ top: "2.55rem", transform: "translateX(-50%)" }}
+          >
             Museum
           </p>
+
+          <div
+            className="absolute rounded-md border-[2px] border-on-surface bg-[#df6f37]"
+            style={{ left: "0.4rem", top: "1.9rem", width: "0.65rem", height: "1.4rem" }}
+          />
+          <div
+            className="absolute rounded-md border-[2px] border-on-surface bg-[#df6f37]"
+            style={{ right: "0.4rem", top: "1.9rem", width: "0.65rem", height: "1.4rem" }}
+          />
 
           {Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
-              className="absolute bottom-0 h-14 w-4 border-x-[2px] border-on-surface/55 bg-[#f6e5bf]"
-              style={{ left: `${17 + index * 21}%` }}
+              className="absolute bottom-0 bg-[#fef3d1]"
+              style={{
+                left: `${1.2 + index * 1.65}rem`,
+                width: "0.7rem",
+                height: "3.15rem",
+                borderLeft: "2px solid rgba(28,28,23,0.4)",
+                borderRight: "2px solid rgba(28,28,23,0.4)",
+              }}
             />
           ))}
 
-          <div className="absolute bottom-0 left-1/2 h-12 w-12 -translate-x-1/2 rounded-t-[14px] border-[3px] border-on-surface bg-[#2b1307]" />
-          <div className="absolute bottom-[2px] left-1/2 h-[42px] w-[42px] -translate-x-1/2 rounded-t-[10px] bg-gradient-to-b from-[#fff7d4]/70 to-[#f3d27e]/30" />
-          <div className="absolute bottom-[2px] left-1/2 flex h-[42px] w-[42px] -translate-x-1/2 overflow-hidden rounded-t-[10px]">
-            <motion.div
-              className="h-full w-1/2 border-r border-[#321607] bg-gradient-to-b from-[#7f4117] to-[#4a220c]"
-              animate={isArriving ? { x: -9, scaleX: 0.72 } : { x: 0, scaleX: 1 }}
-              transition={isArriving ? { duration: 0.24, ease: "easeOut" } : { duration: 0.22, ease: "easeOut" }}
-              style={{ transformOrigin: "left center" }}
+          <div
+            className="absolute left-1/2"
+            style={{
+              bottom: "0",
+              width: "3.2rem",
+              height: "3.35rem",
+              transform: "translateX(-50%)",
+              border: "3px solid #1c1c17",
+              borderBottom: "0",
+              borderRadius: "1rem 1rem 0 0",
+              background: "#2b1307",
+            }}
+          />
+          <div
+            className="absolute left-1/2 overflow-hidden"
+            style={{
+              bottom: "0.15rem",
+              width: "2.65rem",
+              height: "2.85rem",
+              transform: "translateX(-50%)",
+              borderRadius: "0.85rem 0.85rem 0 0",
+            }}
+          >
+            <div
+              className="absolute inset-0"
+              style={{ background: "linear-gradient(180deg, rgba(255,247,212,0.72) 0%, rgba(243,210,126,0.32) 100%)" }}
             />
             <motion.div
-              className="h-full w-1/2 bg-gradient-to-b from-[#7f4117] to-[#4a220c]"
-              animate={isArriving ? { x: 9, scaleX: 0.72 } : { x: 0, scaleX: 1 }}
+              className="absolute left-0 top-0 h-full w-1/2 border-r border-[#321607]"
+              animate={isArriving ? { x: -8, scaleX: 0.72 } : { x: 0, scaleX: 1 }}
               transition={isArriving ? { duration: 0.24, ease: "easeOut" } : { duration: 0.22, ease: "easeOut" }}
-              style={{ transformOrigin: "right center" }}
+              transformTemplate={({ x, scaleX }) => `translateX(${x ?? 0}px) scaleX(${scaleX ?? 1})`}
+              style={{ transformOrigin: "left center", background: "linear-gradient(180deg, #7f4117 0%, #4a220c 100%)" }}
+            />
+            <motion.div
+              className="absolute right-0 top-0 h-full w-1/2"
+              animate={isArriving ? { x: 8, scaleX: 0.72 } : { x: 0, scaleX: 1 }}
+              transition={isArriving ? { duration: 0.24, ease: "easeOut" } : { duration: 0.22, ease: "easeOut" }}
+              transformTemplate={({ x, scaleX }) => `translateX(${x ?? 0}px) scaleX(${scaleX ?? 1})`}
+              style={{ transformOrigin: "right center", background: "linear-gradient(180deg, #7f4117 0%, #4a220c 100%)" }}
             />
           </div>
           <div className="absolute bottom-0 h-3 w-full bg-[#d3b27e]" />
         </div>
-        <div className="flex h-4 w-28 items-center justify-center gap-1 rounded-b-2xl border-x-[3px] border-b-[3px] border-on-surface bg-[#f3e2bb]">
+        <div
+          className="mx-auto flex items-center justify-center gap-1 rounded-b-2xl border-x-[3px] border-b-[3px] border-on-surface bg-[#f3e2bb]"
+          style={{ width: "6.9rem", height: "1rem" }}
+        >
           {Array.from({ length: 5 }).map((_, index) => (
             <div key={index} className="h-2 w-3 rounded-full bg-[#986d42]/45" />
           ))}
@@ -183,81 +289,108 @@ function MuseumBuilding({ phase }: { phase: TransitionPhase }) {
 function DoneOverlay({ dinoImage, dinoName, onComplete }: { dinoImage: string; dinoName: string; onComplete: () => void }) {
   return (
     <motion.div
-      className="absolute inset-0 flex flex-col items-center justify-center z-30"
+      className="absolute inset-0 z-30"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
-      <div className="absolute inset-0 bg-[#061019]/48 backdrop-blur-[6px]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#08131d]/12 to-[#061019]/42" />
       <div
         className="absolute inset-0"
-        style={{ background: "radial-gradient(circle at center, rgba(255,220,136,0.18) 0%, rgba(255,220,136,0) 44%)" }}
+        style={{ background: "radial-gradient(circle at 50% 38%, rgba(255,220,136,0.22) 0%, rgba(255,220,136,0) 34%)" }}
       />
-      <motion.div
-        className="relative mx-6 w-[min(90vw,24rem)] rounded-[2rem] border-[3px] border-on-surface bg-gradient-to-br from-[#fff8e7] via-[#ffe3ab] to-[#e9b45e] px-6 py-7 text-center sticker-shadow"
-        initial={{ scale: 0 }}
-        animate={{ scale: [0, 1.2, 1] }}
-        transition={{ type: "spring", damping: 8 }}
-      >
-        <div className="absolute inset-x-6 top-4 h-16 rounded-full bg-white/30 blur-2xl" />
-        <div className="relative flex items-center justify-center gap-3">
-          <div className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-[1.5rem] border-[3px] border-on-surface bg-white/70">
-            <img src={dinoImage} alt="" className="h-14 w-14 object-contain drop-shadow-md" />
-          </div>
-          <div className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] border-[3px] border-on-surface bg-[#fff5db]">
-            <span
-              className="material-symbols-outlined text-primary-container"
-              style={{ fontSize: "28px", fontVariationSettings: "'FILL' 1" }}
-            >
-              museum
-            </span>
-          </div>
-        </div>
+      <div className="absolute inset-x-0 bottom-0 h-[44%] bg-gradient-to-t from-[#061019]/18 to-transparent" />
 
-        <div className="relative mt-4 inline-flex items-center gap-2 rounded-full border-[2px] border-on-surface bg-white/65 px-3 py-1">
-          <span className="material-symbols-outlined text-secondary-container" style={{ fontSize: "18px" }}>
-            auto_awesome
-          </span>
-          <span className="text-[11px] font-black uppercase tracking-[0.18em] text-on-surface">Gesichert</span>
-        </div>
-
-        <p className="relative mt-4 text-3xl font-black uppercase leading-none text-on-surface">
-          {dinoName}
-          <br />
-          im Museum!
-        </p>
-        <p className="relative mt-3 text-sm font-semibold text-on-surface-variant">
-          Dein Dino ist angekommen und wartet jetzt in der Sammlung auf seinen großen Auftritt.
-        </p>
-      </motion.div>
-
-      {Array.from({ length: 8 }).map((_, i) => (
+      {Array.from({ length: 6 }).map((_, i) => (
         <motion.div
           key={i}
-          className="absolute z-40 rotate-45 rounded-[8px] bg-white/85"
+          className="absolute z-40 rotate-45 rounded-[6px] bg-white/80"
           style={{
-            left: `${10 + i * 10}%`,
-            top: `${16 + (i % 4) * 14}%`,
-            width: `${10 + (i % 3) * 4}px`,
-            height: `${10 + (i % 3) * 4}px`,
-            boxShadow: "0 0 24px rgba(255,230,170,0.7)",
+            left: `${14 + i * 11}%`,
+            top: `${18 + (i % 3) * 10}%`,
+            width: `${8 + (i % 2) * 4}px`,
+            height: `${8 + (i % 2) * 4}px`,
+            boxShadow: "0 0 18px rgba(255,229,164,0.65)",
           }}
           initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: [0, 1.4, 0.25], opacity: [0, 1, 0], y: [0, -34] }}
-          transition={{ delay: i * 0.08, duration: 1.45, repeat: Infinity, repeatDelay: 1 }}
+          animate={{ scale: [0, 1.15, 0.2], opacity: [0, 1, 0], y: [0, -26] }}
+          transition={{ delay: i * 0.1, duration: 1.3, repeat: Infinity, repeatDelay: 1.2 }}
         />
       ))}
 
-      <motion.button
-        className="mt-10 px-8 py-3 bg-white text-primary-container border-[3px] border-on-surface rounded-xl sticker-shadow font-black uppercase tracking-wider text-sm flex items-center gap-2 relative z-40"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, type: "spring" }}
-        whileTap={{ scale: 0.93 }}
-        onClick={onComplete}
+      <motion.div
+        className="absolute inset-x-3 bottom-3 overflow-hidden rounded-[2rem] border-[3px] border-on-surface bg-[#fff8e8]/95 sticker-shadow"
+        style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
+        initial={{ y: 42, opacity: 0, scale: 0.96 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={{ delay: 0.08, type: "spring", stiffness: 240, damping: 22 }}
       >
-        <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>check</span>
-        Weiter geht's!
-      </motion.button>
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/60 to-transparent" />
+        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#ffd171]/35 blur-3xl" />
+
+        <div className="relative px-5 pt-5">
+          <div className="flex items-center justify-between gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full border-[2px] border-on-surface bg-white/80 px-3 py-1">
+              <span className="material-symbols-outlined text-secondary-container" style={{ fontSize: "18px" }}>
+                auto_awesome
+              </span>
+              <span className="text-[11px] font-black uppercase tracking-[0.18em] text-on-surface">Gesichert</span>
+            </div>
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-on-surface-variant">Museumseintrag</p>
+          </div>
+
+          <div className="mt-4 flex items-center gap-3">
+            <div className="flex h-[4.5rem] w-[4.5rem] flex-shrink-0 items-center justify-center rounded-[1.4rem] border-[3px] border-on-surface bg-white/82">
+              <img src={dinoImage} alt="" className="h-14 w-14 object-contain drop-shadow-md" />
+            </div>
+
+            <div className="relative flex flex-1 items-center">
+              <div className="h-[4px] flex-1 rounded-full bg-gradient-to-r from-[#78a36d] via-[#dba95b] to-[#7ea36d]" />
+              <motion.div
+                className="absolute left-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border-[2px] border-on-surface bg-white"
+                animate={{ x: ["0%", "92%"] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </div>
+
+            <div className="flex h-[4rem] w-[4rem] flex-shrink-0 items-center justify-center rounded-[1.15rem] border-[3px] border-on-surface bg-[#fff2cf]">
+              <span
+                className="material-symbols-outlined text-primary-container"
+                style={{ fontSize: "28px", fontVariationSettings: "'FILL' 1" }}
+              >
+                museum
+              </span>
+            </div>
+          </div>
+
+          <p className="mt-5 text-[2rem] font-black uppercase leading-[0.9] text-on-surface">
+            {dinoName}
+            <br />
+            im Museum
+          </p>
+          <p className="mt-3 text-sm font-semibold leading-snug text-on-surface-variant">
+            Dein Fund ist jetzt sauber archiviert und wartet in deiner Sammlung auf den nächsten Besuch.
+          </p>
+
+          <div className="mt-4 rounded-[1.35rem] border-[2px] border-on-surface/15 bg-white/65 px-4 py-3">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-on-surface-variant">Neuer Eintrag</p>
+            <p className="mt-1 text-sm font-semibold text-on-surface">
+              Abgelegt in der Vitrine und bereit fur deine Sammlung.
+            </p>
+          </div>
+
+          <motion.button
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-[3px] border-on-surface bg-white py-3 text-sm font-black uppercase tracking-wider text-primary-container sticker-shadow"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.22, type: "spring" }}
+            whileTap={{ scale: 0.97 }}
+            onClick={onComplete}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>check</span>
+            Weiter geht's!
+          </motion.button>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }

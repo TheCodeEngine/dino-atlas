@@ -127,20 +127,73 @@ export function LandScene(phase: TransitionPhase, dinoImage: string) {
       {CLOUDS.map((cloud, index) => (
         <motion.div
           key={cloud.left}
-          className="absolute rounded-full bg-white blur-[1px]"
+          className="absolute"
           style={{
             left: cloud.left,
             top: cloud.top,
             width: cloud.width,
             height: cloud.height,
             opacity: cloud.opacity,
+            filter: "blur(0.5px)",
           }}
           animate={isRunning ? { x: [0, -cloud.drift], y: [0, -4, 0] } : isArriving ? { x: -cloud.drift, y: 0 } : { x: 0, y: 0 }}
           transition={isRunning ? { duration: RUN_DURATION + index * 0.18, ease: "linear" } : { duration: 0.35, ease: "easeOut" }}
-        />
+        >
+          <div
+            className="absolute rounded-full bg-white/70"
+            style={{ left: "10%", bottom: "10%", width: "34%", height: "56%" }}
+          />
+          <div
+            className="absolute rounded-full bg-white/82"
+            style={{ left: "28%", bottom: "20%", width: "42%", height: "66%" }}
+          />
+          <div
+            className="absolute rounded-full bg-white/72"
+            style={{ right: "8%", bottom: "12%", width: "36%", height: "54%" }}
+          />
+          <div
+            className="absolute rounded-full bg-white/64"
+            style={{ left: "22%", bottom: "0%", width: "56%", height: "40%" }}
+          />
+        </motion.div>
       ))}
 
       <div className="absolute inset-x-0 bottom-[45%] h-[18%] bg-gradient-to-b from-white/18 to-transparent opacity-35" />
+      <div
+        className="absolute"
+        style={{
+          right: "-2%",
+          bottom: "36.5%",
+          width: "42%",
+          height: "15%",
+          background: "linear-gradient(180deg, #4e7847 0%, #284624 100%)",
+          clipPath: "polygon(10% 100%, 100% 100%, 100% 28%, 78% 12%, 56% 26%, 30% 56%, 0 84%)",
+          boxShadow: "0 18px 28px rgba(0,0,0,0.18)",
+        }}
+      />
+      <div
+        className="absolute"
+        style={{
+          right: "13.5%",
+          bottom: "35.8%",
+          width: "18%",
+          height: "1rem",
+          borderRadius: "999px",
+          background: "#274024",
+        }}
+      />
+      <motion.div
+        className="absolute blur-2xl"
+        style={{
+          right: "18.5%",
+          bottom: "37.4%",
+          width: "2.8rem",
+          height: "5.6rem",
+          background: "linear-gradient(180deg, rgba(255,243,210,0.52) 0%, rgba(255,243,210,0) 100%)",
+        }}
+        animate={isArriving ? { opacity: [0.1, 0.75, 0.3], scaleY: [0.8, 1.15, 1] } : { opacity: 0.16, scaleY: 0.86 }}
+        transition={isArriving ? { duration: 0.42, ease: "easeOut" } : { duration: 0.3, ease: "easeOut" }}
+      />
 
       <motion.div
         className="absolute inset-x-[-12%] bottom-[36%] h-[24%]"

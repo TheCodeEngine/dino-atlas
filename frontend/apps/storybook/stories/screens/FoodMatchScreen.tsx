@@ -1,5 +1,17 @@
 import { useState } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  useDraggable,
+  useDroppable,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
 import { FullscreenHeader } from "../../../../packages/ui/src/components/FullscreenHeader";
 import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
 import { Button } from "../../../../packages/ui/src/primitives/Button";
@@ -17,115 +29,163 @@ const FOODS = [
   { id: "meat", emoji: "🥩", label: "Fleisch" },
 ];
 
+function DraggableDino({ dino, disabled }: { dino: typeof DINOS[0]; disabled: boolean }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: dino.id, disabled });
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      className={`flex flex-col items-center gap-1 p-2 rounded-xl border-[3px] border-on-surface bg-surface-container-lowest sticker-shadow touch-none ${
+        isDragging ? "opacity-30" : ""
+      } ${disabled ? "opacity-40 grayscale" : ""}`}
+    >
+      <img src={dino.image} alt={dino.name} className="w-14 h-14 object-contain" />
+      <span className="text-[9px] font-black uppercase">{dino.name}</span>
+    </div>
+  );
+}
+
+function FoodDropZone({ food, dinosHere, isOver }: { food: typeof FOODS[0]; dinosHere: typeof DINOS; isOver: boolean }) {
+  const { setNodeRef } = useDroppable({ id: food.id });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`flex-1 rounded-xl border-[3px] p-3 min-h-[120px] transition-all ${
+        isOver ? "border-[#ffc850] bg-[#ffc850]/10" : "border-on-surface bg-surface-container-lowest"
+      }`}
+    >
+      <div className="text-center mb-2">
+        <span className="text-3xl">{food.emoji}</span>
+        <p className="text-[10px] font-black uppercase">{food.label}</p>
+      </div>
+      <div className="flex flex-wrap gap-1 justify-center">
+        {dinosHere.map((d) => (
+          <motion.img
+            key={d.id}
+            src={d.image}
+            alt={d.name}
+            className="w-10 h-10 object-contain"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", damping: 12 }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function FoodMatchScreen() {
-  const [current, setCurrent] = useState(0);
-  const [score, setScore] = useState(0);
-  const [feedback, setFeedback] = useState<"none" | "correct" | "wrong">("none");
+  const [assignments, setAssignments] = useState<Record<string, string>>({});
+  const [activeDino, setActiveDino] = useState<string | null>(null);
+  const [overZone, setOverZone] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const haptics = useHaptics();
 
-  const dino = DINOS[current]!;
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 100, tolerance: 5 } }),
+  );
 
-  function handleAnswer(foodId: string) {
-    if (feedback !== "none") return;
+  const unplaced = DINOS.filter((d) => !assignments[d.id]);
+  const score = DINOS.filter((d) => assignments[d.id] === d.food).length;
+
+  function handleDragStart(event: DragStartEvent) {
+    setActiveDino(String(event.active.id));
     haptics.tap();
-    const isCorrect = foodId === dino.food;
+  }
 
-    if (isCorrect) {
-      setFeedback("correct");
-      setScore((s) => s + 1);
-      setTimeout(() => haptics.success(), 100);
-    } else {
-      setFeedback("wrong");
-      setTimeout(() => haptics.error(), 100);
-    }
+  function handleDragEnd(event: DragEndEvent) {
+    setActiveDino(null);
+    setOverZone(null);
+    const { active, over } = event;
+    if (!over) return;
 
-    setTimeout(() => {
-      setFeedback("none");
-      if (current + 1 >= DINOS.length) {
-        setDone(true);
-        if (isCorrect) setScore((s) => s); // already incremented
-      } else {
-        setCurrent((c) => c + 1);
+    const dinoId = String(active.id);
+    const foodId = String(over.id);
+    const dino = DINOS.find((d) => d.id === dinoId)!;
+
+    if (dino.food === foodId) {
+      haptics.success();
+      const next = { ...assignments, [dinoId]: foodId };
+      setAssignments(next);
+      if (Object.keys(next).length === DINOS.length) {
+        setTimeout(() => setDone(true), 500);
       }
-    }, 1200);
+    } else {
+      haptics.error();
+    }
   }
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
       <FullscreenHeader title="Futter-Zuordnung" playerEmoji="🦖" />
 
-      <main className="flex-1 flex flex-col items-center px-4 pb-6 max-w-sm mx-auto w-full">
-        {!done ? (
-          <>
-            {/* Progress */}
-            <div className="w-full flex items-center gap-2 mb-4">
-              <span className="text-[10px] font-black text-on-surface-variant">{current + 1}/{DINOS.length}</span>
-              <div className="flex-1 h-2 bg-surface-container-high rounded-full overflow-hidden">
-                <div className="h-full bg-primary-container rounded-full" style={{ width: `${((current + (feedback === "correct" ? 1 : 0)) / DINOS.length) * 100}%` }} />
-              </div>
-            </div>
+      <main className="flex-1 flex flex-col px-4 pb-6 max-w-sm mx-auto w-full">
+        <div className="mb-3">
+          <ForscherSpeech text="Ziehe jeden Dino zum richtigen Futter! Frisst er Pflanzen oder Fleisch?" />
+        </div>
 
-            <div className="mb-3 w-full">
-              <ForscherSpeech text={`Was frisst der ${dino.name}?`} />
-            </div>
+        <AnimatePresence mode="wait">
+          {!done ? (
+            <motion.div key="game" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <DndContext
+                sensors={sensors}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+                onDragOver={(e) => setOverZone(e.over ? String(e.over.id) : null)}
+              >
+                {/* Drop zones */}
+                <div className="flex gap-3 mb-4">
+                  {FOODS.map((food) => (
+                    <FoodDropZone
+                      key={food.id}
+                      food={food}
+                      dinosHere={DINOS.filter((d) => assignments[d.id] === food.id)}
+                      isOver={overZone === food.id}
+                    />
+                  ))}
+                </div>
 
-            {/* Dino */}
-            <motion.div
-              key={dino.id}
-              className={`w-full bg-surface-container-lowest rounded-xl border-[3px] p-6 flex items-center justify-center mb-4 ${
-                feedback === "correct" ? "border-[#1B5E20] bg-primary-fixed" :
-                feedback === "wrong" ? "border-error" :
-                "border-on-surface sticker-shadow"
-              }`}
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <div className="text-center">
-                <img src={dino.image} alt={dino.name} className="w-28 h-28 object-contain mx-auto mb-2" />
-                <p className="text-sm font-black uppercase">{dino.name}</p>
+                {/* Dino tray */}
+                {unplaced.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant mb-2">Ziehe die Dinos:</p>
+                    <div className="flex gap-2 justify-center flex-wrap">
+                      {unplaced.map((dino) => (
+                        <DraggableDino key={dino.id} dino={dino} disabled={false} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Drag overlay */}
+                <DragOverlay>
+                  {activeDino && (() => {
+                    const d = DINOS.find((d) => d.id === activeDino)!;
+                    return (
+                      <div className="flex flex-col items-center gap-1 p-2 rounded-xl border-[3px] border-[#ffc850] bg-white shadow-xl">
+                        <img src={d.image} alt={d.name} className="w-14 h-14 object-contain" />
+                        <span className="text-[9px] font-black uppercase">{d.name}</span>
+                      </div>
+                    );
+                  })()}
+                </DragOverlay>
+              </DndContext>
+            </motion.div>
+          ) : (
+            <motion.div key="done" className="flex-1 flex flex-col items-center justify-center text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <span className="text-6xl mb-4">🎉</span>
+              <h2 className="text-2xl font-black uppercase mb-2">Perfekt!</h2>
+              <p className="text-sm text-on-surface-variant mb-4">Alle {DINOS.length} Dinos richtig zugeordnet!</p>
+              <ForscherSpeech text="Du weißt genau was jeder Dino frisst! Klasse!" />
+              <div className="w-full mt-6">
+                <Button variant="primary" fullWidth icon="check">Fertig!</Button>
               </div>
             </motion.div>
-
-            {/* Food options */}
-            <div className="flex gap-3">
-              {FOODS.map((food) => (
-                <motion.button
-                  key={food.id}
-                  onClick={() => handleAnswer(food.id)}
-                  disabled={feedback !== "none"}
-                  className="flex-1 flex flex-col items-center gap-2 p-4 bg-surface-container-lowest rounded-xl border-[3px] border-on-surface sticker-shadow"
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <span className="text-5xl">{food.emoji}</span>
-                  <span className="text-xs font-black uppercase">{food.label}</span>
-                </motion.button>
-              ))}
-            </div>
-
-            {feedback !== "none" && (
-              <motion.p
-                className={`mt-3 text-sm font-black ${feedback === "correct" ? "text-primary-container" : "text-error"}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                {feedback === "correct" ? "✅ Richtig!" : "❌ Falsch!"}
-              </motion.p>
-            )}
-          </>
-        ) : (
-          <motion.div className="flex-1 flex flex-col items-center justify-center text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <span className="text-6xl mb-4">{score === DINOS.length ? "🎉" : "👍"}</span>
-            <h2 className="text-2xl font-black uppercase mb-2">
-              {score === DINOS.length ? "Perfekt!" : `${score} von ${DINOS.length} richtig!`}
-            </h2>
-            <ForscherSpeech text={score === DINOS.length ? "Du weißt genau was jeder Dino frisst!" : "Beim nächsten Mal klappt es noch besser!"} />
-            <div className="w-full mt-6">
-              <Button variant="primary" fullWidth icon="check">Fertig!</Button>
-            </div>
-          </motion.div>
-        )}
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );

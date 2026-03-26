@@ -16,19 +16,35 @@ const MAP_CARDS = [
     color: "from-[#7ab648]/20 to-[#7ab648]/5",
     content: (
       <div className="relative">
+        {/* Dino bubble pointing to Kreide */}
+        <div className="flex justify-end pr-4 mb-1">
+          <div className="flex flex-col items-center">
+            <div className="w-12 h-12 rounded-full border-[3px] border-[#7ab648] bg-white shadow-[2px_2px_0px_0px_#1c1c17] flex items-center justify-center overflow-hidden">
+              <img src="/dinos/triceratops/comic.png" alt="" className="w-10 h-10 object-contain" />
+            </div>
+            <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-[#7ab648] -mt-0.5" />
+          </div>
+        </div>
         {/* Timeline bar */}
-        <div className="flex gap-1 mb-2">
-          <div className="flex-1 h-6 rounded bg-[#e8604c]/30 flex items-center justify-center text-[8px] font-black text-[#e8604c]/60">TRIAS</div>
-          <div className="flex-1 h-6 rounded bg-[#5ba67a]/30 flex items-center justify-center text-[8px] font-black text-[#5ba67a]/60">JURA</div>
-          <div className="flex-1 h-6 rounded bg-[#7ab648] flex items-center justify-center text-[8px] font-black text-white">KREIDE</div>
+        <div className="flex gap-1 mb-1.5">
+          <div className="flex-1 h-8 rounded-lg bg-[#e8604c]/25 flex flex-col items-center justify-center">
+            <span className="text-base leading-none">🌋</span>
+            <span className="text-[7px] font-black text-[#e8604c]/50">TRIAS</span>
+          </div>
+          <div className="flex-1 h-8 rounded-lg bg-[#5ba67a]/25 flex flex-col items-center justify-center">
+            <span className="text-base leading-none">🌿</span>
+            <span className="text-[7px] font-black text-[#5ba67a]/50">JURA</span>
+          </div>
+          <div className="flex-1 h-8 rounded-lg bg-[#7ab648] border-2 border-[#7ab648] flex flex-col items-center justify-center shadow-[2px_2px_0px_0px_#1c1c17]">
+            <span className="text-base leading-none">☄️</span>
+            <span className="text-[7px] font-black text-white">KREIDE</span>
+          </div>
         </div>
-        <div className="flex justify-between text-[7px] font-bold text-on-surface-variant">
-          <span>252 Mio.</span>
-          <span className="font-black text-primary-container">← hier! →</span>
-          <span>66 Mio.</span>
-        </div>
-        <p className="text-[10px] text-on-surface-variant text-center mt-2 font-semibold">
-          Ganz am Ende — einer der allerletzten Dinos! ☄️
+        <p className="text-[10px] text-on-surface text-center font-bold">
+          Ganz am Ende der Dino-Zeit! ☄️
+        </p>
+        <p className="text-[9px] text-on-surface-variant text-center">
+          Einer der allerletzten Dinosaurier überhaupt.
         </p>
       </div>
     ),
@@ -128,77 +144,141 @@ function MapCarousel({ dinoImage }: { dinoImage: string }) {
 // ── Museum CTA with animation ───────────────────────────────────
 
 function MuseumCTA({ dinoImage, dinoName }: { dinoImage: string; dinoName: string }) {
-  const [launched, setLaunched] = useState(false);
+  const [phase, setPhase] = useState<"idle" | "running" | "entering" | "done">("idle");
   const haptics = useHaptics();
 
+  function handleClick() {
+    if (phase !== "idle") return;
+    haptics.success();
+    setPhase("running");
+    setTimeout(() => setPhase("entering"), 1800);
+    setTimeout(() => setPhase("done"), 2800);
+  }
+
   return (
-    <div className="mx-4 relative overflow-hidden">
+    <>
+      {/* Fullscreen animation overlay */}
       <AnimatePresence>
-        {launched && (
+        {phase !== "idle" && (
           <motion.div
-            className="absolute inset-0 z-10 flex items-center justify-center bg-primary-container rounded-xl"
-            initial={{ scale: 0, borderRadius: "100%" }}
-            animate={{ scale: 1, borderRadius: "12px" }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="fixed inset-0 z-50 overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ backgroundImage: "none" }}
           >
+            {/* Sky */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#87CEEB] to-[#E0F0FF]" />
+
+            {/* Ground */}
             <motion.div
-              className="flex flex-col items-center"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3, type: "spring", damping: 12 }}
+              className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-[#4a7c3f] to-[#6ab04c]"
+              initial={{ y: 100 }}
+              animate={{ y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <motion.img
-                src={dinoImage}
-                alt=""
-                className="w-20 h-20 object-contain"
-                animate={{ y: [0, -15, 0], rotate: [0, -5, 5, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
-              />
-              <motion.p
-                className="text-white font-black uppercase tracking-wider text-sm mt-2"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                Ab ins Museum! 🏛️
-              </motion.p>
-              {/* Sparkles */}
-              {["⭐", "✨", "🌟", "✨", "⭐"].map((e, i) => (
-                <motion.span
-                  key={i}
-                  className="absolute text-xl"
-                  style={{ left: `${15 + i * 18}%`, top: `${20 + (i % 3) * 20}%` }}
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: [0, 1.2, 0.8], opacity: [0, 1, 0] }}
-                  transition={{ delay: 0.4 + i * 0.12, duration: 1, repeat: Infinity, repeatDelay: 0.5 }}
-                >
-                  {e}
-                </motion.span>
-              ))}
+              {/* Grass tufts */}
+              <div className="absolute top-0 left-0 right-0 flex justify-around -translate-y-3">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <span key={i} className="text-xl" style={{ transform: `rotate(${(i % 3 - 1) * 10}deg)` }}>🌿</span>
+                ))}
+              </div>
             </motion.div>
+
+            {/* Museum door */}
+            <motion.div
+              className="absolute bottom-[33%] right-8 flex flex-col items-center"
+              initial={{ x: 200, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
+            >
+              <div className="bg-[#f5e6c8] border-[4px] border-on-surface rounded-t-3xl w-24 h-32 flex flex-col items-center justify-end pb-1 shadow-lg relative">
+                <span className="material-symbols-outlined text-on-surface absolute top-3" style={{ fontSize: "28px", fontVariationSettings: "'FILL' 1" }}>museum</span>
+                {/* Door */}
+                <motion.div
+                  className="w-12 h-16 bg-[#8B4513] border-[3px] border-on-surface rounded-t-xl"
+                  animate={phase === "entering" || phase === "done" ? { scaleX: [1, 0.1, 0.1] } : {}}
+                  transition={{ duration: 0.3, delay: 0 }}
+                  style={{ transformOrigin: "left" }}
+                />
+              </div>
+              <p className="text-[10px] font-black uppercase text-on-surface mt-1">Museum</p>
+            </motion.div>
+
+            {/* Running Dino */}
+            <motion.div
+              className="absolute bottom-[33%]"
+              initial={{ left: "-20%", y: 0 }}
+              animate={
+                phase === "running" ? { left: "55%", y: [0, -20, 0, -15, 0, -20, 0] }
+                  : phase === "entering" ? { left: "68%", scale: 0.5, opacity: 0 }
+                  : { left: "68%", scale: 0, opacity: 0 }
+              }
+              transition={
+                phase === "running" ? { left: { duration: 1.8, ease: "easeInOut" }, y: { duration: 0.4, repeat: 4, ease: "easeInOut" } }
+                  : { duration: 0.5, ease: "easeIn" }
+              }
+            >
+              <img src={dinoImage} alt="" className="w-20 h-20 object-contain -translate-y-full drop-shadow-lg" style={{ transform: "translateY(-100%) scaleX(-1)" }} />
+            </motion.div>
+
+            {/* Done: Confetti + Text */}
+            {phase === "done" && (
+              <motion.div
+                className="absolute inset-0 flex flex-col items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.p
+                  className="text-3xl font-black text-white uppercase tracking-tight"
+                  style={{ textShadow: "0 3px 0 rgba(0,0,0,0.3)" }}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: [0, 1.2, 1] }}
+                  transition={{ type: "spring", damping: 10 }}
+                >
+                  Im Museum! 🏛️
+                </motion.p>
+                {["🎉", "⭐", "✨", "🦕", "🎉", "✨", "⭐"].map((e, i) => (
+                  <motion.span
+                    key={i}
+                    className="absolute text-2xl"
+                    style={{ left: `${10 + i * 13}%`, top: `${25 + (i % 3) * 15}%` }}
+                    initial={{ scale: 0, y: 0 }}
+                    animate={{ scale: [0, 1.3, 0], y: -30 }}
+                    transition={{ delay: 0.2 + i * 0.1, duration: 1.5, repeat: Infinity, repeatDelay: 0.8 }}
+                  >
+                    {e}
+                  </motion.span>
+                ))}
+              </motion.div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
 
-      <button
-        onClick={() => { setLaunched(true); haptics.success(); }}
-        className="w-full bg-gradient-to-br from-primary-container to-[#2E7D32] rounded-xl border-[3px] border-on-surface sticker-shadow active-press overflow-hidden text-left"
-      >
-        <div className="flex items-center gap-3 p-3">
-          <motion.img
-            src={dinoImage}
-            alt={dinoName}
-            className="w-14 h-14 object-contain flex-shrink-0"
-            whileTap={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
-          />
-          <div className="flex-1 text-white min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-wider text-white/70">Dein neuer Freund</p>
-            <p className="text-base font-black uppercase tracking-tight leading-tight">Ab ins Museum!</p>
+      {/* Button */}
+      <div className="mx-4">
+        <button
+          onClick={handleClick}
+          className="w-full bg-gradient-to-br from-primary-container to-[#2E7D32] rounded-xl border-[3px] border-on-surface sticker-shadow active-press overflow-hidden text-left"
+        >
+          <div className="flex items-center gap-3 p-3">
+            <motion.img
+              src={dinoImage}
+              alt={dinoName}
+              className="w-14 h-14 object-contain flex-shrink-0"
+              whileTap={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+            />
+            <div className="flex-1 text-white min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-wider text-white/70">Dein neuer Freund</p>
+              <p className="text-base font-black uppercase tracking-tight leading-tight">Ab ins Museum!</p>
+            </div>
+            <span className="material-symbols-outlined text-white/80" style={{ fontSize: "24px" }}>arrow_forward</span>
           </div>
-          <span className="material-symbols-outlined text-white/80" style={{ fontSize: "24px" }}>arrow_forward</span>
-        </div>
-      </button>
-    </div>
+        </button>
+      </div>
+    </>
   );
 }
 

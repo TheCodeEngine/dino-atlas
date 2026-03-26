@@ -1,8 +1,8 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import { useHaptics } from "../hooks/useHaptics";
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "primary" | "secondary" | "tertiary";
-  /** Render as interactive button-like card */
   interactive?: boolean;
   children: ReactNode;
 }
@@ -19,8 +19,16 @@ export function Card({
   interactive = false,
   children,
   className = "",
+  onClick,
   ...props
 }: CardProps) {
+  const haptics = useHaptics();
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (interactive) haptics.tap();
+    onClick?.(e);
+  };
+
   return (
     <div
       className={[
@@ -31,6 +39,7 @@ export function Card({
       ]
         .filter(Boolean)
         .join(" ")}
+      onClick={handleClick}
       {...props}
     >
       {children}

@@ -1,34 +1,55 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { motion } from "motion/react";
 import { Icon } from "../primitives/Icon";
+import { TtsContext } from "./AudioPlayer";
 
 interface ForscherSpeechProps {
   text: string;
+  /** TTS text with [[IPA]] phonemes — falls back to text if not set */
+  ttsText?: string;
   subtext?: string;
   icon?: string;
-  /** Enable play button for TTS voiceover */
   playable?: boolean;
-  /** Called when play is pressed — integrate with TTS service */
   onPlay?: () => void;
 }
 
-export function ForscherSpeech({ text, subtext, icon = "face", playable = true, onPlay }: ForscherSpeechProps) {
-  const [playing, setPlaying] = useState(false);
+export function ForscherSpeech({ text, ttsText, subtext, icon = "face", playable = true, onPlay }: ForscherSpeechProps) {
+  const ttsCtx = useContext(TtsContext);
+  const spokenText = ttsText || text;
 
-  // Demo: auto-stop after simulated duration
+  // TTS context: check if this text is currently playing
+  const ttsActive = ttsCtx?.activeText === spokenText;
+  const ttsPlaying = ttsActive && ttsCtx?.status === "playing";
+  const ttsLoading = ttsActive && ttsCtx?.status === "loading";
+
+  // Demo mode: no TTS context and no onPlay
+  const [demoPlaying, setDemoPlaying] = useState(false);
+  const isDemo = !ttsCtx && !onPlay;
+  const playing = isDemo ? demoPlaying : (ttsPlaying || false);
+  const loading = ttsLoading || false;
+
   useEffect(() => {
-    if (!playing) return;
-    const t = setTimeout(() => setPlaying(false), 3000 + text.length * 30);
+    if (!demoPlaying) return;
+    const t = setTimeout(() => setDemoPlaying(false), 3000 + text.length * 30);
     return () => clearTimeout(t);
-  }, [playing, text.length]);
+  }, [demoPlaying, text.length]);
 
   function handlePlay() {
-    if (playing) {
-      setPlaying(false);
-    } else {
-      setPlaying(true);
-      onPlay?.();
+    if (isDemo) {
+      setDemoPlaying(!demoPlaying);
+      return;
     }
+    if (ttsCtx) {
+      // Use TTS context
+      if (ttsPlaying) {
+        ttsCtx.stop();
+      } else {
+        ttsCtx.speak(spokenText);
+      }
+      return;
+    }
+    // Custom onPlay handler
+    onPlay?.();
   }
 
   return (
@@ -45,18 +66,24 @@ export function ForscherSpeech({ text, subtext, icon = "face", playable = true, 
           {playable && (
             <motion.button
               onClick={handlePlay}
+              disabled={loading}
               className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                playing ? "bg-primary-container text-white" : "bg-surface-container-high text-on-surface-variant"
+                loading ? "bg-primary-container/50 text-white cursor-wait"
+                : playing ? "bg-primary-container text-white"
+                : "bg-surface-container-high text-on-surface-variant"
               }`}
               whileTap={{ scale: 0.85 }}
               aria-label={playing ? "Pause" : "Vorlesen"}
             >
-              <Icon name={playing ? "pause" : "volume_up"} size="sm" filled />
+              {loading ? (
+                <span className="block w-4 h-4 rounded-full border-2 border-white/35 border-t-white animate-spin" />
+              ) : (
+                <Icon name={playing ? "pause" : "volume_up"} size="sm" filled />
+              )}
             </motion.button>
           )}
         </div>
-        {/* Playing indicator */}
-        {playing && (
+        {(playing || loading) && (
           <div className="flex items-center gap-1 mt-1.5">
             {[0, 1, 2, 3, 4].map((i) => (
               <motion.div
@@ -66,7 +93,9 @@ export function ForscherSpeech({ text, subtext, icon = "face", playable = true, 
                 transition={{ duration: 0.5, delay: i * 0.1, repeat: Infinity, ease: "easeInOut" }}
               />
             ))}
-            <span className="text-[9px] font-bold text-primary-container ml-1">Vorlesen...</span>
+            <span className="text-[9px] font-bold text-primary-container ml-1">
+              {loading ? "Lade..." : "Vorlesen..."}
+            </span>
           </div>
         )}
       </div>

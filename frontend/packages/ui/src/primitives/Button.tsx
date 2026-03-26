@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { Icon } from "./Icon";
+import { useHaptics } from "../hooks/useHaptics";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "tertiary" | "surface" | "ghost";
@@ -37,9 +38,16 @@ export function Button({
   iconPosition = "right",
   children,
   className = "",
+  onClick,
   ...props
 }: ButtonProps) {
+  const haptics = useHaptics();
   const iconEl = icon && <Icon name={icon} size="md" />;
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!props.disabled) haptics.tap();
+    onClick?.(e);
+  };
 
   return (
     <button
@@ -55,6 +63,7 @@ export function Button({
       ]
         .filter(Boolean)
         .join(" ")}
+      onClick={handleClick}
       {...props}
     >
       {iconPosition === "left" && iconEl}

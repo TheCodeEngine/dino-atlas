@@ -4,16 +4,19 @@ pub mod expedition;
 pub mod museum;
 pub mod budget;
 pub mod players;
+pub mod tts;
 
 use axum::{middleware, Router};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::pocketbase::client::PbClient;
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct AppState {
     pub pb: PbClient,
+    pub tts: Option<Arc<dino_atlas_tts::PiperTts>>,
 }
 
 #[derive(OpenApi)]
@@ -33,6 +36,7 @@ pub struct AppState {
         expedition::get_active,
         expedition::start,
         expedition::advance,
+        tts::generate_speech,
     ),
     components(schemas(
         auth::RegisterRequest,
@@ -73,6 +77,7 @@ pub fn create_router(state: AppState) -> Router {
         .merge(museum::routes())
         .merge(budget::routes())
         .merge(players::routes())
+        .merge(tts::routes())
         .layer(middleware::from_fn_with_state(
             state.clone(),
             crate::middleware::auth::auth_middleware,

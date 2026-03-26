@@ -1,7 +1,20 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, createContext, useContext } from "react";
 import { Icon } from "../primitives/Icon";
 
 export type AudioPlayerStatus = "idle" | "loading" | "playing" | "paused" | "error";
+
+/** TTS context — provide from app to enable real voiceover */
+export interface TtsContextValue {
+  speak: (text: string) => void;
+  stop: () => void;
+  activeText: string | null;
+  status: AudioPlayerStatus;
+  progress: number;
+  currentTime: number;
+  duration: number;
+}
+
+export const TtsContext = createContext<TtsContextValue | null>(null);
 
 export interface AudioPlayerProps {
   text: string;
@@ -26,14 +39,26 @@ function splitSentences(text: string): string[] {
 
 export function AudioPlayer({
   text,
-  status = "idle",
-  progress = 0,
-  currentTime = 0,
-  duration,
-  onPlay,
-  onPause,
+  status: statusProp = "idle",
+  progress: progressProp = 0,
+  currentTime: currentTimeProp = 0,
+  duration: durationProp,
+  onPlay: onPlayProp,
+  onPause: onPauseProp,
   compact = false,
 }: AudioPlayerProps) {
+  // Check TTS context — if available and no explicit onPlay, use it
+  const ttsCtx = useContext(TtsContext);
+  const hasTts = !!ttsCtx && !onPlayProp;
+  const ttsActive = hasTts && ttsCtx!.activeText === text;
+
+  const status = ttsActive ? ttsCtx!.status : statusProp;
+  const progress = ttsActive ? ttsCtx!.progress : progressProp;
+  const currentTime = ttsActive ? ttsCtx!.currentTime : currentTimeProp;
+  const duration = ttsActive ? ttsCtx!.duration : durationProp;
+  const onPlay = hasTts ? () => ttsCtx!.speak(text) : onPlayProp;
+  const onPause = hasTts ? () => ttsCtx!.stop() : onPauseProp;
+
   const isPlaying = status === "playing";
   const isLoading = status === "loading";
   const isError = status === "error";
@@ -41,7 +66,7 @@ export function AudioPlayer({
 
   const sentences = splitSentences(text);
 
-  // Demo mode
+  // Demo mode (no onPlay and no TTS context)
   const [demoProgress, setDemoProgress] = useState(0);
   const [demoPlaying, setDemoPlaying] = useState(false);
   const isDemo = !onPlay;

@@ -22,7 +22,31 @@ async fn main() {
     let config = Config::from_env();
 
     let pb = PbClient::new(&config);
-    let state = AppState { pb };
+
+    // Initialize TTS if piper binary is available
+    let tts = {
+        let piper_bin = std::env::var("PIPER_BIN").unwrap_or_else(|_| "piper".into());
+        let piper_model = std::env::var("PIPER_MODEL").unwrap_or_else(|_| "models/de_DE-thorsten-high.onnx".into());
+        let tts_config = dino_atlas_tts::TtsConfig {
+            piper_bin,
+            model_path: std::path::PathBuf::from(&piper_model),
+            ffmpeg_bin: std::env::var("FFMPEG_BIN").unwrap_or_else(|_| "ffmpeg".into()),
+            cache_dir: std::path::PathBuf::from(std::env::var("TTS_CACHE_DIR").unwrap_or_else(|_| "cache/tts".into())),
+            sample_rate: 22050,
+        };
+        match dino_atlas_tts::PiperTts::new(tts_config).await {
+            Ok(tts) => {
+                tracing::info!("TTS initialized (Piper)");
+                Some(std::sync::Arc::new(tts))
+            }
+            Err(e) => {
+                tracing::warn!("TTS not available: {e}");
+                None
+            }
+        }
+    };
+
+    let state = AppState { pb, tts };
 
     let cors = CorsLayer::new()
         .allow_origin(

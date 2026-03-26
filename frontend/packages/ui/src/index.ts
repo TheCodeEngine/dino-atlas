@@ -14,7 +14,8 @@ export { StarRating } from "./primitives/StarRating";
 export { Skeleton } from "./primitives/Skeleton";
 
 // Components
-export { AudioPlayer } from "./components/AudioPlayer";
+export { AudioPlayer, TtsContext } from "./components/AudioPlayer";
+export type { TtsContextValue, AudioPlayerStatus } from "./components/AudioPlayer";
 export { FormCard } from "./components/FormCard";
 export { PageHeader } from "./components/PageHeader";
 export { TopBar } from "./components/TopBar";

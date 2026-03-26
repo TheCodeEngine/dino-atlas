@@ -41,4 +41,8 @@ generator/target/
 # Lock files (keep pnpm-lock.yaml, Cargo.lock)
 package-lock.json
 yarn.lock
+
+# Screenshots (from Playwright etc.)
 *.png
+# But keep app assets
+!frontend/public/**/*.png

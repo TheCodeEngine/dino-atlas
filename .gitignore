@@ -41,3 +41,4 @@ generator/target/
 # Lock files (keep pnpm-lock.yaml, Cargo.lock)
 package-lock.json
 yarn.lock
+*.png

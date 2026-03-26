@@ -82,15 +82,13 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
       </p>
 
       <div className="bg-gradient-to-br from-primary-fixed/40 to-tertiary-fixed/30 rounded-xl border-[3px] border-on-surface sticker-shadow p-5">
-        {/* Dino touch area — touch-none prevents scroll hijack */}
-        <div
-          className="relative flex items-center justify-center mb-4 cursor-pointer select-none h-52 touch-none"
-          onPointerDown={handlePet}
-        >
+        {/* Dino area — only image is touchable */}
+        <div className="relative flex items-center justify-center mb-4 h-52">
           <motion.img
             src={image}
             alt={name}
-            className="w-48 h-48 object-contain drop-shadow-lg"
+            onPointerDown={handlePet}
+            className="w-48 h-48 object-contain drop-shadow-lg cursor-pointer select-none touch-none"
             animate={
               mood === "love" ? { rotate: [0, -5, 5, -3, 0], scale: [1, 1.05, 1] }
                 : mood === "eating" ? { y: [0, -8, 0], scale: [1, 1.1, 1] }
@@ -340,7 +338,7 @@ export function DiscoveryScreen() {
 
         {/* Time Slider — animates in on scroll */}
         <div className="px-4 mb-4">
-          <TimeSlider period="Kreide" startMya={68} endMya={66} />
+          <TimeSlider period="Kreide" startMya={68} endMya={66} dinoName="Triceratops" />
         </div>
 
         {/* Two Maps */}

@@ -1,5 +1,9 @@
 mod config;
 mod error;
+mod domain;
+mod adapters;
+mod routes;
+mod middleware;
 
 use axum::{Router, routing::get};
 use tower_http::cors::{CorsLayer, Any};

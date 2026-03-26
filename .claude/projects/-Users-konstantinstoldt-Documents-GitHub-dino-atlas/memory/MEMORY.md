@@ -1,0 +1,2 @@
+- [Dino-Atlas Projekt](project_dinoatlas.md) — Lern-App fuer Karl (4) & Oskar (6), Dino-Expeditionen, begrenzte Bildschirmzeit
+- [Konstantin](user_konstantin.md) — Vater & Entwickler, JS/PocketBase Erfahrung, Gemini API Key

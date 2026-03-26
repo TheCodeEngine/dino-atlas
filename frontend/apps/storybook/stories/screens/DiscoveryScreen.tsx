@@ -2,6 +2,9 @@ import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { AudioPlayer } from "../../../../packages/ui/src/components/AudioPlayer";
 import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
+import { StatusBadge } from "../../../../packages/ui/src/components/StatusBadge";
+import { ImageSwitcher } from "../../../../packages/ui/src/components/ImageSwitcher";
+import { TimeSlider } from "../../../../packages/ui/src/components/TimeSlider";
 import { Button } from "../../../../packages/ui/src/primitives/Button";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
@@ -250,21 +253,14 @@ const DINO = {
   ],
 };
 
-const IMAGE_VIEWS = [
-  { id: "real", label: "Echt", icon: "photo_camera" },
-  { id: "comic", label: "Comic", icon: "brush" },
-  { id: "skeleton", label: "Skelett", icon: "skeleton" },
-] as const;
-
-const IMAGE_URLS: Record<string, string> = {
-  real: "/dinos/triceratops/real.png",
-  comic: "/dinos/triceratops/comic.png",
-  skeleton: "/dinos/triceratops/skeleton.png",
-};
+const DINO_IMAGES = [
+  { id: "real", label: "Echt", icon: "photo_camera", url: "/dinos/triceratops/real.png" },
+  { id: "comic", label: "Comic", icon: "brush", url: "/dinos/triceratops/comic.png", bg: "bg-gradient-to-br from-primary-fixed/30 to-tertiary-fixed/20", contain: true },
+  { id: "skeleton", label: "Skelett", icon: "skeleton", url: "/dinos/triceratops/skeleton.png", bg: "bg-[#2C1A0E]" },
+];
 
 export function DiscoveryScreen() {
   const [activeFact, setActiveFact] = useState(0);
-  const [activeImage, setActiveImage] = useState<string>("real");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -274,44 +270,14 @@ export function DiscoveryScreen() {
         <button className="w-9 h-9 flex items-center justify-center bg-surface-container-lowest border-[3px] border-on-surface rounded-lg sticker-shadow active-press">
           <span className="material-symbols-outlined text-on-surface text-lg">close</span>
         </button>
-        <span className="bg-secondary-container text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase whitespace-nowrap flex items-center gap-1">
-          <span className="material-symbols-outlined" style={{ fontSize: "14px", fontVariationSettings: "'FILL' 1" }}>new_releases</span>
-          Neu entdeckt!
-        </span>
+        <StatusBadge label="Neu entdeckt!" variant="warning" icon="new_releases" />
       </header>
 
       {/* Scrollable */}
       <main className="flex-1 overflow-y-auto pb-6 max-w-md mx-auto w-full">
-        {/* Hero Image */}
+        {/* Hero Image — square, switchable */}
         <div className="mx-4 mb-2">
-          <div className={`rounded-xl border-[3px] border-on-surface sticker-shadow overflow-hidden ${
-            activeImage === "skeleton" ? "bg-[#2C1A0E]" : activeImage === "comic" ? "bg-gradient-to-br from-primary-fixed/30 to-tertiary-fixed/20" : ""
-          }`}>
-            <img
-              src={IMAGE_URLS[activeImage]}
-              alt={`${DINO.name} — ${activeImage}`}
-              className={`w-full ${activeImage === "comic" ? "h-44 object-contain py-2" : "h-44 object-cover"}`}
-            />
-          </div>
-
-          {/* Thumbnails */}
-          <div className="flex justify-center gap-2 mt-2">
-            {IMAGE_VIEWS.map((view) => (
-              <button
-                key={view.id}
-                onClick={() => setActiveImage(view.id)}
-                className={[
-                  "flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all",
-                  activeImage === view.id
-                    ? "bg-primary-container text-white border-[2px] border-on-surface shadow-[2px_2px_0px_0px_#1c1c17]"
-                    : "bg-surface-container-low text-on-surface-variant border-[2px] border-outline-variant",
-                ].join(" ")}
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>{view.icon}</span>
-                {view.label}
-              </button>
-            ))}
-          </div>
+          <ImageSwitcher views={DINO_IMAGES} alt={DINO.name} square />
         </div>
 
         {/* Name */}
@@ -370,6 +336,11 @@ export function DiscoveryScreen() {
               <div key={i} className={`h-1.5 rounded-full transition-all ${i === activeFact ? "w-4 bg-primary-container" : "w-1.5 bg-outline-variant"}`} />
             ))}
           </div>
+        </div>
+
+        {/* Time Slider — animates in on scroll */}
+        <div className="px-4 mb-4">
+          <TimeSlider period="Kreide" startMya={68} endMya={66} />
         </div>
 
         {/* Two Maps */}

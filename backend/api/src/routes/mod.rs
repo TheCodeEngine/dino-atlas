@@ -4,6 +4,7 @@ pub mod expedition;
 pub mod museum;
 pub mod budget;
 pub mod players;
+pub mod minigames;
 pub mod tts;
 
 use axum::{middleware, Router};
@@ -36,6 +37,8 @@ pub struct AppState {
         expedition::get_active,
         expedition::start,
         expedition::advance,
+        minigames::available,
+        minigames::complete,
         tts::generate_speech,
     ),
     components(schemas(
@@ -77,6 +80,7 @@ pub fn create_router(state: AppState) -> Router {
         .merge(museum::routes())
         .merge(budget::routes())
         .merge(players::routes())
+        .merge(minigames::routes())
         .merge(tts::routes())
         .layer(middleware::from_fn_with_state(
             state.clone(),

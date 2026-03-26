@@ -13,6 +13,9 @@ import { IdentifyPage } from "@/pages/IdentifyPage";
 import { DiscoveryPage } from "@/pages/DiscoveryPage";
 import { MuseumPage } from "@/pages/MuseumPage";
 import { MuseumDetailPage } from "@/pages/MuseumDetailPage";
+import { MinigameSelectPage } from "@/pages/MinigameSelectPage";
+import { MinigamePage } from "@/pages/MinigamePage";
+import { SleepyDinosPage } from "@/pages/SleepyDinosPage";
 
 export const router = createBrowserRouter([
   // Public
@@ -34,11 +37,14 @@ export const router = createBrowserRouter([
             children: [
               { path: "/", element: <HomePage /> },
               { path: "/museum", element: <MuseumPage /> },
+              { path: "/minigames", element: <MinigameSelectPage /> },
             ],
           },
 
           // Fullscreen (no nav)
           { path: "/museum/:slug", element: <MuseumDetailPage /> },
+          { path: "/minigames/:type", element: <MinigamePage /> },
+          { path: "/sleepy", element: <SleepyDinosPage /> },
           { path: "/expedition/intro", element: <ExpeditionIntroPage /> },
           { path: "/expedition/excavation", element: <ExcavationPage /> },
           { path: "/expedition/puzzle", element: <PuzzlePage /> },

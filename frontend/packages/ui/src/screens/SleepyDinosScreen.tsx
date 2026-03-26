@@ -1,11 +1,15 @@
 import { Icon } from "../primitives/Icon";
 
-export function SleepyDinosScreen() {
+export interface SleepyDinosScreenProps {
+  onParentReset?: () => void;
+  onBack?: () => void;
+}
+
+export function SleepyDinosScreen({ onParentReset, onBack }: SleepyDinosScreenProps = {}) {
   return (
     <div
       className="text-white min-h-screen flex flex-col items-center justify-center px-4 relative overflow-hidden"
       style={{ background: "#1c1c17", backgroundImage: "none" }}
-      ref={(el) => { if (el) document.body.style.background = "#1c1c17"; }}
     >
       {/* Stars background */}
       <div className="absolute inset-0 pointer-events-none">
@@ -14,25 +18,30 @@ export function SleepyDinosScreen() {
             key={i}
             className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 60}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
-              opacity: 0.3 + Math.random() * 0.5,
+              left: `${10 + (i * 4.7) % 90}%`,
+              top: `${5 + (i * 3.1) % 55}%`,
+              animationDelay: `${(i * 0.4) % 3}s`,
+              animationDuration: `${2 + (i * 0.3) % 2}s`,
+              opacity: 0.3 + (i * 0.05) % 0.5,
             }}
           />
         ))}
-        {/* Moon */}
         <div className="absolute top-8 right-8 w-16 h-16 bg-[#fef0c7] rounded-full shadow-[0_0_40px_10px_rgba(254,240,199,0.3)]" />
       </div>
 
       {/* Content */}
       <div className="relative z-10 max-w-sm w-full text-center">
+        {/* Back button */}
+        {onBack && (
+          <button onClick={onBack} className="absolute -top-16 left-0 text-white/40 hover:text-white/70">
+            <Icon name="arrow_back" size="lg" />
+          </button>
+        )}
+
         {/* Sleeping Dino */}
         <div className="mb-6">
           <div className="inline-block relative">
             <span className="text-8xl">🦕</span>
-            {/* Zzz bubbles */}
             <span className="absolute -top-2 -right-2 text-2xl animate-bounce" style={{ animationDuration: "2s" }}>💤</span>
             <span className="absolute -top-6 right-4 text-lg animate-bounce" style={{ animationDelay: "0.5s", animationDuration: "2.5s" }}>💤</span>
             <span className="absolute -top-8 right-10 text-sm animate-bounce" style={{ animationDelay: "1s", animationDuration: "3s" }}>💤</span>
@@ -45,7 +54,7 @@ export function SleepyDinosScreen() {
             Die Dinos schlafen
           </h1>
           <p className="text-sm font-medium text-inverse-on-surface/70 leading-relaxed">
-            Du hast heute toll geforscht! Unsere Dinos brauchen jetzt ihren Schlaf. Morgen sind sie wieder fit fuer neue Abenteuer!
+            Du hast heute toll geforscht! Unsere Dinos brauchen jetzt ihren Schlaf. Morgen sind sie wieder fit für neue Abenteuer!
           </p>
         </div>
 
@@ -56,32 +65,32 @@ export function SleepyDinosScreen() {
           </div>
           <div className="bg-inverse-surface border-[3px] border-outline rounded-lg rounded-tl-none p-2.5 flex-1 text-left">
             <p className="text-xs font-bold text-inverse-on-surface">
-              Ruh dich auch mal aus! Morgen frueh wartet eine neue Expedition auf dich! 🌅
+              Ruh dich auch mal aus! Morgen früh wartet eine neue Expedition auf dich! 🌅
             </p>
           </div>
         </div>
 
-        {/* Timer visual */}
+        {/* Timer */}
         <div className="flex items-center justify-center gap-3 mb-8">
           <Icon name="dark_mode" size="lg" filled className="text-[#fef0c7]" />
           <div className="flex-1 max-w-[200px]">
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
               <div className="h-full w-[30%] bg-gradient-to-r from-[#fef0c7] to-secondary-container rounded-full" />
             </div>
-            <p className="text-[9px] font-bold text-white/40 mt-1">Morgen um 14:00 geht's weiter</p>
+            <p className="text-[9px] font-bold text-white/40 mt-1">Morgen geht's weiter</p>
           </div>
           <Icon name="light_mode" size="lg" filled className="text-secondary-container" />
         </div>
 
-        {/* Bis morgen */}
         <p className="text-lg font-black uppercase tracking-wider text-[#fef0c7] mb-4">
           Bis morgen!
         </p>
 
-        {/* Parent reset link - deliberately small/subtle */}
-        <button className="text-[10px] font-semibold text-white/20 hover:text-white/50 transition-colors">
-          Erwachsene: Nochmal spielen?
-        </button>
+        {onParentReset && (
+          <button onClick={onParentReset} className="text-[10px] font-semibold text-white/20 hover:text-white/50 transition-colors">
+            Erwachsene: Nochmal spielen?
+          </button>
+        )}
       </div>
     </div>
   );

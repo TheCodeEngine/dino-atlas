@@ -5,3 +5,4 @@ pub mod seed;
 pub mod schema;
 pub mod costs;
 pub mod status;
+pub mod discover;

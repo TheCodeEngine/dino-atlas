@@ -108,7 +108,7 @@ pub async fn run(
     println!("\nDone! Run `costs` to see usage summary.");
 }
 
-async fn generate_one(
+pub async fn generate_one(
     pb: &PocketBaseClient,
     gemini: Option<&GeminiClient>,
     tts: Option<&PiperTts>,

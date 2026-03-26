@@ -97,6 +97,21 @@ enum Command {
 
     /// Show status of all dinos (what content exists)
     Status,
+
+    /// Discover new dinosaurs via AI and seed them into PocketBase
+    Discover {
+        /// How many new dinos to discover
+        #[arg(long, default_value = "1")]
+        count: u32,
+
+        /// Also generate content (texts, images, audio) after seeding
+        #[arg(long)]
+        generate: bool,
+
+        /// Only generate specific content type (use with --generate)
+        #[arg(long)]
+        only: Option<ContentType>,
+    },
 }
 
 #[derive(Clone, Debug, clap::ValueEnum)]
@@ -169,6 +184,14 @@ async fn main() {
         }
         Command::Status => {
             commands::status::run(&cli.pocketbase_url, &cli.pb_email, &cli.pb_password).await;
+        }
+        Command::Discover { count, generate, only } => {
+            commands::discover::run(
+                &cli.pocketbase_url, &cli.gemini_key,
+                &cli.piper_bin, &cli.piper_model,
+                &cli.pb_email, &cli.pb_password,
+                count, generate, only,
+            ).await;
         }
     }
 }

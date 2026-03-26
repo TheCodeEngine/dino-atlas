@@ -46,6 +46,47 @@ pub fn shadow_prompt(name: &str) -> String {
     )
 }
 
+/// Prompt to discover new dinosaurs via AI
+pub fn discover_prompt(existing_slugs: &[String], count: u32) -> String {
+    let slugs_list = existing_slugs.join(", ");
+    format!(
+        r#"Du bist ein Palaentologie-Experte. Ich baue eine Dinosaurier-App fuer Kinder.
+
+Folgende Dinosaurier sind bereits in der App:
+{slugs_list}
+
+Schlage {count} neue ECHTE Dinosaurier vor, die noch nicht in der Liste sind.
+Waehle moeglichst unterschiedliche Arten (verschiedene Perioden, Kontinente, Diaetvarianten, Groessen).
+
+Antworte NUR mit einem JSON-Array. Kein anderer Text!
+
+[
+  {{
+    "slug": "name-mit-bindestrichen",
+    "display_name_de": "Deutscher Anzeigename",
+    "scientific_name": "Deutsche Uebersetzung des wissenschaftlichen Namens (z.B. 'Dornenechse' fuer Spinosaurus)",
+    "period": "Trias|Jura|Kreide",
+    "period_start_mya": 150,
+    "period_end_mya": 145,
+    "diet": "Pflanzenfresser|Fleischfresser|Allesfresser|Fischfresser",
+    "length_m": 6.0,
+    "weight_kg": 2000.0,
+    "continent": "Europa|Nordamerika|Suedamerika|Afrika|Asien|Australien|Antarktika",
+    "rarity": "common|uncommon|rare|epic|legendary",
+    "habitat_description": "English description of the habitat for image generation, 1 sentence"
+  }}
+]
+
+Wichtig:
+- NUR echte, wissenschaftlich anerkannte Dinosaurier (oder prahistorische Reptilien)
+- slug: Kleinbuchstaben, Bindestriche statt Leerzeichen
+- period_start_mya > period_end_mya (Millionen Jahre vor heute)
+- Realistische Masse und Gewichte basierend auf palaontologischer Forschung
+- rarity-Verteilung: bevorzuge common/uncommon, legendary nur fuer wirklich besondere Arten
+- habitat_description auf Englisch (wird fuer Bildgenerierung verwendet)"#,
+    )
+}
+
 /// Text generation prompt for kid-friendly dino content
 pub fn dino_content_prompt(name: &str, scientific: &str, period: &str, diet: &str, length_m: f32, weight_kg: f32, continent: &str) -> String {
     format!(

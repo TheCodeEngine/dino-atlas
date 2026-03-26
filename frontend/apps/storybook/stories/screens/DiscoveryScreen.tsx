@@ -144,25 +144,34 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
           )}
         </div>
 
-        {/* Message */}
-        <AnimatePresence>
-          {message && (
-            <motion.p
-              className="text-center text-xs font-bold text-on-surface mb-2"
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-            >
-              {message}
-            </motion.p>
-          )}
-        </AnimatePresence>
-
-        {!message && (
-          <p className="text-center text-[11px] text-on-surface-variant font-semibold mb-3">
-            Streichle mich! Oder füttere mich mit dem richtigen Futter!
-          </p>
-        )}
+        {/* Message — fixed height to prevent layout shift */}
+        <div className="h-5 flex items-center justify-center mb-2">
+          <AnimatePresence mode="wait">
+            {message ? (
+              <motion.p
+                key="msg"
+                className="text-center text-xs font-bold text-on-surface"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              >
+                {message}
+              </motion.p>
+            ) : (
+              <motion.p
+                key="hint"
+                className="text-center text-[11px] text-on-surface-variant font-semibold"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                Streichle mich! Oder füttere mich!
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Food options */}
         <div className="flex justify-center gap-3">

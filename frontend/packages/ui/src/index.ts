@@ -3,7 +3,8 @@
 // Primitives
 export { Button } from "./primitives/Button";
 
-// Components (will be added as they're built)
+// Components
+export { AudioPlayer } from "./components/AudioPlayer";
 // export { DinoCard } from "./components/DinoCard";
 // export { PlayerAvatar } from "./components/PlayerAvatar";
 // export { PlayerSelector } from "./components/PlayerSelector";

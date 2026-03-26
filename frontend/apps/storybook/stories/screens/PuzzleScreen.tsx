@@ -1,184 +1,234 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
 /**
- * Skelett-Puzzle
- * - Skelett in 6 Teile aufgeteilt
- * - Teile liegen unten durcheinander
- * - Antippen → Teil fliegt an die richtige Stelle
- * - Alle platziert → Skelett erwacht zum Leben
+ * Bild-Puzzle: Skelett wird in Kacheln geschnitten, shuffled, Kind tippt
+ * auf ein Teil und dann auf die Zielposition um es zu platzieren.
  */
 
-const PIECES = [
-  { id: "skull", label: "Schädel", emoji: "💀", targetX: "25%", targetY: "15%", width: "35%", height: "25%" },
-  { id: "spine", label: "Wirbelsäule", emoji: "🦴", targetX: "45%", targetY: "30%", width: "40%", height: "15%" },
-  { id: "ribs", label: "Rippen", emoji: "🦴", targetX: "40%", targetY: "45%", width: "30%", height: "20%" },
-  { id: "frontlegs", label: "Vorderbeine", emoji: "🦵", targetX: "25%", targetY: "65%", width: "20%", height: "25%" },
-  { id: "backlegs", label: "Hinterbeine", emoji: "🦵", targetX: "60%", targetY: "65%", width: "20%", height: "25%" },
-  { id: "tail", label: "Schwanz", emoji: "🦴", targetX: "75%", targetY: "35%", width: "25%", height: "20%" },
-];
+const GRID = { cols: 3, rows: 3 };
+const TOTAL = GRID.cols * GRID.rows;
+const IMAGE = "/dinos/triceratops/skeleton.png";
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j]!, a[i]!];
+  }
+  return a;
+}
 
 const HINTS = [
-  "Fang mit dem Kopf an! Der hat drei Hörner.",
-  "Super! Jetzt die Wirbelsäule — das ist das Rückgrat!",
-  "Weiter so! Die Rippen schützen das Herz.",
-  "Toll! Jetzt die Vorderbeine.",
-  "Fast geschafft! Noch die Hinterbeine!",
-  "Letztes Teil — der Schwanz!",
+  "Tippe auf ein Teil, dann auf die richtige Stelle!",
+  "Super! Weiter so!",
+  "Du bist richtig gut darin!",
+  "Fast geschafft!",
+  "Noch ein paar Teile!",
+  "Gleich hast du es!",
 ];
 
 export function PuzzleScreen() {
-  const [placed, setPlaced] = useState<string[]>([]);
+  // Board: index = position, value = which piece is there (null = empty)
+  const [board, setBoard] = useState<(number | null)[]>(() => Array(TOTAL).fill(null));
+  // Tray: shuffled pieces not yet placed
+  const [tray, setTray] = useState<number[]>(() => shuffle(Array.from({ length: TOTAL }, (_, i) => i)));
+  // Selected piece from tray
+  const [selected, setSelected] = useState<number | null>(null);
   const [complete, setComplete] = useState(false);
   const haptics = useHaptics();
 
-  function handlePlace(id: string) {
-    if (placed.includes(id) || complete) return;
+  const placedCount = board.filter((v) => v !== null).length;
+  const hint = HINTS[Math.min(Math.floor(placedCount / 2), HINTS.length - 1)]!;
+
+  function handleTrayTap(piece: number) {
+    if (complete) return;
     haptics.tap();
-    const next = [...placed, id];
-    setPlaced(next);
-    if (next.length === PIECES.length) {
-      setTimeout(() => { setComplete(true); haptics.success(); }, 600);
-    }
+    setSelected(piece === selected ? null : piece);
   }
 
-  const remaining = PIECES.filter((p) => !placed.includes(p.id));
-  const hint = HINTS[Math.min(placed.length, HINTS.length - 1)]!;
+  function handleBoardTap(position: number) {
+    if (complete || selected === null) return;
+    if (board[position] !== null) return; // already filled
+
+    // Place piece
+    haptics.tap();
+    const newBoard = [...board];
+    newBoard[position] = selected;
+
+    // Remove from tray
+    const newTray = tray.filter((p) => p !== selected);
+    setBoard(newBoard);
+    setTray(newTray);
+    setSelected(null);
+
+    // Check if correct position (piece index matches board position)
+    if (selected !== position) {
+      // Wrong position — shake and return to tray after delay
+      haptics.error();
+      setTimeout(() => {
+        setBoard((b) => { const nb = [...b]; nb[position] = null; return nb; });
+        setTray((t) => [...t, selected]);
+      }, 600);
+    } else {
+      // Correct!
+      haptics.success();
+      if (newTray.length === 0) {
+        setTimeout(() => setComplete(true), 500);
+      }
+    }
+  }
 
   return (
     <div className="bg-[#2C1A0E] text-white min-h-screen flex flex-col" style={{ backgroundImage: "none" }}>
       {/* Header */}
       <header className="flex justify-between items-center px-4 py-3">
-        <button className="w-9 h-9 flex items-center justify-center bg-white/10 rounded-lg active-press">
+        <button className="w-9 h-9 flex items-center justify-center bg-white/10 rounded-lg">
           <span className="material-symbols-outlined text-white text-lg">close</span>
         </button>
-        <p className="text-[10px] font-black uppercase tracking-wider text-[#ffc850]/80">Oskar's Expedition</p>
+        <p className="text-[10px] font-black uppercase tracking-wider text-[#ffc850]/80">Skelett-Puzzle</p>
         <div className="w-9 h-9 rounded-full border-[3px] border-[#ffc850]/50 bg-[#ffc850]/20 flex items-center justify-center text-base">🦖</div>
       </header>
 
       {/* Progress */}
       <div className="px-4 mb-2">
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-[10px] font-black uppercase tracking-wider text-[#ffc850]">
-            {placed.length} von {PIECES.length} Teilen
-          </span>
-        </div>
         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-gradient-to-r from-[#84c75d] to-[#ffc850] rounded-full"
-            animate={{ width: `${(placed.length / PIECES.length) * 100}%` }}
-            transition={{ duration: 0.3 }}
+            animate={{ width: `${(placedCount / TOTAL) * 100}%` }}
           />
         </div>
+        <p className="text-[9px] font-bold text-white/40 mt-1 text-center">{placedCount} von {TOTAL}</p>
       </div>
 
-      {/* Puzzle area */}
-      <div className="flex-1 mx-4 mb-2 relative rounded-xl border-2 border-[#5a3a1a] overflow-hidden bg-[#3a2510]">
-        {/* Skeleton outline as guide */}
-        <img
-          src="/dinos/triceratops/skeleton.png"
-          alt="Umriss"
-          className="absolute inset-0 w-full h-full object-contain opacity-15 p-4"
-        />
+      {/* Puzzle board */}
+      <div className="mx-4 mb-3 relative">
+        <div
+          className="grid gap-1 rounded-xl overflow-hidden border-2 border-[#5a3a1a]"
+          style={{ gridTemplateColumns: `repeat(${GRID.cols}, 1fr)`, aspectRatio: "1" }}
+        >
+          {Array.from({ length: TOTAL }).map((_, pos) => {
+            const piece = board[pos];
+            const isCorrect = piece === pos;
+            const row = Math.floor(pos / GRID.cols);
+            const col = pos % GRID.cols;
 
-        {/* Placed pieces */}
-        <AnimatePresence>
-          {placed.map((id) => {
-            const piece = PIECES.find((p) => p.id === id)!;
             return (
-              <motion.div
-                key={id}
-                className="absolute bg-[#ffc850]/20 border-2 border-[#ffc850]/40 rounded-lg flex items-center justify-center"
-                style={{ left: piece.targetX, top: piece.targetY, width: piece.width, height: piece.height }}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", damping: 12 }}
+              <motion.button
+                key={pos}
+                onClick={() => handleBoardTap(pos)}
+                className={`relative aspect-square overflow-hidden ${
+                  piece !== null ? "" : "bg-[#3a2510] border border-[#5a3a1a]/50"
+                } ${selected !== null && piece === null ? "ring-2 ring-[#ffc850]/60" : ""}`}
+                animate={piece !== null && !isCorrect ? { x: [0, -4, 4, -2, 0] } : {}}
+                transition={{ duration: 0.3 }}
               >
-                <div className="text-center">
-                  <span className="text-2xl">{piece.emoji}</span>
-                  <p className="text-[8px] font-black text-[#ffc850]/60 uppercase">{piece.label}</p>
-                </div>
-              </motion.div>
+                {piece !== null ? (
+                  // Show the piece image (clipped to its original position)
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `url(${IMAGE})`,
+                      backgroundSize: `${GRID.cols * 100}% ${GRID.rows * 100}%`,
+                      backgroundPosition: `${(piece % GRID.cols) * (100 / (GRID.cols - 1))}% ${Math.floor(piece / GRID.cols) * (100 / (GRID.rows - 1))}%`,
+                    }}
+                  />
+                ) : (
+                  // Empty slot — show faint grid number
+                  <span className="text-white/10 text-lg font-black">{pos + 1}</span>
+                )}
+                {/* Correct indicator */}
+                {isCorrect && (
+                  <div className="absolute inset-0 border-2 border-[#84c75d]/60 rounded-sm" />
+                )}
+              </motion.button>
             );
           })}
-        </AnimatePresence>
+        </div>
 
-        {/* Completion animation */}
-        {complete && (
-          <motion.div
-            className="absolute inset-0 flex flex-col items-center justify-center bg-[#2C1A0E]/80 backdrop-blur-sm z-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <motion.img
-              src="/dinos/triceratops/skeleton.png"
-              alt="Skelett"
-              className="w-3/4 object-contain"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: [0, 1, 1, 0], scale: [0.8, 1, 1.05, 1.1] }}
-              transition={{ duration: 2, times: [0, 0.3, 0.7, 1] }}
-            />
-            <motion.img
-              src="/dinos/triceratops/comic.png"
-              alt="Triceratops"
-              className="w-1/2 object-contain absolute"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.5, type: "spring", damping: 10 }}
-            />
-            <motion.p
-              className="text-xl font-black uppercase text-[#ffc850] mt-4 relative z-10"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 2 }}
+        {/* Completion overlay */}
+        <AnimatePresence>
+          {complete && (
+            <motion.div
+              className="absolute inset-0 flex flex-col items-center justify-center bg-[#2C1A0E]/60 backdrop-blur-sm rounded-xl z-10"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
             >
-              🎉 Geschafft! 🎉
-            </motion.p>
-          </motion.div>
-        )}
+              <motion.img
+                src="/dinos/triceratops/comic.png"
+                alt="Triceratops"
+                className="w-32 h-32 object-contain drop-shadow-xl"
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", damping: 10, delay: 0.3 }}
+              />
+              <motion.p
+                className="text-xl font-black uppercase text-[#ffc850] mt-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+              >
+                🎉 Geschafft!
+              </motion.p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Forscher hint */}
+      {/* Hint */}
       <div className="px-4 mb-2">
         <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg p-2">
           <div className="w-7 h-7 bg-primary-fixed rounded-lg flex items-center justify-center flex-shrink-0">
             <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>face</span>
           </div>
-          <p className="text-[11px] font-bold text-white/70">{complete ? "Wow! Das Skelett erwacht zum Leben!" : hint}</p>
+          <p className="text-[11px] font-bold text-white/70">
+            {complete ? "Wow! Das Skelett ist komplett!" : selected !== null ? "Jetzt tippe auf die richtige Stelle!" : hint}
+          </p>
         </div>
       </div>
 
-      {/* Bone pieces to place */}
+      {/* Tray — pieces to place */}
       {!complete && (
         <div className="px-4 pb-4">
-          <div className="flex flex-wrap justify-center gap-2">
-            {remaining.map((piece, i) => (
-              <motion.button
-                key={piece.id}
-                onClick={() => handlePlace(piece.id)}
-                className="flex flex-col items-center gap-0.5 px-3 py-2 bg-[#5a3a1a] border-2 border-[#ffc850]/30 rounded-lg active:scale-90 transition-transform"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                whileTap={{ scale: 0.85 }}
-              >
-                <span className="text-xl">{piece.emoji}</span>
-                <span className="text-[8px] font-black text-[#ffc850]/60 uppercase">{piece.label}</span>
-              </motion.button>
-            ))}
+          <div className="flex flex-wrap justify-center gap-1.5">
+            {tray.map((piece) => {
+              const row = Math.floor(piece / GRID.cols);
+              const col = piece % GRID.cols;
+              const isSelected = selected === piece;
+
+              return (
+                <motion.button
+                  key={piece}
+                  onClick={() => handleTrayTap(piece)}
+                  className={`w-16 h-16 rounded-lg overflow-hidden border-[3px] transition-all ${
+                    isSelected ? "border-[#ffc850] shadow-[0_0_12px_rgba(255,200,80,0.5)] scale-110" : "border-[#5a3a1a] active:scale-95"
+                  }`}
+                  layout
+                  exit={{ scale: 0, opacity: 0 }}
+                >
+                  <div
+                    className="w-full h-full"
+                    style={{
+                      backgroundImage: `url(${IMAGE})`,
+                      backgroundSize: `${GRID.cols * 100}% ${GRID.rows * 100}%`,
+                      backgroundPosition: `${col * (100 / (GRID.cols - 1))}% ${row * (100 / (GRID.rows - 1))}%`,
+                    }}
+                  />
+                </motion.button>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* Continue button after completion */}
+      {/* Continue */}
       {complete && (
         <motion.div
           className="px-4 pb-4"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2.5 }}
+          transition={{ delay: 1.2 }}
         >
           <button className="w-full py-3 bg-[#1B5E20] text-white border-[3px] border-on-surface rounded-lg sticker-shadow font-bold uppercase tracking-wider text-sm flex items-center justify-center gap-1.5 active-press">
             <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>arrow_forward</span>

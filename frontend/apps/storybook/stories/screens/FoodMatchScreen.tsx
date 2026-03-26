@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import {
   DndContext,
   DragOverlay,
@@ -12,9 +12,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { FullscreenHeader } from "../../../../packages/ui/src/components/FullscreenHeader";
-import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
-import { Button } from "../../../../packages/ui/src/primitives/Button";
+import { MinigameShell } from "../../../../packages/ui/src/components/MinigameShell";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
 const DINOS = [
@@ -119,18 +117,14 @@ export function FoodMatchScreen() {
   }
 
   return (
-    <div className="bg-surface text-on-surface min-h-screen flex flex-col">
-      <FullscreenHeader title="Futter-Zuordnung" playerEmoji="🦖" />
-
-      <main className="flex-1 flex flex-col px-4 pb-6 max-w-sm mx-auto w-full">
-        <div className="mb-3">
-          <ForscherSpeech text="Ziehe jeden Dino zum richtigen Futter! Frisst er Pflanzen oder Fleisch?" />
-        </div>
-
-        <AnimatePresence mode="wait">
-          {!done ? (
-            <motion.div key="game" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <DndContext
+    <MinigameShell
+      title="Futter-Zuordnung"
+      instruction="Ziehe jeden Dino zum richtigen Futter! Frisst er Pflanzen oder Fleisch?"
+      done={done}
+      doneTitle="Perfekt!"
+      donePraise="Du weißt genau was jeder Dino frisst! Klasse!"
+    >
+      <DndContext
                 sensors={sensors}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
@@ -172,21 +166,7 @@ export function FoodMatchScreen() {
                     );
                   })()}
                 </DragOverlay>
-              </DndContext>
-            </motion.div>
-          ) : (
-            <motion.div key="done" className="flex-1 flex flex-col items-center justify-center text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <span className="text-6xl mb-4">🎉</span>
-              <h2 className="text-2xl font-black uppercase mb-2">Perfekt!</h2>
-              <p className="text-sm text-on-surface-variant mb-4">Alle {DINOS.length} Dinos richtig zugeordnet!</p>
-              <ForscherSpeech text="Du weißt genau was jeder Dino frisst! Klasse!" />
-              <div className="w-full mt-6">
-                <Button variant="primary" fullWidth icon="check">Fertig!</Button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
-    </div>
+      </DndContext>
+    </MinigameShell>
   );
 }

@@ -12,9 +12,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { FullscreenHeader } from "../../../../packages/ui/src/components/FullscreenHeader";
-import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
-import { Button } from "../../../../packages/ui/src/primitives/Button";
+import { MinigameShell } from "../../../../packages/ui/src/components/MinigameShell";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
 const PERIODS = [
@@ -121,16 +119,14 @@ export function TimelineSortScreen() {
   }
 
   return (
-    <div className="bg-surface text-on-surface min-h-screen flex flex-col">
-      <FullscreenHeader title="Zeitleiste" playerEmoji="🦖" />
-
-      <main className="flex-1 flex flex-col px-4 pb-6 max-w-sm mx-auto w-full">
-        {!done ? (
-          <>
-          <div className="mb-3">
-            <ForscherSpeech text="In welcher Zeit hat jeder Dino gelebt? Ziehe sie in die richtige Epoche!" />
-          </div>
-          <DndContext
+    <MinigameShell
+      title="Zeitleiste"
+      instruction="In welcher Zeit hat jeder Dino gelebt? Ziehe sie in die richtige Epoche!"
+      done={done}
+      doneTitle="Alle richtig!"
+      donePraise="Du weißt genau wann jeder Dino gelebt hat! Klasse!"
+    >
+      <DndContext
             sensors={sensors}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
@@ -175,19 +171,7 @@ export function TimelineSortScreen() {
                 );
               })()}
             </DragOverlay>
-          </DndContext>
-          </>
-        ) : (
-          <motion.div className="flex-1 flex flex-col items-center justify-center text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <span className="text-6xl mb-4">🎉</span>
-            <h2 className="text-2xl font-black uppercase mb-3">Alle richtig!</h2>
-            <ForscherSpeech text="Du weißt genau wann jeder Dino gelebt hat! Klasse!" />
-            <div className="w-full mt-4">
-              <Button variant="primary" fullWidth icon="check">Fertig!</Button>
-            </div>
-          </motion.div>
-        )}
-      </main>
-    </div>
+      </DndContext>
+    </MinigameShell>
   );
 }

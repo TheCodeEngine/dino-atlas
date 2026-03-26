@@ -256,73 +256,95 @@ function DoneOverlay({ dinoImage, dinoName, onComplete }: { dinoImage: string; d
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, #10213d 0%, #234974 28%, #4f83b4 56%, #c59b5e 84%, #f0cf95 100%)",
+            "linear-gradient(180deg, #101d33 0%, #1b3960 24%, #3d6da1 52%, #c99b59 83%, #f3d7a0 100%)",
         }}
       />
       <div
-        className="absolute inset-0 opacity-45"
+        className="absolute inset-0 opacity-55"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 18% 18%, rgba(255,255,255,0.18), transparent 22%), radial-gradient(circle at 78% 24%, rgba(255,214,132,0.18), transparent 24%), radial-gradient(circle at 50% 38%, rgba(255,243,202,0.16), transparent 28%)",
+            "radial-gradient(circle at 18% 18%, rgba(255,255,255,0.16), transparent 22%), radial-gradient(circle at 80% 24%, rgba(255,214,132,0.18), transparent 24%), radial-gradient(circle at 50% 38%, rgba(255,243,202,0.14), transparent 30%)",
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#2a1907]/18" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#2a1907]/24" />
 
-      <div className="absolute inset-x-0 top-0 h-[56%] overflow-hidden">
-        <div className="absolute left-[-12%] top-[8%] h-44 w-44 rounded-full border-[22px] border-[#f3d28a]/16" />
-        <div className="absolute right-[-10%] top-[18%] h-36 w-36 rounded-full border-[18px] border-[#f7e3b8]/10" />
-        <div className="absolute left-[-8%] bottom-[10%] h-40 w-28 rounded-t-[8rem] bg-[#18324e]/18" />
-        <div className="absolute right-[-6%] bottom-[8%] h-44 w-32 rounded-t-[8rem] bg-[#18324e]/18" />
-        <div className="absolute left-[8%] bottom-[8%] h-28 w-20 rounded-t-[4rem] bg-[#173450]/20" />
-        <div className="absolute right-[10%] bottom-[6%] h-32 w-24 rounded-t-[4rem] bg-[#173450]/20" />
+      <div className="absolute inset-x-0 top-0 h-[58%] overflow-hidden">
+        <div
+          className="absolute left-1/2 top-[6%] h-[15rem] w-[18rem] -translate-x-1/2 rounded-t-[9rem]"
+          style={{
+            border: "3px solid rgba(28,28,23,0.24)",
+            background: "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%)",
+          }}
+        />
+        <div className="absolute left-[-4%] top-[17%] h-[15rem] w-[3.8rem] rounded-t-[2rem] bg-gradient-to-b from-[#1f4468] to-[#112844]" />
+        <div className="absolute right-[-4%] top-[17%] h-[15rem] w-[3.8rem] rounded-t-[2rem] bg-gradient-to-b from-[#1f4468] to-[#112844]" />
+        <div className="absolute left-[2%] top-[15%] h-6 w-[4.5rem] rounded-t-[0.8rem] bg-[#ecd8a7] border-[3px] border-on-surface border-b-0" />
+        <div className="absolute right-[2%] top-[15%] h-6 w-[4.5rem] rounded-t-[0.8rem] bg-[#ecd8a7] border-[3px] border-on-surface border-b-0" />
+        <div className="absolute left-[10%] top-[20%] h-32 w-6 rounded-full bg-[#173250]/28 blur-[2px]" />
+        <div className="absolute right-[10%] top-[20%] h-32 w-6 rounded-full bg-[#173250]/28 blur-[2px]" />
+
+        <div
+          className="absolute left-[8%] top-[23%] h-[3.1rem] w-[4.4rem]"
+          style={{ clipPath: "polygon(0 0, 100% 0, 82% 100%, 0 100%)", background: "linear-gradient(180deg, #f4c56e 0%, #b66f2c 100%)" }}
+        />
+        <div
+          className="absolute right-[8%] top-[23%] h-[3.1rem] w-[4.4rem]"
+          style={{ clipPath: "polygon(18% 0, 100% 0, 100% 100%, 0 100%)", background: "linear-gradient(180deg, #f4c56e 0%, #b66f2c 100%)" }}
+        />
+        <div className="absolute left-[9.5%] top-[22%] text-[10px] font-black uppercase tracking-[0.18em] text-[#6b3e11]">Top Fund</div>
+        <div className="absolute right-[9.5%] top-[22%] text-[10px] font-black uppercase tracking-[0.18em] text-[#6b3e11]">Museum</div>
 
         <motion.div
-          className="absolute left-1/2 top-[10%] h-56 w-24 -translate-x-1/2 blur-2xl"
+          className="absolute left-1/2 top-[12%] h-56 w-24 -translate-x-1/2 blur-2xl"
           style={{ background: "linear-gradient(180deg, rgba(255,244,207,0.75) 0%, rgba(255,244,207,0) 100%)" }}
           animate={{ opacity: [0.5, 0.86, 0.58], scaleY: [0.92, 1.08, 1] }}
           transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute left-[32%] top-[14%] h-44 w-12 origin-top rounded-full blur-xl"
+          className="absolute left-[31%] top-[16%] h-44 w-12 origin-top rounded-full blur-xl"
           style={{ background: "linear-gradient(180deg, rgba(255,238,193,0.38) 0%, rgba(255,238,193,0) 100%)" }}
           animate={{ rotate: [-16, -8, -14], opacity: [0.18, 0.42, 0.18] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute right-[32%] top-[14%] h-44 w-12 origin-top rounded-full blur-xl"
+          className="absolute right-[31%] top-[16%] h-44 w-12 origin-top rounded-full blur-xl"
           style={{ background: "linear-gradient(180deg, rgba(255,238,193,0.38) 0%, rgba(255,238,193,0) 100%)" }}
           animate={{ rotate: [16, 8, 14], opacity: [0.18, 0.42, 0.18] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        <div className="absolute left-1/2 top-[18%] h-32 w-32 -translate-x-1/2 rounded-full bg-[#ffd77e]/30 blur-3xl" />
+        <div className="absolute left-1/2 top-[18%] h-36 w-36 -translate-x-1/2 rounded-full bg-[#ffd77e]/32 blur-3xl" />
         <motion.div
-          className="absolute left-1/2 top-[19%] flex h-[6.8rem] w-[6.8rem] -translate-x-1/2 items-center justify-center rounded-full border-[4px] border-on-surface bg-[#fff4d9]"
+          className="absolute left-1/2 top-[20%] flex h-[7.4rem] w-[7.4rem] -translate-x-1/2 items-center justify-center rounded-full border-[4px] border-on-surface bg-[#fff4d9]"
           animate={{ y: [0, -4, 0], boxShadow: ["0 14px 0 #1c1c17", "0 18px 0 #1c1c17", "0 14px 0 #1c1c17"] }}
           transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
         >
           <div className="absolute inset-[0.45rem] rounded-full border-[2px] border-dashed border-[#d5ad5f]" />
-          <img src={dinoImage} alt="" className="relative h-16 w-16 object-contain drop-shadow-md" />
+          <div className="absolute inset-[0.9rem] rounded-full bg-[#fffaf0]" />
+          <img src={dinoImage} alt="" className="relative h-[4.3rem] w-[4.3rem] object-contain drop-shadow-md" />
         </motion.div>
 
-        <div className="absolute left-1/2 top-[41%] flex -translate-x-1/2 items-center gap-2 rounded-full border-[2px] border-on-surface bg-white/82 px-3 py-1">
+        <div className="absolute left-1/2 top-[47%] flex -translate-x-1/2 items-center gap-2 rounded-full border-[2px] border-on-surface bg-white/88 px-3 py-1">
           <span className="material-symbols-outlined text-primary-container" style={{ fontSize: "16px", fontVariationSettings: "'FILL' 1" }}>
             museum
           </span>
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface">Neue Vitrine</span>
         </div>
+        <p className="absolute inset-x-0 top-[55%] text-center text-[2rem] font-black uppercase leading-[0.9] text-white" style={{ textShadow: "0 4px 0 rgba(0,0,0,0.28)" }}>
+          Im Museum
+        </p>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 h-[36%] bg-gradient-to-t from-[#8b6132]/44 via-[#d2a15d]/24 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-[#8b6132]/48 via-[#d2a15d]/24 to-transparent" />
       <div
-        className="absolute inset-x-[-6%] bottom-0 h-[17%]"
+        className="absolute inset-x-[-6%] bottom-0 h-[18%]"
         style={{
           background: "linear-gradient(180deg, #efddb4 0%, #d9af6d 44%, #b88443 100%)",
           clipPath: "polygon(0 100%, 100% 100%, 100% 26%, 74% 18%, 50% 8%, 28% 18%, 0 26%)",
         }}
       />
       <div
-        className="absolute inset-x-[14%] bottom-[15.3%] h-[1.15rem] rounded-full bg-[#6c4a27]/35 blur-[2px]"
+        className="absolute inset-x-[12%] bottom-[16.4%] h-[1.25rem] rounded-full bg-[#6c4a27]/35 blur-[2px]"
       />
 
       {Array.from({ length: 7 }).map((_, i) => (
@@ -331,7 +353,7 @@ function DoneOverlay({ dinoImage, dinoName, onComplete }: { dinoImage: string; d
           className="absolute z-40 rounded-full bg-white/75 blur-[1px]"
           style={{
             left: `${10 + i * 12}%`,
-            top: `${12 + (i % 3) * 8}%`,
+            top: `${10 + (i % 3) * 8}%`,
             width: `${5 + (i % 2) * 3}px`,
             height: `${5 + (i % 2) * 3}px`,
             boxShadow: "0 0 16px rgba(255,229,164,0.55)",
@@ -343,15 +365,18 @@ function DoneOverlay({ dinoImage, dinoName, onComplete }: { dinoImage: string; d
       ))}
 
       <motion.div
-        className="absolute inset-x-3 bottom-3 overflow-hidden rounded-[1.85rem] border-[3px] border-on-surface bg-[#fff7e8]/96 sticker-shadow"
-        style={{ paddingBottom: "calc(0.9rem + env(safe-area-inset-bottom, 0px))" }}
+        className="absolute inset-x-3 overflow-hidden rounded-[1.85rem] border-[3px] border-on-surface bg-[#fff7e8]/97 sticker-shadow"
+        style={{ top: "42%", paddingBottom: "calc(0.9rem + env(safe-area-inset-bottom, 0px))" }}
         initial={{ y: 46, opacity: 0, scale: 0.97 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ delay: 0.08, type: "spring", stiffness: 220, damping: 24 }}
       >
-        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/62 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/68 to-transparent" />
         <div className="absolute -right-8 top-[-1.4rem] h-28 w-28 rounded-full bg-[#ffd171]/28 blur-3xl" />
         <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[#efcc8d]/32 to-transparent" />
+        <div
+          className="absolute right-[-1.2rem] top-8 h-24 w-24 rounded-full border-[2px] border-dashed border-[#dcb77a]/55"
+        />
 
         <div className="relative px-4 pt-4">
           <div className="flex items-center justify-between gap-2">

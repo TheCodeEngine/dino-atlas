@@ -18,6 +18,7 @@ export { ActionCard } from "./components/ActionCard";
 export { BottomNav } from "./components/BottomNav";
 export { AppShell } from "./components/AppShell";
 export { FullscreenHeader } from "./components/FullscreenHeader";
+export { MinigameShell } from "./components/MinigameShell";
 export { PlayerSwitcher } from "./components/PlayerSwitcher";
 export { TimeSlider } from "./components/TimeSlider";
 export { ImageSwitcher } from "./components/ImageSwitcher";

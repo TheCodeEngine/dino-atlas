@@ -20,6 +20,8 @@ export { PlayerSwitcher } from "./components/PlayerSwitcher";
 export { TimeSlider } from "./components/TimeSlider";
 export { ImageSwitcher } from "./components/ImageSwitcher";
 export { MuseumTransition, LandScene } from "./components/museum-transition";
+export { ExpeditionIntro } from "./components/ExpeditionIntro";
+export { DesertScene, DESERT_CONFIG, JungleScene, JUNGLE_CONFIG, IceScene, ICE_CONFIG, OceanScene, OCEAN_CONFIG } from "./components/biom-scene";
 
 // Hooks
 export { useHaptics } from "./hooks/useHaptics";

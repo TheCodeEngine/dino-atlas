@@ -21,23 +21,27 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
   const heartId = useRef(0);
   const haptics = useHaptics();
 
-  const spawnHearts = useCallback((x: number, y: number) => {
-    const newHearts = Array.from({ length: 3 }, (_, i) => ({
+  const spawnHearts = useCallback(() => {
+    // Hearts burst out from dino center in all directions
+    const emojis = ["❤️", "💕", "💖", "✨", "⭐"];
+    const newHearts = Array.from({ length: 6 }, (_, i) => ({
       id: heartId.current++,
-      x: x + (Math.random() - 0.5) * 40,
-      y: y - 10 - i * 15,
+      x: 50 + (Math.random() - 0.5) * 30, // % from center
+      y: 50 + (Math.random() - 0.5) * 20,
+      dx: (Math.random() - 0.5) * 120, // spread distance
+      dy: -40 - Math.random() * 80, // always float up
+      emoji: emojis[Math.floor(Math.random() * emojis.length)]!,
+      size: 20 + Math.random() * 16,
+      delay: i * 0.05,
     }));
     setHearts((prev) => [...prev, ...newHearts]);
     setTimeout(() => {
       setHearts((prev) => prev.filter((h) => !newHearts.find((n) => n.id === h.id)));
-    }, 1200);
+    }, 1500);
   }, []);
 
-  function handlePet(e: React.PointerEvent) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    spawnHearts(x, y);
+  function handlePet() {
+    spawnHearts();
     setMood("love");
     haptics.tap();
     setTimeout(() => setMood("idle"), 800);
@@ -65,16 +69,16 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
         Dein neuer Freund
       </p>
 
-      <div className="bg-gradient-to-br from-primary-fixed/40 to-tertiary-fixed/30 rounded-xl border-[3px] border-on-surface sticker-shadow p-4">
+      <div className="bg-gradient-to-br from-primary-fixed/40 to-tertiary-fixed/30 rounded-xl border-[3px] border-on-surface sticker-shadow p-5">
         {/* Dino touch area */}
         <div
-          className="relative flex items-center justify-center mb-3 cursor-pointer select-none"
+          className="relative flex items-center justify-center mb-4 cursor-pointer select-none h-52"
           onPointerDown={handlePet}
         >
           <motion.img
             src={image}
             alt={name}
-            className="w-32 h-32 object-contain drop-shadow-lg"
+            className="w-48 h-48 object-contain drop-shadow-lg"
             animate={
               mood === "love" ? { rotate: [0, -5, 5, -3, 0], scale: [1, 1.05, 1] }
                 : mood === "eating" ? { y: [0, -5, 0], scale: [1, 1.08, 1] }
@@ -86,19 +90,23 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
             }
           />
 
-          {/* Floating hearts */}
+          {/* Particle burst from dino */}
           <AnimatePresence>
             {hearts.map((heart) => (
               <motion.span
                 key={heart.id}
-                className="absolute text-xl pointer-events-none"
-                style={{ left: heart.x, top: heart.y }}
-                initial={{ opacity: 1, y: 0, scale: 0.5 }}
-                animate={{ opacity: 0, y: -50, scale: 1.2 }}
+                className="absolute pointer-events-none"
+                style={{
+                  left: `${heart.x}%`,
+                  top: `${heart.y}%`,
+                  fontSize: `${heart.size}px`,
+                }}
+                initial={{ opacity: 1, x: 0, y: 0, scale: 0 }}
+                animate={{ opacity: 0, x: heart.dx, y: heart.dy, scale: 1.3, rotate: (Math.random() - 0.5) * 40 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 1, ease: "easeOut" }}
+                transition={{ duration: 1.2, ease: "easeOut", delay: heart.delay }}
               >
-                ❤️
+                {heart.emoji}
               </motion.span>
             ))}
           </AnimatePresence>
@@ -106,7 +114,7 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
           {/* Mood indicator */}
           {mood === "eating" && (
             <motion.span
-              className="absolute top-0 right-4 text-2xl"
+              className="absolute -top-2 right-2 text-4xl"
               initial={{ scale: 0, rotate: -20 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", damping: 10 }}
@@ -116,9 +124,10 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
           )}
           {mood === "reject" && (
             <motion.span
-              className="absolute top-0 right-4 text-2xl"
+              className="absolute -top-2 right-2 text-4xl"
               initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              animate={{ scale: [0, 1.3, 1] }}
+              transition={{ duration: 0.3 }}
             >
               😖
             </motion.span>
@@ -146,17 +155,17 @@ function InteractiveDino({ name, image, diet }: { name: string; image: string; d
         )}
 
         {/* Food options */}
-        <div className="flex justify-center gap-2">
+        <div className="flex justify-center gap-3">
           {FOOD_OPTIONS.map((food) => (
             <motion.button
               key={food.id}
               onClick={() => handleFeed(food)}
-              className="flex flex-col items-center gap-0.5 px-3 py-2 bg-white/80 rounded-lg border-2 border-on-surface/20 active:scale-90 transition-transform"
+              className="flex flex-col items-center gap-1 px-4 py-3 bg-white/80 rounded-xl border-[3px] border-on-surface/20 sticker-shadow"
               whileTap={{ scale: 0.85 }}
               disabled={mood !== "idle"}
             >
-              <span className="text-xl">{food.emoji}</span>
-              <span className="text-[9px] font-bold text-on-surface-variant">{food.label}</span>
+              <span className="text-3xl">{food.emoji}</span>
+              <span className="text-[10px] font-bold text-on-surface-variant">{food.label}</span>
             </motion.button>
           ))}
         </div>

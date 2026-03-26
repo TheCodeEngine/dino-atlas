@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { AudioPlayer } from "../../../../packages/ui/src/components/AudioPlayer";
 import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
 import { ImageSwitcher } from "../../../../packages/ui/src/components/ImageSwitcher";
+import { MuseumTransition, LandScene } from "../../../../packages/ui/src/components/museum-transition";
 import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
 
 // ── Map Carousel: Wann → Wo damals → Wo heute ──────────────────
@@ -144,211 +145,6 @@ function MapCarousel({ dinoImage }: { dinoImage: string }) {
         ))}
       </div>
     </div>
-  );
-}
-
-// ── Museum CTA with animation ───────────────────────────────────
-
-function MuseumCTA({ dinoImage, dinoName }: { dinoImage: string; dinoName: string }) {
-  const [phase, setPhase] = useState<"idle" | "run" | "enter" | "done">("idle");
-  const haptics = useHaptics();
-
-  function handleClick() {
-    if (phase !== "idle") return;
-    haptics.success();
-    setPhase("run");
-    setTimeout(() => setPhase("enter"), 2500);
-    setTimeout(() => setPhase("done"), 3200);
-  }
-
-  return (
-    <>
-      <AnimatePresence>
-        {phase !== "idle" && (
-          <motion.div
-            className="fixed inset-0 z-50 overflow-hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{ backgroundImage: "none" }}
-          >
-            {/* Sky */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#3d7cc9] via-[#7ec8e3] to-[#b5dfef]" />
-
-            {/* Sun */}
-            <motion.div
-              className="absolute top-[8%] right-[15%] w-16 h-16 rounded-full bg-[#FFD93D]"
-              style={{ boxShadow: "0 0 40px 15px rgba(255,217,61,0.4)" }}
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 3, repeat: Infinity }}
-            />
-
-            {/* Background mountains (parallax slow) */}
-            <motion.div
-              className="absolute bottom-[30%] left-0 right-0 h-[20%]"
-              animate={phase === "run" ? { x: [0, -60] } : {}}
-              transition={{ duration: 2.5, ease: "linear" }}
-            >
-              {[0, 80, 170, 260, 350, 440].map((x, i) => (
-                <div
-                  key={i}
-                  className="absolute bottom-0"
-                  style={{ left: `${x}px`, width: 0, height: 0, borderLeft: `${40 + i * 5}px solid transparent`, borderRight: `${40 + i * 5}px solid transparent`, borderBottom: `${50 + i * 8}px solid ${i % 2 === 0 ? "#5a9e4b" : "#4a8c3f"}` }}
-                />
-              ))}
-            </motion.div>
-
-            {/* Mid-ground trees (parallax medium) */}
-            <motion.div
-              className="absolute bottom-[28%] left-0 flex gap-12"
-              animate={phase === "run" ? { x: [100, -200] } : {}}
-              transition={{ duration: 2.5, ease: "linear" }}
-            >
-              {Array.from({ length: 8 }).map((_, i) => (
-                <span key={i} className="text-3xl">{i % 2 === 0 ? "🌲" : "🌳"}</span>
-              ))}
-            </motion.div>
-
-            {/* Ground */}
-            <div className="absolute bottom-0 left-0 right-0 h-[30%] bg-gradient-to-t from-[#2d5a1e] via-[#3d7a2e] to-[#5aad3e]" />
-
-            {/* Foreground grass (parallax fast - 3D effect) */}
-            <motion.div
-              className="absolute bottom-[27%] left-0 flex gap-4 z-20"
-              animate={phase === "run" ? { x: [200, -400] } : {}}
-              transition={{ duration: 2.5, ease: "linear" }}
-            >
-              {Array.from({ length: 20 }).map((_, i) => (
-                <span key={i} className="text-2xl" style={{ transform: `rotate(${(i % 3 - 1) * 20}deg)` }}>
-                  {i % 4 === 0 ? "🌿" : i % 4 === 1 ? "🌾" : i % 4 === 2 ? "🍃" : "🌱"}
-                </span>
-              ))}
-            </motion.div>
-
-            {/* Dust particles */}
-            {phase === "run" && Array.from({ length: 6 }).map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-2 h-2 rounded-full bg-[#c8a96a]/60 z-10"
-                style={{ bottom: `${28 + Math.random() * 4}%`, left: "35%" }}
-                initial={{ opacity: 0, x: 0 }}
-                animate={{ opacity: [0, 0.8, 0], x: -(30 + Math.random() * 40), y: -(10 + Math.random() * 20) }}
-                transition={{ duration: 0.6, delay: i * 0.3, repeat: 4, ease: "easeOut" }}
-              />
-            ))}
-
-            {/* Museum (appears from right) */}
-            <motion.div
-              className="absolute bottom-[30%] right-4 flex flex-col items-center z-10"
-              initial={{ x: 200 }}
-              animate={phase === "run" ? { x: [200, 0] } : { x: 0 }}
-              transition={{ duration: 2, delay: 0.5, ease: "easeOut" }}
-            >
-              <div className="w-0 h-0 border-l-[50px] border-r-[50px] border-b-[24px] border-l-transparent border-r-transparent border-b-[#d4a56a] mb-[-2px]" />
-              <div className="bg-[#f5e6c8] border-[3px] border-on-surface w-24 h-24 flex flex-col items-center justify-between py-1.5 shadow-xl">
-                <span className="material-symbols-outlined text-primary-container" style={{ fontSize: "24px", fontVariationSettings: "'FILL' 1" }}>museum</span>
-                <p className="text-[7px] font-black uppercase text-on-surface-variant">Museum</p>
-                <motion.div
-                  className="w-9 h-11 bg-[#6B3410] border-[2px] border-on-surface rounded-t-lg"
-                  animate={phase === "enter" || phase === "done" ? { scaleX: [1, 0.05] } : {}}
-                  transition={{ duration: 0.25 }}
-                  style={{ transformOrigin: "left" }}
-                />
-              </div>
-            </motion.div>
-
-            {/* Dino running on ground */}
-            <motion.div
-              className="absolute bottom-[30%] z-10"
-              style={{ marginBottom: "-4px" }}
-              initial={{ left: "-15%" }}
-              animate={
-                phase === "run" ? { left: "60%" }
-                : phase === "enter" ? { left: "72%", scale: 0.3, opacity: 0 }
-                : {}
-              }
-              transition={
-                phase === "run" ? { duration: 2.5, ease: [0.25, 0.1, 0.25, 1] }
-                : { duration: 0.4, ease: "easeIn" }
-              }
-            >
-              <motion.img
-                src={dinoImage}
-                alt=""
-                className="w-16 h-16 object-contain drop-shadow-lg -translate-y-full"
-                style={{ scaleX: -1 }}
-                animate={phase === "run" ? { y: [0, -12, 0] } : {}}
-                transition={{ duration: 0.35, repeat: 7, ease: "easeInOut" }}
-              />
-            </motion.div>
-
-            {/* Done state */}
-            {phase === "done" && (
-              <motion.div
-                className="absolute inset-0 flex flex-col items-center justify-center z-30"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                <div className="absolute inset-0 bg-on-surface/30" />
-                <motion.div
-                  className="flex flex-col items-center relative"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: [0, 1.2, 1] }}
-                  transition={{ type: "spring", damping: 8 }}
-                >
-                  <span className="text-7xl mb-3">🏛️</span>
-                  <p className="text-3xl font-black text-white uppercase" style={{ textShadow: "0 4px 0 rgba(0,0,0,0.5), 0 0 30px rgba(255,255,255,0.4)" }}>
-                    Im Museum!
-                  </p>
-                </motion.div>
-
-                {["🎉", "⭐", "✨", "🦕", "🌟", "🎊", "💫", "🎉", "⭐", "✨"].map((e, i) => (
-                  <motion.span
-                    key={i}
-                    className="absolute text-3xl z-40"
-                    style={{ left: `${5 + i * 10}%`, top: `${15 + (i % 4) * 15}%` }}
-                    initial={{ scale: 0, rotate: 0 }}
-                    animate={{ scale: [0, 1.8, 0], rotate: [0, 360], y: [0, -60] }}
-                    transition={{ delay: i * 0.06, duration: 1.5, repeat: Infinity, repeatDelay: 1.2 }}
-                  >{e}</motion.span>
-                ))}
-
-                <motion.button
-                  className="mt-10 px-8 py-3 bg-white text-primary-container border-[3px] border-on-surface rounded-xl sticker-shadow font-black uppercase tracking-wider text-sm flex items-center gap-2 relative z-40"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6, type: "spring" }}
-                  whileTap={{ scale: 0.93 }}
-                  onClick={() => setPhase("idle")}
-                >
-                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>check</span>
-                  Weiter geht's!
-                </motion.button>
-              </motion.div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Button - Museum icon instead of dino */}
-      <div className="mx-4">
-        <button
-          onClick={handleClick}
-          className="w-full bg-gradient-to-br from-primary-container to-[#2E7D32] rounded-xl border-[3px] border-on-surface sticker-shadow active-press overflow-hidden text-left"
-        >
-          <div className="flex items-center gap-3 p-3">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined text-white" style={{ fontSize: "28px", fontVariationSettings: "'FILL' 1" }}>museum</span>
-            </div>
-            <div className="flex-1 text-white min-w-0">
-              <p className="text-base font-black uppercase tracking-tight leading-tight">Ab ins Museum!</p>
-            </div>
-            <span className="material-symbols-outlined text-white/80" style={{ fontSize: "24px" }}>arrow_forward</span>
-          </div>
-        </button>
-      </div>
-    </>
   );
 }
 
@@ -695,8 +491,12 @@ export function DiscoveryScreen() {
           <ForscherSpeech text="Streichle deinen neuen Freund! Und füttere ihn mit dem richtigen Futter!" />
         </div>
 
-        {/* Museum CTA with animation */}
-        <MuseumCTA dinoImage={DINO.images.comic} dinoName={DINO.name} />
+        {/* Museum CTA with land animation */}
+        <MuseumTransition
+          dinoImage={DINO.images.comic}
+          dinoName={DINO.name}
+          scene={LandScene}
+        />
       </main>
     </div>
   );

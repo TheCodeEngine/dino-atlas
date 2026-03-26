@@ -19,6 +19,7 @@ export { BottomNav } from "./components/BottomNav";
 export { PlayerSwitcher } from "./components/PlayerSwitcher";
 export { TimeSlider } from "./components/TimeSlider";
 export { ImageSwitcher } from "./components/ImageSwitcher";
+export { MuseumTransition, LandScene } from "./components/museum-transition";
 
 // Hooks
 export { useHaptics } from "./hooks/useHaptics";

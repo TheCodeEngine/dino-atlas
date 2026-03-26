@@ -8,15 +8,19 @@
     "build": "storybook build"
   },
   "dependencies": {
+    "@dino-atlas/minigames": "workspace:*",
     "@dino-atlas/types": "workspace:*",
     "@dino-atlas/ui": "workspace:*",
-    "@dino-atlas/minigames": "workspace:*",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "motion": "^12.38.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@storybook/addon-docs": "^10.3.3",
     "@storybook/addon-a11y": "^10.3.3",
+    "@storybook/addon-docs": "^10.3.3",
     "@storybook/react-vite": "^10.3.3",
     "@tailwindcss/vite": "^4.0.0",
     "@types/react": "^19.0.0",

@@ -31,6 +31,10 @@ export { TimeSlider } from "./components/TimeSlider";
 export { ImageSwitcher } from "./components/ImageSwitcher";
 export { MuseumTransition, LandScene } from "./components/museum-transition";
 export { ExpeditionIntro } from "./components/ExpeditionIntro";
+export { DinoHeader } from "./components/DinoHeader";
+export { FactCarousel } from "./components/FactCarousel";
+export { DinoMapCarousel, buildDefaultMapCards } from "./components/DinoMapCarousel";
+export { InteractiveDino } from "./components/InteractiveDino";
 export { DesertScene, DESERT_CONFIG, JungleScene, JUNGLE_CONFIG, IceScene, ICE_CONFIG, OceanScene, OCEAN_CONFIG } from "./components/biom-scene";
 
 // Hooks

@@ -4,6 +4,7 @@ mod middleware;
 mod pocketbase;
 mod routes;
 
+use axum::http::{HeaderName, Method};
 use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::EnvFilter;
@@ -29,8 +30,11 @@ async fn main() {
                 .filter_map(|o| o.parse().ok())
                 .collect::<Vec<_>>(),
         )
-        .allow_methods(tower_http::cors::Any)
-        .allow_headers(tower_http::cors::Any)
+        .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE, Method::OPTIONS])
+        .allow_headers([
+            HeaderName::from_static("content-type"),
+            HeaderName::from_static("authorization"),
+        ])
         .allow_credentials(true);
 
     let app = create_router(state)

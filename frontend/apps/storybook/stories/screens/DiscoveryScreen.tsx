@@ -1,7 +1,176 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { AudioPlayer } from "../../../../packages/ui/src/components/AudioPlayer";
 import { ForscherSpeech } from "../../../../packages/ui/src/components/ForscherSpeech";
 import { Button } from "../../../../packages/ui/src/primitives/Button";
+import { useHaptics } from "../../../../packages/ui/src/hooks/useHaptics";
+
+// ── Interactive Dino Component ──────────────────────────────────
+
+const FOOD_OPTIONS = [
+  { id: "fern", emoji: "🌿", label: "Farn", correct: true },
+  { id: "meat", emoji: "🥩", label: "Fleisch", correct: false },
+  { id: "leaf", emoji: "🍃", label: "Blätter", correct: true },
+];
+
+function InteractiveDino({ name, image, diet }: { name: string; image: string; diet: string }) {
+  const [mood, setMood] = useState<"idle" | "happy" | "love" | "eating" | "reject">("idle");
+  const [hearts, setHearts] = useState<{ id: number; x: number; y: number }[]>([]);
+  const [fedCount, setFedCount] = useState(0);
+  const [message, setMessage] = useState("");
+  const heartId = useRef(0);
+  const haptics = useHaptics();
+
+  const spawnHearts = useCallback((x: number, y: number) => {
+    const newHearts = Array.from({ length: 3 }, (_, i) => ({
+      id: heartId.current++,
+      x: x + (Math.random() - 0.5) * 40,
+      y: y - 10 - i * 15,
+    }));
+    setHearts((prev) => [...prev, ...newHearts]);
+    setTimeout(() => {
+      setHearts((prev) => prev.filter((h) => !newHearts.find((n) => n.id === h.id)));
+    }, 1200);
+  }, []);
+
+  function handlePet(e: React.PointerEvent) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    spawnHearts(x, y);
+    setMood("love");
+    haptics.tap();
+    setTimeout(() => setMood("idle"), 800);
+  }
+
+  function handleFeed(food: typeof FOOD_OPTIONS[0]) {
+    haptics.tap();
+    if (food.correct) {
+      setMood("eating");
+      setFedCount((c) => c + 1);
+      setMessage(`${name} liebt ${food.label}! 😋`);
+      haptics.success();
+    } else {
+      setMood("reject");
+      setMessage(`${name} mag kein ${food.label}! 🙅`);
+      haptics.error();
+    }
+    setTimeout(() => { setMood("idle"); setMessage(""); }, 1500);
+  }
+
+  return (
+    <div className="mx-4 mb-4">
+      <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant flex items-center gap-1 mb-2">
+        <span className="material-symbols-outlined" style={{ fontSize: "14px", fontVariationSettings: "'FILL' 1" }}>favorite</span>
+        Dein neuer Freund
+      </p>
+
+      <div className="bg-gradient-to-br from-primary-fixed/40 to-tertiary-fixed/30 rounded-xl border-[3px] border-on-surface sticker-shadow p-4">
+        {/* Dino touch area */}
+        <div
+          className="relative flex items-center justify-center mb-3 cursor-pointer select-none"
+          onPointerDown={handlePet}
+        >
+          <motion.img
+            src={image}
+            alt={name}
+            className="w-32 h-32 object-contain drop-shadow-lg"
+            animate={
+              mood === "love" ? { rotate: [0, -5, 5, -3, 0], scale: [1, 1.05, 1] }
+                : mood === "eating" ? { y: [0, -5, 0], scale: [1, 1.08, 1] }
+                : mood === "reject" ? { x: [0, -8, 8, -6, 4, 0] }
+                : { y: [0, -2, 0] }
+            }
+            transition={
+              mood === "idle" ? { repeat: Infinity, duration: 3, ease: "easeInOut" } : { duration: 0.5 }
+            }
+          />
+
+          {/* Floating hearts */}
+          <AnimatePresence>
+            {hearts.map((heart) => (
+              <motion.span
+                key={heart.id}
+                className="absolute text-xl pointer-events-none"
+                style={{ left: heart.x, top: heart.y }}
+                initial={{ opacity: 1, y: 0, scale: 0.5 }}
+                animate={{ opacity: 0, y: -50, scale: 1.2 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1, ease: "easeOut" }}
+              >
+                ❤️
+              </motion.span>
+            ))}
+          </AnimatePresence>
+
+          {/* Mood indicator */}
+          {mood === "eating" && (
+            <motion.span
+              className="absolute top-0 right-4 text-2xl"
+              initial={{ scale: 0, rotate: -20 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", damping: 10 }}
+            >
+              😋
+            </motion.span>
+          )}
+          {mood === "reject" && (
+            <motion.span
+              className="absolute top-0 right-4 text-2xl"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+            >
+              😖
+            </motion.span>
+          )}
+        </div>
+
+        {/* Message */}
+        <AnimatePresence>
+          {message && (
+            <motion.p
+              className="text-center text-xs font-bold text-on-surface mb-2"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+            >
+              {message}
+            </motion.p>
+          )}
+        </AnimatePresence>
+
+        {!message && (
+          <p className="text-center text-[11px] text-on-surface-variant font-semibold mb-3">
+            Streichle mich! Oder füttere mich mit dem richtigen Futter!
+          </p>
+        )}
+
+        {/* Food options */}
+        <div className="flex justify-center gap-2">
+          {FOOD_OPTIONS.map((food) => (
+            <motion.button
+              key={food.id}
+              onClick={() => handleFeed(food)}
+              className="flex flex-col items-center gap-0.5 px-3 py-2 bg-white/80 rounded-lg border-2 border-on-surface/20 active:scale-90 transition-transform"
+              whileTap={{ scale: 0.85 }}
+              disabled={mood !== "idle"}
+            >
+              <span className="text-xl">{food.emoji}</span>
+              <span className="text-[9px] font-bold text-on-surface-variant">{food.label}</span>
+            </motion.button>
+          ))}
+        </div>
+
+        {/* Fed counter */}
+        {fedCount > 0 && (
+          <p className="text-center text-[10px] font-bold text-primary mt-2">
+            {fedCount}x gefüttert! {fedCount >= 3 ? "🎉 Satt und glücklich!" : ""}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 const DINO = {
   name: "Triceratops",
@@ -49,7 +218,6 @@ const DINO = {
       story: "800 Zähne die ständig nachwuchsen — genau wie bei einem Hai! In seinem ganzen Leben hatte er tausende Zähne.",
     },
   ],
-  sizeComparison: "So groß wie 2 Autos!",
 };
 
 export function DiscoveryScreen() {
@@ -182,32 +350,17 @@ export function DiscoveryScreen() {
           </div>
         </div>
 
-        {/* Size Comparison */}
-        <div className="mx-4 bg-primary-fixed/30 rounded-lg border-[3px] border-primary/30 p-3 mb-4 flex items-center gap-3">
-          <span className="material-symbols-outlined text-primary" style={{ fontSize: "28px", fontVariationSettings: "'FILL' 1" }}>directions_car</span>
-          <div>
-            <p className="text-[9px] font-black uppercase tracking-wider text-primary">Größenvergleich</p>
-            <p className="text-sm font-black text-on-surface">{DINO.sizeComparison}</p>
-          </div>
-        </div>
+        {/* Interactive Dino Friend */}
+        <InteractiveDino name={DINO.name} image={DINO.images.comic} diet="Pflanzenfresser" />
 
         {/* Forscher */}
         <div className="mx-4 mb-4">
-          <ForscherSpeech text="Was für ein Fund! Diesen Triceratops nehmen wir sofort mit ins Museum!" />
+          <ForscherSpeech text="Streichle deinen neuen Freund! Und füttere ihn mit dem richtigen Futter!" />
         </div>
 
-        {/* Museum CTA with Comic Dino */}
-        <div className="mx-4 bg-gradient-to-br from-primary-container to-[#2E7D32] rounded-xl border-[3px] border-on-surface sticker-shadow overflow-hidden">
-          <div className="flex items-center gap-3 p-4">
-            <img src={DINO.images.comic} alt={`${DINO.name} Comic`} className="w-20 h-20 object-contain flex-shrink-0 drop-shadow-lg" />
-            <div className="flex-1 text-white min-w-0">
-              <p className="text-xs font-black uppercase tracking-wider text-white/70">Dein neuer Freund</p>
-              <p className="text-lg font-black uppercase tracking-tight leading-tight">Ich komme ins Museum!</p>
-            </div>
-          </div>
-          <div className="px-4 pb-4">
-            <Button variant="surface" fullWidth icon="museum">Ab ins Museum!</Button>
-          </div>
+        {/* Museum CTA */}
+        <div className="mx-4">
+          <Button variant="primary" fullWidth icon="museum">Ab ins Museum!</Button>
         </div>
       </main>
     </div>

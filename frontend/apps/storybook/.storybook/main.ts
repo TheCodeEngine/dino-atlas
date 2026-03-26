@@ -11,6 +11,12 @@ const config: StorybookConfig = {
     "@storybook/addon-a11y",
   ],
   framework: "@storybook/react-vite",
+  viteFinal: async (config) => {
+    const tailwindcss = await import("@tailwindcss/vite");
+    config.plugins = config.plugins || [];
+    config.plugins.push(tailwindcss.default());
+    return config;
+  },
 };
 
 export default config;

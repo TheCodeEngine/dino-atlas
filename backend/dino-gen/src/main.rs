@@ -24,9 +24,13 @@ struct Cli {
     #[arg(long, env = "GEMINI_API_KEY")]
     gemini_key: Option<String>,
 
-    /// TTS service URL
-    #[arg(long, env = "TTS_URL", default_value = "http://localhost:3100")]
-    tts_url: String,
+    /// Path to piper binary
+    #[arg(long, env = "PIPER_BIN", default_value = "piper")]
+    piper_bin: String,
+
+    /// Path to piper voice model (.onnx)
+    #[arg(long, env = "PIPER_MODEL", default_value = "models/de_DE-thorsten-high.onnx")]
+    piper_model: String,
 
     #[command(subcommand)]
     command: Command,
@@ -34,7 +38,7 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Generate content for a single dino
+    /// Generate content for a single dino or all dinos
     Generate {
         /// Dino slug (e.g. "triceratops") or "all" for batch
         slug: String,
@@ -68,7 +72,7 @@ enum Command {
         family_id: String,
     },
 
-    /// Seed base dino data into PocketBase (no images)
+    /// Seed base dino data into PocketBase (no images/texts/audio)
     Seed {
         /// Only seed if collection is empty
         #[arg(long)]
@@ -78,12 +82,25 @@ enum Command {
     /// Import PocketBase schema
     Schema,
 
-    /// Show generation costs summary
+    /// Show AI usage costs summary
     Costs,
+
+    /// Test TTS: generate audio from text
+    TtsTest {
+        /// Text to speak (German)
+        text: String,
+
+        /// Output MP3 file path
+        #[arg(long, default_value = "test_output.mp3")]
+        output: String,
+    },
+
+    /// Show status of all dinos (what content exists)
+    Status,
 }
 
 #[derive(Clone, Debug, clap::ValueEnum)]
-enum ContentType {
+pub enum ContentType {
     /// Texts: kid_summary, fun_fact, facts, quiz_questions, food_options, hints
     Texts,
     /// Images: comic, real, skeleton, shadow
@@ -104,13 +121,18 @@ async fn main() {
 
     match cli.command {
         Command::Generate { slug, only, skip_existing, force } => {
-            commands::generate::run(&cli.pocketbase_url, &cli.gemini_key, &cli.tts_url, &slug, only, skip_existing, force).await;
+            commands::generate::run(
+                &cli.pocketbase_url, &cli.gemini_key,
+                &cli.piper_bin, &cli.piper_model,
+                &cli.pb_email, &cli.pb_password,
+                &slug, only, skip_existing, force,
+            ).await;
         }
         Command::EvaluatePhoto { photo, dino } => {
             commands::evaluate::run(&cli.gemini_key, &photo, &dino).await;
         }
         Command::GenerateStory { family_id } => {
-            commands::story::run(&cli.pocketbase_url, &cli.gemini_key, &cli.tts_url, &family_id).await;
+            commands::story::run(&cli.pocketbase_url, &cli.gemini_key, &cli.piper_bin, &cli.piper_model, &family_id).await;
         }
         Command::Seed { skip_existing } => {
             commands::seed::run(&cli.pocketbase_url, &cli.pb_email, &cli.pb_password, skip_existing).await;
@@ -119,7 +141,34 @@ async fn main() {
             commands::schema::run(&cli.pocketbase_url, &cli.pb_email, &cli.pb_password).await;
         }
         Command::Costs => {
-            commands::costs::run(&cli.pocketbase_url).await;
+            commands::costs::run(&cli.pocketbase_url, &cli.pb_email, &cli.pb_password).await;
+        }
+        Command::TtsTest { text, output } => {
+            use dino_atlas_tts::{PiperTts, TtsConfig};
+            use std::path::PathBuf;
+
+            let config = TtsConfig {
+                piper_bin: cli.piper_bin,
+                model_path: PathBuf::from(&cli.piper_model),
+                ffmpeg_bin: "ffmpeg".into(),
+                cache_dir: PathBuf::from("cache/tts"),
+                sample_rate: 22050,
+            };
+
+            tracing::info!("Initializing TTS...");
+            let tts = PiperTts::new(config).await.expect("TTS init failed");
+
+            tracing::info!("Generating speech for: {}", &text);
+            let result = tts.speak(&text).await.expect("TTS generation failed");
+
+            tokio::fs::write(&output, &result.audio).await.expect("Failed to write output");
+            println!(
+                "Generated {} bytes MP3 → {} (cached: {})",
+                result.audio.len(), output, result.cached
+            );
+        }
+        Command::Status => {
+            commands::status::run(&cli.pocketbase_url, &cli.pb_email, &cli.pb_password).await;
         }
     }
 }

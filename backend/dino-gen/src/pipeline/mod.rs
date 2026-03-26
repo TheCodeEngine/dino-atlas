@@ -3,3 +3,4 @@ pub mod prompts;
 pub mod images;
 pub mod texts;
 pub mod audio;
+pub mod costs;

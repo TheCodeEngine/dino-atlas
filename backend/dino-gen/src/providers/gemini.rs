@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-const IMAGEN_MODEL: &str = "imagen-4.0-ultra-generate-001";
+const IMAGEN_MODEL: &str = "imagen-4.0-generate-001";
 const TEXT_MODEL: &str = "gemini-2.5-flash";
 
 pub struct GeminiClient {

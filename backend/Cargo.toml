@@ -5,4 +5,5 @@ members = [
     "generator",
     "core",
     "dino-gen",
+    "tts",
 ]

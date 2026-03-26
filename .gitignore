@@ -27,6 +27,8 @@ valkey_data/
 # TTS cache & models
 tts-api/cache/
 tts-api/models/
+backend/tts/models/
+cache/
 
 # Storybook
 storybook-static/

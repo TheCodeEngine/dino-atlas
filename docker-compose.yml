@@ -58,7 +58,6 @@ services:
       - JWT_SECRET=${JWT_SECRET:?Set JWT_SECRET in .env (min 32 chars)}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - VALKEY_URL=redis://valkey:6379
-      - TTS_URL=http://tts:3100
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost,http://localhost:5173}
       - PORT=3001
       - RUST_LOG=${RUST_LOG:-info}
@@ -92,34 +91,31 @@ services:
       - POCKETBASE_ADMIN_PASSWORD=${POCKETBASE_ADMIN_PASSWORD}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - VALKEY_URL=redis://valkey:6379
-      - TTS_URL=http://tts:3100
       - RUST_LOG=${RUST_LOG:-info}
     depends_on:
       - pocketbase
       - valkey
-      - tts
     networks:
       - backend
 
-  # ── TTS Service (Piper) ──
-  tts:
+  # ── Content Generator CLI (Piper TTS + Imagen + Gemini) ──
+  dino-gen:
     build:
-      context: ./services/tts
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: dino-gen/Dockerfile
     environment:
-      - PB_URL=http://pocketbase:8090
+      - POCKETBASE_URL=http://pocketbase:8090
+      - POCKETBASE_ADMIN_EMAIL=${POCKETBASE_ADMIN_EMAIL}
+      - POCKETBASE_ADMIN_PASSWORD=${POCKETBASE_ADMIN_PASSWORD}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - RUST_LOG=${RUST_LOG:-info}
     volumes:
-      - tts-cache:/app/cache
-      - tts-models:/app/models
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.tts.rule=PathPrefix(`/tts`)"
-      - "traefik.http.routers.tts.entrypoints=web"
-      - "traefik.http.routers.tts.priority=15"
-      - "traefik.http.services.tts.loadbalancer.server.port=3100"
+      - tts-cache:/app/cache/tts
+    depends_on:
+      - pocketbase
     networks:
-      - frontend
       - backend
+    profiles: [gen]
 
   # ── PocketBase ──
   pocketbase:
@@ -128,12 +124,13 @@ services:
       - PB_ADMIN_EMAIL=${POCKETBASE_ADMIN_EMAIL:?Set POCKETBASE_ADMIN_EMAIL in .env}
       - PB_ADMIN_PASSWORD=${POCKETBASE_ADMIN_PASSWORD:?Set POCKETBASE_ADMIN_PASSWORD in .env}
     ports:
-      - "127.0.0.1:8090:8090"
+      - "127.0.0.1:8091:8090"
     volumes:
       - pocketbase_data:/pb_data
     labels:
       - "traefik.enable=false"
     networks:
+      - frontend
       - backend
 
   # ── Valkey (Job Queue) ──
@@ -165,4 +162,3 @@ volumes:
   pocketbase_data:
   valkey_data:
   tts-cache:
-  tts-models:

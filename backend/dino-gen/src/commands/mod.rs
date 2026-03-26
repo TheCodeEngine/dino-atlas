@@ -4,3 +4,4 @@ pub mod story;
 pub mod seed;
 pub mod schema;
 pub mod costs;
+pub mod status;

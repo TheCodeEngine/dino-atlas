@@ -30,10 +30,6 @@ services:
       - generator-cargo-cache:/usr/local/cargo/registry
       - generator-target-cache:/app/target
 
-  tts:
-    volumes:
-      - ./services/tts/src:/app/src
-
   storybook:
     build:
       context: ./frontend

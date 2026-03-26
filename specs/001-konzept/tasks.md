@@ -5,327 +5,181 @@
 
 ---
 
-## Phase 0: Projekt-Setup & Infrastruktur
+## Phase 0: Projekt-Setup & Infrastruktur ✅
 
-Ziel: Alles laeuft lokal, leeres Geruest steht, `make dev` startet den Stack.
-
-- [x] Monorepo initialisieren (pnpm Workspaces, `pnpm-workspace.yaml`)
-- [x] Shared Configs (`tsconfig.base.json`)
-- [x] Package-Stubs anlegen (leere `package.json` + `src/index.ts`):
-  - [x] `packages/ui` (@dino-atlas/ui) — mit Button, Design Tokens
-  - [x] `packages/types` (@dino-atlas/types) — alle Types definiert
-  - [x] `packages/minigames` (@dino-atlas/minigames) — mit GameWrapper
-  - [x] `apps/app` (@dino-atlas/app) — Vite + React + TanStack Query
-  - [x] `apps/landing` (@dino-atlas/landing) — Stub
-  - [x] `apps/storybook` (@dino-atlas/storybook) — Config + Preview
-- [x] Rust Backend Projekt (`backend/`, Cargo.toml, Axum Health-Endpoint)
-- [x] Generator Worker Projekt (`generator/`, Cargo.toml, Poll-Loop Stub)
-- [x] TTS Service Stub (`tts-api/`, Express mit /tts/health, /tts/audio, /tts/timestamps)
-- [x] PocketBase Setup (Image + Seed-Script Stub)
-- [x] Docker Compose (alle 8 Services, Netzwerke, Volumes, Profiles)
-- [x] Docker Compose Override (Dev Hot-Reload, Storybook)
-- [x] Traefik Config (Rate Limiting, CORS, Security Headers)
-- [x] Makefile (dev, dev-storybook, infra-up, seed, reset, build, test, tunnel, logs)
-- [x] `.env.example` mit allen benoetigten Variablen
-- [x] `.gitignore`
-- [x] Dockerfiles (Production + Dev) fuer Backend, Generator, App, Landing, TTS, Storybook
-- [ ] `pnpm install` laeuft fehlerfrei
-- [ ] `make dev` startet den kompletten Stack fehlerfrei
+- [x] Monorepo (pnpm Workspaces), Shared Configs
+- [x] Alle Packages (ui, types, minigames, app, landing, storybook)
+- [x] Rust Backend Workspace (api + generator + core)
+- [x] TTS Service (Piper), PocketBase, Docker Compose, Traefik, Makefile
+- [x] Node 24 + Rust 1.94 + pnpm install + cargo check
 
 ---
 
 ## Phase 1: Datenbank & Seed-Pipeline
 
-Ziel: PocketBase hat das Schema, Seed-Script befuellt Basis-Dinos, alles reproduzierbar.
+Ziel: PocketBase hat das Schema, Seed-Script befuellt Basis-Dinos.
 
-- [ ] PocketBase Collections Schema definieren (JSON):
-  - [ ] FAMILIES
-  - [ ] USERS (Auth)
-  - [ ] PLAYERS
-  - [ ] DINO_SPECIES
-  - [ ] EXPEDITIONS
-  - [ ] MUSEUM_ENTRIES
-  - [ ] STORIES
-  - [ ] MINIGAME_SESSIONS
-  - [ ] DAILY_BUDGETS
-  - [ ] BUDGET_RESETS
-  - [ ] AI_MODELS
-  - [ ] AI_MODEL_ROUTING
-  - [ ] AI_USAGE_LOG
-- [ ] Schema-Import Script (`pocketbase/seed/import.sh`)
-- [ ] Dino-Seed-Daten aufbauen (aus altem Prototyp + erweitert):
-  - [ ] 15-20 Basis-Dinos mit vollstaendigen Fakten (deutsch + lateinisch)
-  - [ ] Erdzeitalter, Ernaehrung, Groesse, Gewicht, Kontinent
-  - [ ] Kindgerechte Texte (kid_summary, fun_fact, detail_text)
-  - [ ] Groessenvergleiche ("So gross wie 2 Autos!")
-  - [ ] Quiz-Fragen pro Dino (3-5 Stueck)
-- [ ] Seed-Script fuer Dino-Daten (`pocketbase/seed/species.jsonl`)
-- [ ] Seed-Script fuer AI_MODELS (Gemini Flash, Pro, Imagen mit Preisen)
-- [ ] Seed-Script fuer AI_MODEL_ROUTING (Default-Zuordnungen)
-- [ ] `make seed` befuellt die DB reproduzierbar
-- [ ] `make reset` setzt DB zurueck + seed neu
-
----
-
-## Phase 2: UI-Kit & Storybook
-
-Ziel: Alle visuellen Bausteine stehen in Storybook, bevor Logik drankommt.
-
-### Design Foundation
-- [ ] Design Tokens definieren (tokens.css):
-  - [ ] Farbpalette (Dino-Theme: Erdtoene, Gruen, Sand, Akzentfarben)
-  - [ ] Typografie (kindgerecht, gut lesbar)
-  - [ ] Spacing, Radien, Schatten
-- [ ] Tailwind Config mit Custom Theme
-- [ ] Storybook Setup + laeuft mit `make dev-storybook`
-
-### Primitive Komponenten
-- [ ] Button (Primary, Secondary, Icon-Button, kindgerechte Groesse)
-- [ ] Icon (Dino-Icons, UI-Icons)
-- [ ] Badge (Sterne, Abzeichen)
-- [ ] ProgressBar (Fortschrittsbalken, auch fuer Grabung)
-- [ ] Panel / Card (Grundlayout-Element)
-
-### Dino-Komponenten
-- [ ] DinoCard (Bild + Name + Kurz-Fakten)
-- [ ] PlayerAvatar (Forscher-Avatar mit Name)
-- [ ] PlayerSelector ("Wer ist dabei?" - Avatar-Auswahl)
-- [ ] ForscherSpeech (Sprechblase mit Text, TTS-Trigger-Button)
-- [ ] KaraokeText (Text mit Satz-Highlighting, Audio-Sync)
-- [ ] SleepyDino (Muede-Animation: Gaehnen, Hinlegen, Schlafen)
-- [ ] Confetti (Jubel-Effekt bei Entdeckung)
-- [ ] TimerBudget (Visuelles Budget: Mond/Sterne, Dino-Energie)
-- [ ] PhotoCapture (Kamera-Aufnahme Komponente)
-
-### Layouts
-- [ ] GameLayout (Vollbild fuer Spiele, mit Exit-Button)
-- [ ] MuseumLayout (Galerie/Scroll-Ansicht)
-- [ ] AppShell (Navigation, aktive Spieler Anzeige)
-
-### Alle Komponenten haben Storybook Stories
+- [ ] PocketBase Collections Schema (basierend auf Screen-Daten):
+  - [ ] FAMILIES, USERS (Auth), PLAYERS
+  - [ ] DINO_SPECIES (mit allen Feldern die Discovery Screen braucht)
+  - [ ] EXPEDITIONS (Status-Flow: intro→excavation→puzzle→identify→discovery)
+  - [ ] MUSEUM_ENTRIES (inkl. Artwork-Foto + KI-Feedback)
+  - [ ] STORIES (Kombinations-Geschichte, Audio-Timestamps)
+  - [ ] MINIGAME_SESSIONS (Quiz, SizeSort, Timeline, FoodMatch, ShadowGuess)
+  - [ ] DAILY_BUDGETS, BUDGET_RESETS
+  - [ ] AI_MODELS, AI_MODEL_ROUTING, AI_USAGE_LOG
+  - [ ] OFFLINE_TASKS (Aufgabentyp, Dino-Referenz, Status)
+- [ ] Schema-Import Script
+- [ ] 15-20 Basis-Dinos mit Seed-Daten:
+  - [ ] Fakten (deutsch + lateinisch), Erdzeitalter, Ernaehrung, Groesse
+  - [ ] Kindgerechte Texte + Fun Facts
+  - [ ] Quiz-Fragen pro Dino (3-5)
+  - [ ] Futter-Info (fuer FoodMatch)
+  - [ ] Zeitalter-Info (fuer Timeline)
+  - [ ] Groessen-Info (fuer SizeSort)
+- [ ] Bilder pro Dino generieren (Imagen 4 Ultra):
+  - [ ] comic.png (Sticker-Stil, Magenta-BG-Removal)
+  - [ ] real.png (Photorealistisch, National Geographic)
+  - [ ] skeleton.png (Top-Down Fossil)
+  - [ ] shadow.png (Schwarze Silhouette)
+- [ ] AI_MODELS + AI_MODEL_ROUTING Seed
+- [ ] `make seed` + `make reset`
 
 ---
 
-## Phase 3: Mini-Games (isoliert in Storybook)
+## Phase 2: UI-Kit & Storybook ✅
 
-Ziel: Jedes Spiel funktioniert standalone mit Mock-Daten in Storybook.
+### Design System
+- [x] Sticker/Badge Design System (vom Designer uebernommen)
+- [x] Material Design 3 Farben + Plus Jakarta Sans
+- [x] Tailwind v4 @theme Konfiguration
+- [x] Storybook mit Tailwind + Fonts + Static Assets
 
-### Shared Game Infrastructure
-- [ ] GameWrapper Komponente (einheitlicher Rahmen: Timer, Score, Exit)
-- [ ] useGameState Hook (Shared State Pattern)
-- [ ] useHaptics Hook (Vibration)
-- [ ] useSound Hook (Sound-Effekte)
-- [ ] MinigameProps Interface definieren (types Package)
+### Primitives (4)
+- [x] Button (5 Varianten, 3 Groessen, Icon, FullWidth, Disabled)
+- [x] TextInput (Label, Icon, Password)
+- [x] Divider (Plain, mit Text)
+- [x] TabBar (Multi-Tab Switcher)
 
-### Kern-Spiele (Expedition-Flow)
-- [ ] **ExcavationGame** - Ausbuddeln
-  - [ ] Canvas-basierte Wisch-Mechanik (aus altem Prototyp adaptieren)
-  - [ ] Verschiedene Boden-Texturen (Wueste, Eis, Dschungel, Unterwasser)
-  - [ ] Haptik-Feedback bei Knochen-Freilegung
-  - [ ] Fortschritts-Tracking (% freigelegt)
-  - [ ] Jubel-Animation bei Abschluss
-  - [ ] Storybook Story mit verschiedenen Dinos
+### Components (17)
+- [x] AudioPlayer (Karaoke-Text, Compact-Modus, Demo-Playback)
+- [x] FormCard (Tabs, Footer)
+- [x] PageHeader (Logo, Titel, Untertitel)
+- [x] TopBar (Logo, Right-Slot)
+- [x] ForscherSpeech (Sprechblase, TTS Play-Button, Equalizer)
+- [x] PlayerCard (Avatar, Name, Alter, 3 States)
+- [x] StatusBadge (6 Varianten, Icon)
+- [x] ActionCard (4 Farbvarianten, Badge)
+- [x] BottomNav (4 Tabs, Active State)
+- [x] AppShell (TopBar + Content + BottomNav)
+- [x] FullscreenHeader (Close + Title + Avatar, Light/Dark)
+- [x] MinigameShell (Instruction + Game + Done-Screen)
+- [x] PlayerSwitcher (Bottom-Sheet, Spring-Animation, Haptics)
+- [x] TimeSlider (Erdzeitalter-Icons, Karten-Thumbnails)
+- [x] ImageSwitcher (Echt/Comic/Skelett Tabs)
+- [x] MuseumTransition + LandScene (Parallax Side-Scroller)
+- [x] ExpeditionIntro + 4 BiomScenes (Wueste/Regenwald/Eis/Ozean)
 
-- [ ] **PuzzleGame** - Skelett zusammensetzen
-  - [ ] Drag & Drop Knochen-Teile
-  - [ ] Adaptive Teile-Anzahl (Schwierigkeit)
-  - [ ] Snap-to-Position wenn nah genug
-  - [ ] Optionale Umriss-Hilfe
-  - [ ] Skelett-erwacht-zum-Leben Animation
-  - [ ] Storybook Story
+### Hooks (1)
+- [x] useHaptics (tap, success, error, warning)
 
-- [ ] **IdentifyGame** - Dino erkennen
-  - [ ] Skelett-Anzeige
-  - [ ] Mehrere Dino-Bilder zur Auswahl
-  - [ ] Hinweis-System bei falsch ("Schau mal, langer Hals...")
-  - [ ] Konfetti + Dino-Ruf bei richtig
-  - [ ] Storybook Story
-
-### Zusatz-Spiele (Mini-Games via Museum)
-- [ ] **QuizGame** - Dino-Quiz mit Bildern + Vorlesefunktion
-- [ ] **SizeSortGame** - Dinos der Groesse nach sortieren
-- [ ] **TimelineGame** - Erdzeitalter zuordnen (visuell)
-- [ ] **FoodMatchGame** - Futter-Zuordnung
-- [ ] **ShadowGuessGame** - Silhouette erkennen
+### Alle mit Storybook Stories
 
 ---
 
-## Phase 4: Rust Backend
+## Phase 3: Screens & Mini-Games ✅
 
-Ziel: API steht, Domain-Logik getestet, Auth funktioniert.
+### Expedition-Flow (6 Screens)
+- [x] ExpeditionIntro (4 Biom-Varianten, Animationen)
+- [x] Excavation (Canvas Dig-Game, Dirt-Layer, Progress)
+- [x] Puzzle (3x3 Bild-Puzzle mit dnd-kit Drag&Drop)
+- [x] Identify (4 echte Comic-Dinos, Hinweise, Konfetti)
+- [x] Discovery (Dino-Buch: Bild-Switcher, AudioPlayer, Fakten-Karussell,
+      Weltkarten, interaktiver Dino mit Fuettern, Museum-Animation)
+- [x] Offline-Auftrag (4 Aufgabentypen, Goodbye-Animation)
 
-### Domain Layer (keine externen Dependencies)
-- [ ] Models definieren:
-  - [ ] Player, Family
-  - [ ] DinoSpecies, DinoFact
-  - [ ] Expedition, ExcavationResult, PuzzleResult
-  - [ ] Museum, ArtworkSubmission
-  - [ ] Story, StorySegment
-  - [ ] DailyBudget, BudgetReset
-  - [ ] MinigameSession
-- [ ] Ports (Traits) definieren:
-  - [ ] PlayerRepository
-  - [ ] DinoRepository
-  - [ ] ExpeditionRepository
-  - [ ] MuseumRepository
-  - [ ] AiGateway
-  - [ ] TtsGateway
-  - [ ] JobQueue
-- [ ] Services implementieren + testen:
-  - [ ] ExpeditionService (Dino-Zuweisung, Tages-Expedition)
-  - [ ] DifficultyService (adaptiver Schwierigkeitsgrad)
-  - [ ] BudgetService (Bildschirmzeit, muede Dinos, Reset-Validierung)
-  - [ ] StoryService (Kombinations-Geschichte Prompt bauen)
-  - [ ] QuizService (Quiz generieren, auswerten)
-  - [ ] MuseumService (Sammlung verwalten)
-  - [ ] PhotoEvalService (Bewertungs-Prompt bauen)
+### Navigation Screens (4)
+- [x] Login + Register (2-Step, FormCard, TextInput)
+- [x] Spieler-Auswahl (PlayerCard, Toggle)
+- [x] Home/Camp (PlayerSwitcher, Expedition CTA, Quick-Tiles)
+- [x] Museum Galerie (Grid, Rarity Badges, Sterne)
 
-### Adapter Layer
-- [ ] PocketBase Client (reqwest Wrapper)
-- [ ] PocketBase Repos (impl Traits fuer alle Repositories)
-- [ ] Valkey Client (Job-Queue Adapter)
-- [ ] Gemini Client (AI Gateway Adapter)
-- [ ] TTS Client (TTS Gateway Adapter)
+### Abend-Session (2)
+- [x] Gute-Nacht-Geschichte (Nacht-Theme, 3 Kid-Avatare, AudioPlayer)
+- [x] Quiz (3 Fragen, Richtig/Falsch, Sterne, Completion)
 
-### HTTP Layer
-- [ ] Axum Server Setup + Middleware
-- [ ] JWT Auth Middleware (Login, Register, Token-Validierung)
-- [ ] Routes implementieren:
-  - [ ] Auth (register, login, me)
-  - [ ] Family (CRUD, Player-Management)
-  - [ ] Expedition (today, start, complete-Schritte)
-  - [ ] Museum (Collection, Artwork-Upload)
-  - [ ] Story (tonight)
-  - [ ] Minigames (available, play, complete)
-  - [ ] Budget (status, reset mit Rechenaufgabe)
-  - [ ] Jobs (trigger, status)
-  - [ ] Admin (AI-Usage, Models, Routing, Reset-Protokoll)
+### Mini-Spiele (4)
+- [x] Groessen-Sortieren (dnd-kit Sortable)
+- [x] Zeitleiste (dnd-kit Drag to Drop-Zones)
+- [x] Futter-Zuordnung (dnd-kit Drag Dinos to Food)
+- [x] Schatten-Raten (Silhouette + Optionen)
 
-### Tests
-- [ ] Domain-Service Unit-Tests (mit Mock-Ports)
-- [ ] Integration-Tests (mit echtem PocketBase)
+### System-Screens (3) — scaffolded
+- [x] Muede Dinos (Nacht-Theme, schlafender Dino)
+- [~] Eltern-Reset (Rechenaufgabe) — Scaffold
+- [~] Eltern-Dashboard (4 Tabs) — Scaffold
+- [~] Foto-Upload (4-Phase Flow) — ausgearbeitet
+- [~] Mini-Spiel Auswahl — Scaffold
+- [~] Museum Detail — Scaffold (nutzt Discovery-Elemente)
+
+### Assets generiert (Imagen 4 Ultra)
+- [x] Triceratops: comic, real, skeleton, shadow
+- [x] T-Rex: comic
+- [x] Stegosaurus: comic
+- [x] Brachiosaurus: comic
+- [x] Logo (Triceratops Explorer)
+- [x] 4 Weltkarten (Trias, Jura, Kreide, Heute)
+
+---
+
+## Phase 4: Datenstruktur & Backend ← NAECHSTER SCHRITT
+
+Ziel: Schema das zu den Screens passt, API Endpoints, Domain-Logik.
+
+### Datenstruktur (abgeleitet aus Screens)
+- [ ] Welche Daten braucht jeder Screen?
+- [ ] PocketBase Schema finalisieren
+- [ ] TypeScript Types (@dino-atlas/types) updaten
+
+### Rust Backend (Hexagonal)
+- [ ] Domain Models (core/)
+- [ ] Ports/Traits
+- [ ] Services (Expedition, Budget, Quiz, Museum, Story)
+- [ ] PocketBase Adapter
+- [ ] API Endpoints (api/)
+- [ ] Auth (JWT)
+
+### Generator Worker
+- [ ] Valkey Job-Queue
+- [ ] Gemini Integration (Bilder, Texte, Stories)
+- [ ] TTS Integration
+- [ ] AI Cost Tracking
 
 ---
 
 ## Phase 5: App zusammenbauen
 
-Ziel: Frontend App verbindet UI-Kit + Mini-Games + Backend zu einem spielbaren Flow.
-
-### Grundgeruest
-- [ ] React Router Setup (Pages, ProtectedRoute)
-- [ ] API Client Layer (Fetch-Wrapper mit JWT)
-- [ ] Zustand Stores (Auth, Session/aktive Kinder)
-- [ ] AppShell mit Navigation
-
-### Pages
-- [ ] **LoginPage** - Familien-Login
-- [ ] **SelectPlayersPage** - "Wer ist heute dabei?" (PlayerSelector)
-- [ ] **ExpeditionPage** - Kompletter Flow:
-  - [ ] Grabungsort-Intro (Forscher erklaert)
-  - [ ] ExcavationGame einbinden
-  - [ ] PuzzleGame einbinden
-  - [ ] IdentifyGame einbinden
-  - [ ] Entdeckung + Steckbrief (DinoCard + ForscherSpeech)
-  - [ ] Offline-Auftrag anzeigen
-- [ ] **MuseumPage** - Sammlung durchstoebern
-  - [ ] Galerie aller entdeckten Dinos
-  - [ ] Detail-Ansicht pro Dino (Vitrine)
-  - [ ] Mini-Spiel Zugang
-- [ ] **MinigamePage** - Spiel auswaehlen + spielen
-  - [ ] Verfuegbare Spiele anzeigen (Budget beachten)
-  - [ ] Lazy-Load des gewaehlten Spiels
-- [ ] **StoryTimePage** - Abend-Session
-  - [ ] Kombinations-Geschichte laden
-  - [ ] KaraokeText mit TTS-Playback
-  - [ ] Quiz nach der Geschichte
-- [ ] **PhotoUploadPage** - Offline-Auftrag Foto hochladen
-  - [ ] Kamera oeffnen
-  - [ ] Foto an Backend senden
-  - [ ] KI-Feedback anzeigen
-- [ ] **ParentDashboard** - Eltern-Bereich
-  - [ ] Reset-Protokoll einsehen
-  - [ ] AI-Kosten Uebersicht
-  - [ ] Kinder-Profile verwalten
-
-### Budget-Integration
-- [ ] SleepyDino Overlay wenn Budget aufgebraucht
-- [ ] Eltern-Reset Flow (Rechenaufgabe)
-- [ ] Budget-Status in der Navigation sichtbar
+- [ ] React Router + Pages
+- [ ] API Client Layer
+- [ ] Zustand Stores
+- [ ] Screens mit Backend verbinden
+- [ ] Expedition-Flow als State Machine
 
 ---
 
-## Phase 6: Content-Pipeline & Generator
+## Phase 6: Content-Pipeline
 
-Ziel: Dino-Content automatisch generierbar, Stories on-demand, Foto-Bewertung funktioniert.
-
-### Generator Worker
-- [ ] Worker-Loop (Valkey pollen, Jobs ausfuehren)
-- [ ] Job-Handler:
-  - [ ] `generate_dino` (Bilder + Fakten + Quiz via Gemini)
-  - [ ] `generate_story` (Kombinations-Geschichte)
-  - [ ] `generate_tts` (Audio via Piper)
-  - [ ] `evaluate_photo` (Foto-Bewertung via Gemini)
-  - [ ] `generate_batch` (Mehrere Dinos auf einmal)
-- [ ] Model-Routing: Operation → Model aus AI_MODEL_ROUTING lesen
-- [ ] Automatisches AI_USAGE_LOG Tracking bei jedem API-Call
-- [ ] Retry-Logik (max 3 Versuche, exponential Backoff)
-- [ ] Ergebnisse in PocketBase speichern (Bilder, Texte, Audio)
-
-### Gemini Integration
-- [ ] Prompt-Templates fuer:
-  - [ ] Realistisches Dino-Bild
-  - [ ] Comic-Stil Dino-Bild (kindgerecht)
-  - [ ] Skelett-Bild
-  - [ ] Kindgerechte Fakten + Quiz-Fragen
-  - [ ] Kombinations-Geschichte (mehrere Dinos, Kinder-Interessen)
-  - [ ] Foto-Bewertung (positiv, lehrreich, kindgerecht)
-- [ ] Token-Count Extraktion aus Response
-- [ ] Kosten-Berechnung via AI_MODELS Preise
-
-### TTS Integration
-- [ ] Piper TTS Setup (deutsche Stimme, Forscher-Charakter)
-- [ ] Audio-Generierung fuer Steckbriefe
-- [ ] Audio-Generierung fuer Geschichten
-- [ ] Wort-Timestamps Generierung fuer Karaoke
-- [ ] Caching (gleicher Text = gleiches Audio)
-
-### Admin-Tools
-- [ ] `make generate-dinos COUNT=10` (Batch-Generierung)
-- [ ] `make generate-story FAMILY=...` (Test-Story)
-- [ ] Admin-API fuer AI-Kosten Dashboard
+- [ ] 15-20 Dinos komplett generieren (Bilder + Texte + Audio)
+- [ ] Gute-Nacht-Geschichten Generator
+- [ ] Quiz-Fragen Generator
+- [ ] Foto-Bewertung (Gemini Vision)
 
 ---
 
-## Phase 7: Landing Page & Polish
+## Phase 7: Landing + Polish + Deploy
 
-Ziel: Oeffentlich zeigbar, iPad-optimiert, performant.
-
-### Landing Page
-- [ ] Hero Section (Dino-Theme, Kinder-Illustrationen)
-- [ ] Feature-Uebersicht (Ausbuddeln, Museum, Geschichten)
-- [ ] Screenshots / Demo-Video
-- [ ] CTA: Self-Hosting Anleitung oder gehostete Version
-- [ ] Open Source Link (GitHub)
-
-### Polish
-- [ ] Animationen verfeinern (Skeleton-to-Dino, Confetti, SleepyDino)
-- [ ] Sound-Design (Kratzen, Jubel, Dino-Rufe, Schlaf-Sounds)
-- [ ] iPad-Optimierung (Layout, Touch-Targets)
-- [ ] Performance-Optimierung (Lazy Loading, Bild-Kompression)
-- [ ] Offline-Cache Strategie (Service Worker fuer gecachte Dinos)
-
-### Deployment
-- [ ] Cloudflare Tunnel Setup
-- [ ] Production Docker Compose (mit Nginx statt Vite Dev Server)
-- [ ] README.md (Setup-Anleitung fuer Self-Hosting)
-- [ ] GitHub Repo aufsetzen (License, Contributing, etc.)
-
----
-
-## Notizen
-
-- Phasen 2 + 3 (UI-Kit + Mini-Games) koennen teilweise parallel zu Phase 1 (Seed) laufen
-- Phase 4 (Backend) kann beginnen sobald Schema (Phase 1) steht
-- Phase 6 (Generator) ist unabhaengig von Phase 5 (App) und kann parallel laufen
-- Alte Prototypen als Referenz: `/Users/konstantinstoldt/Downloads/dino-atlas-original`
-- Mathoria als Architektur-Vorbild: `/Users/konstantinstoldt/Documents/GitHub/mathoria`
+- [ ] Landing Page
+- [ ] Animationen optimieren
+- [ ] iPad-Optimierung
+- [ ] Cloudflare Tunnel
+- [ ] README fuer Open Source

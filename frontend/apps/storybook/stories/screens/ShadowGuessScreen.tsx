@@ -42,25 +42,20 @@ export function ShadowGuessScreen() {
   const remaining = r.options.filter((o) => !wrongIds.includes(o.id));
 
   return (
-    <div className="bg-[#1a1530] text-white min-h-screen flex flex-col" style={{ backgroundImage: "none" }}>
-      <FullscreenHeader title="Schatten-Raten" playerEmoji="🦖" variant="dark" />
+    <div className="bg-surface text-on-surface min-h-screen flex flex-col">
+      <FullscreenHeader title="Schatten-Raten" playerEmoji="🦖" />
 
       <main className="flex-1 flex flex-col items-center px-4 pb-6 max-w-sm mx-auto w-full">
         <div className="mb-4 w-full">
-          <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg p-2">
-            <div className="w-7 h-7 bg-primary-fixed rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>face</span>
-            </div>
-            <p className="text-[11px] font-bold text-white/70">
-              {result === "correct" ? "Genau! Du hast den Schatten erkannt!" : "Welcher Dino versteckt sich im Schatten?"}
-            </p>
-          </div>
+          <ForscherSpeech
+            text={result === "correct" ? "Genau! Du hast den Schatten erkannt!" : "Welcher Dino versteckt sich im Schatten?"}
+          />
         </div>
 
         {/* Shadow display */}
         <motion.div
           className={`w-full aspect-square max-w-[280px] rounded-xl border-[3px] mb-4 flex items-center justify-center p-8 ${
-            result === "correct" ? "border-[#ffc850] bg-[#ffc850]/10" : "border-white/20 bg-white/5"
+            result === "correct" ? "border-[#1B5E20] bg-primary-fixed shadow-[3px_3px_0px_0px_#1B5E20]" : "border-on-surface bg-surface-container-high sticker-shadow"
           }`}
           animate={result === "wrong" ? { x: [0, -5, 5, -3, 0] } : {}}
         >
@@ -96,20 +91,20 @@ export function ShadowGuessScreen() {
                 <motion.button
                   key={opt.id}
                   onClick={() => handleGuess(opt.id)}
-                  className="flex flex-col items-center gap-1 p-2 bg-white/5 border-[3px] border-white/20 rounded-xl"
+                  className="flex flex-col items-center gap-1 p-2 bg-surface-container-lowest border-[3px] border-on-surface rounded-xl sticker-shadow"
                   whileTap={{ scale: 0.9 }}
                   layout
                   exit={{ scale: 0, opacity: 0 }}
                 >
                   <img src={opt.image} alt={opt.name} className="w-16 h-16 object-contain" />
-                  <span className="text-[9px] font-black uppercase text-white/70">{opt.name}</span>
+                  <span className="text-[9px] font-black uppercase">{opt.name}</span>
                 </motion.button>
               ))}
             </AnimatePresence>
           </div>
         ) : (
           <motion.div className="text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-            <p className="text-xl font-black text-[#ffc850] mb-4">🎉 {r.options.find((o) => o.id === r.answer)!.name}!</p>
+            <p className="text-xl font-black text-primary-container mb-4">🎉 {r.options.find((o) => o.id === r.answer)!.name}!</p>
             <Button variant="primary" fullWidth icon="check">Fertig!</Button>
           </motion.div>
         )}

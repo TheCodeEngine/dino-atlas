@@ -17,3 +17,6 @@ export { StatusBadge } from "./components/StatusBadge";
 export { ActionCard } from "./components/ActionCard";
 export { BottomNav } from "./components/BottomNav";
 export { PlayerSwitcher } from "./components/PlayerSwitcher";
+
+// Hooks
+export { useHaptics } from "./hooks/useHaptics";

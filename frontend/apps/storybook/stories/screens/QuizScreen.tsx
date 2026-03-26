@@ -52,13 +52,14 @@ export function QuizScreen() {
 
   function handleAnswer(correct: boolean) {
     if (phase !== "question") return;
+    haptics.tap(); // immediate feedback on any tap
     if (correct) {
-      haptics.success();
+      setTimeout(() => haptics.success(), 150); // delayed success
       setStars((s) => s + 1);
       setPhase("correct");
       setExplanation(q.explanation);
     } else {
-      haptics.error();
+      setTimeout(() => haptics.error(), 150); // delayed error
       setPhase("wrong");
       setExplanation("Hmm, nicht ganz! Versuch es nochmal!");
       setTimeout(() => setPhase("question"), 1500);
@@ -66,8 +67,10 @@ export function QuizScreen() {
   }
 
   function handleNext() {
+    haptics.tap();
     if (current + 1 >= total) {
       setPhase("done");
+      haptics.success();
     } else {
       setCurrent((c) => c + 1);
       setPhase("question");

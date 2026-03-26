@@ -116,24 +116,19 @@ export function QuizScreen() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
             >
-              <motion.div
-                className="flex gap-1 mb-4"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", damping: 8 }}
-              >
+              <div className="flex gap-2 mb-4">
                 {Array.from({ length: total }).map((_, i) => (
                   <motion.span
                     key={i}
-                    className={`text-4xl ${i < stars ? "" : "opacity-20"}`}
-                    initial={{ rotate: -30, scale: 0 }}
-                    animate={{ rotate: 0, scale: 1 }}
-                    transition={{ delay: 0.2 + i * 0.15, type: "spring" }}
+                    className={`text-4xl ${i < stars ? "" : "opacity-20 grayscale"}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 + i * 0.2, duration: 0.4, ease: "easeOut" }}
                   >
                     ⭐
                   </motion.span>
                 ))}
-              </motion.div>
+              </div>
               <h2 className="text-2xl font-black uppercase mb-2">
                 {stars === total ? "Perfekt!" : stars > 0 ? "Gut gemacht!" : "Weiter üben!"}
               </h2>

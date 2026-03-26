@@ -11,11 +11,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<string, string> = {
   primary:
-    "bg-primary-container text-white border-on-primary-fixed-variant sticker-shadow-primary active-press-primary",
+    "bg-primary-container text-white border-on-surface sticker-shadow active-press",
   secondary:
-    "bg-secondary-container text-white border-on-secondary-container sticker-shadow-secondary active-press",
+    "bg-secondary-container text-white border-on-surface sticker-shadow active-press",
   tertiary:
-    "bg-tertiary text-white border-on-tertiary-fixed-variant sticker-shadow active-press",
+    "bg-tertiary text-white border-on-surface sticker-shadow active-press",
   surface:
     "bg-surface-container-lowest text-on-surface border-on-surface sticker-shadow active-press",
   ghost:

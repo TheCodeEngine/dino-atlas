@@ -10,6 +10,7 @@ const config: StorybookConfig = {
     "@storybook/addon-docs",
     "@storybook/addon-a11y",
   ],
+  staticDirs: ["../../../public"],
   framework: "@storybook/react-vite",
   viteFinal: async (config) => {
     const tailwindcss = await import("@tailwindcss/vite");

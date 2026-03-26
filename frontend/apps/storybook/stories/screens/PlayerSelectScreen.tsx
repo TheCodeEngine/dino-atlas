@@ -15,7 +15,10 @@ export function PlayerSelectScreen() {
     <div className="bg-surface text-on-surface min-h-screen">
       {/* TopAppBar */}
       <header className="fixed top-0 w-full z-50 flex justify-between items-center px-5 h-14 bg-[#FCF9F0] border-b-[3px] border-[#1B5E20] shadow-[3px_3px_0px_0px_rgba(28,28,23,1)]">
-        <span className="text-lg font-black text-[#1B5E20] uppercase tracking-tight">Dino Explorer</span>
+        <div className="flex items-center gap-2">
+          <img src="/logo.png" alt="Dino-Atlas" className="w-8 h-8 object-contain" />
+          <span className="text-lg font-black text-[#1B5E20] uppercase tracking-tight">Dino Atlas</span>
+        </div>
         <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-surface-container-high">
           <span className="material-symbols-outlined text-on-surface-variant text-xl">settings</span>
         </button>

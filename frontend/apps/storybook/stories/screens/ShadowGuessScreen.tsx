@@ -80,8 +80,7 @@ export function ShadowGuessScreen() {
                 key="shadow"
                 src={r.shadow}
                 alt="Schatten"
-                className="w-full h-full object-contain"
-                style={{ filter: "brightness(0)" }}
+                className="w-full h-full object-contain drop-shadow-lg"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               />

@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@dino-atlas/types": ["../../packages/types/src"],
+      "@dino-atlas/ui": ["../../packages/ui/src"],
+      "@dino-atlas/minigames": ["../../packages/minigames/src"]
+    },
+    "types": ["vite/client"]
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../packages/types" },
+    { "path": "../../packages/ui" },
+    { "path": "../../packages/minigames" }
+  ]
+}

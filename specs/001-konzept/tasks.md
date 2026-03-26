@@ -9,23 +9,27 @@
 
 Ziel: Alles laeuft lokal, leeres Geruest steht, `make dev` startet den Stack.
 
-- [ ] Monorepo initialisieren (pnpm Workspaces, `pnpm-workspace.yaml`)
-- [ ] Shared Configs (`tsconfig.base.json`, `vite.config.shared.ts`)
-- [ ] Package-Stubs anlegen (leere `package.json` + `src/index.ts`):
-  - [ ] `packages/ui` (@dino-atlas/ui)
-  - [ ] `packages/types` (@dino-atlas/types)
-  - [ ] `packages/minigames` (@dino-atlas/minigames)
-  - [ ] `apps/app` (@dino-atlas/app)
-  - [ ] `apps/landing` (@dino-atlas/landing)
-  - [ ] `apps/storybook` (@dino-atlas/storybook)
-- [ ] Rust Backend Projekt (`backend/`, Cargo.toml, Axum Hello-World)
-- [ ] Generator Worker Projekt (`generator/`, Cargo.toml, Stub)
-- [ ] TTS Service Stub (`tts-api/`, Express Hello-World)
-- [ ] PocketBase Setup (`pocketbase/`, Dockerfile)
-- [ ] Docker Compose (alle Services, Netzwerke, Volumes)
-- [ ] Traefik Config (Routing-Regeln)
-- [ ] Makefile (dev, infra-up, seed, build, test)
-- [ ] `.env.example` mit allen benoetigten Variablen
+- [x] Monorepo initialisieren (pnpm Workspaces, `pnpm-workspace.yaml`)
+- [x] Shared Configs (`tsconfig.base.json`)
+- [x] Package-Stubs anlegen (leere `package.json` + `src/index.ts`):
+  - [x] `packages/ui` (@dino-atlas/ui) — mit Button, Design Tokens
+  - [x] `packages/types` (@dino-atlas/types) — alle Types definiert
+  - [x] `packages/minigames` (@dino-atlas/minigames) — mit GameWrapper
+  - [x] `apps/app` (@dino-atlas/app) — Vite + React + TanStack Query
+  - [x] `apps/landing` (@dino-atlas/landing) — Stub
+  - [x] `apps/storybook` (@dino-atlas/storybook) — Config + Preview
+- [x] Rust Backend Projekt (`backend/`, Cargo.toml, Axum Health-Endpoint)
+- [x] Generator Worker Projekt (`generator/`, Cargo.toml, Poll-Loop Stub)
+- [x] TTS Service Stub (`tts-api/`, Express mit /tts/health, /tts/audio, /tts/timestamps)
+- [x] PocketBase Setup (Image + Seed-Script Stub)
+- [x] Docker Compose (alle 8 Services, Netzwerke, Volumes, Profiles)
+- [x] Docker Compose Override (Dev Hot-Reload, Storybook)
+- [x] Traefik Config (Rate Limiting, CORS, Security Headers)
+- [x] Makefile (dev, dev-storybook, infra-up, seed, reset, build, test, tunnel, logs)
+- [x] `.env.example` mit allen benoetigten Variablen
+- [x] `.gitignore`
+- [x] Dockerfiles (Production + Dev) fuer Backend, Generator, App, Landing, TTS, Storybook
+- [ ] `pnpm install` laeuft fehlerfrei
 - [ ] `make dev` startet den kompletten Stack fehlerfrei
 
 ---

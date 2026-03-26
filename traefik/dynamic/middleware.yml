@@ -1,0 +1,39 @@
+http:
+  middlewares:
+    cors-headers:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        accessControlAllowHeaders:
+          - Content-Type
+          - Authorization
+        accessControlAllowOriginList:
+          - "http://localhost"
+          - "http://localhost:5173"
+          - "http://localhost:6006"
+        accessControlMaxAge: 86400
+
+    auth-rate-limit:
+      rateLimit:
+        average: 10
+        burst: 15
+        period: 1m
+
+    api-rate-limit:
+      rateLimit:
+        average: 60
+        burst: 100
+        period: 1m
+
+    security-headers:
+      headers:
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true

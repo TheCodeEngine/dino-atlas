@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@dino-atlas/types": ["../types/src"],
+      "@dino-atlas/ui": ["../ui/src"]
+    }
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../types" },
+    { "path": "../ui" }
+  ]
+}

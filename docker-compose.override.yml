@@ -1,0 +1,60 @@
+# Local development overrides — auto-loaded by docker compose
+# Hot-reload for frontend and backend
+
+services:
+  app:
+    build:
+      context: ./frontend
+      dockerfile: apps/app/Dockerfile.dev
+    volumes:
+      - ./frontend:/app
+      - app_node_modules:/app/node_modules
+    labels:
+      - "traefik.http.services.app.loadbalancer.server.port=5173"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/Cargo.toml:/app/Cargo.toml
+      - cargo-cache:/usr/local/cargo/registry
+      - target-cache:/app/target
+
+  generator:
+    build:
+      context: ./generator
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./generator/src:/app/src
+      - ./generator/Cargo.toml:/app/Cargo.toml
+      - generator-cargo-cache:/usr/local/cargo/registry
+      - generator-target-cache:/app/target
+
+  tts-api:
+    volumes:
+      - ./tts-api/src:/app/src
+
+  storybook:
+    build:
+      context: ./frontend
+      dockerfile: apps/storybook/Dockerfile.dev
+    volumes:
+      - ./frontend:/app
+      - storybook_node_modules:/app/node_modules
+    ports:
+      - "6006:6006"
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - frontend
+    profiles: [dev]
+
+volumes:
+  app_node_modules:
+  storybook_node_modules:
+  cargo-cache:
+  target-cache:
+  generator-cargo-cache:
+  generator-target-cache:

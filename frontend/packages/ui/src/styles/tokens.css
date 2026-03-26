@@ -1,0 +1,81 @@
+/* Dino-Atlas Design Tokens */
+
+:root {
+  /* ── Primary: Warm Sand/Brown (Ausgrabung) ── */
+  --color-sand-50: #fdf8f0;
+  --color-sand-100: #f5e6c8;
+  --color-sand-200: #ecd4a0;
+  --color-sand-300: #d4b06a;
+  --color-sand-400: #c49a4a;
+  --color-sand-500: #a67c30;
+  --color-sand-600: #8a6528;
+  --color-sand-700: #6e4f20;
+  --color-sand-800: #523a18;
+  --color-sand-900: #362610;
+
+  /* ── Secondary: Green (Urzeit-Dschungel) ── */
+  --color-jungle-50: #f0f9f0;
+  --color-jungle-100: #d0ecd0;
+  --color-jungle-200: #a3d9a3;
+  --color-jungle-300: #6bc46b;
+  --color-jungle-400: #4aad4a;
+  --color-jungle-500: #2d8a2d;
+  --color-jungle-600: #247024;
+  --color-jungle-700: #1b561b;
+  --color-jungle-800: #123c12;
+  --color-jungle-900: #0a220a;
+
+  /* ── Accent: Gold/Orange (Entdeckung!) ── */
+  --color-gold-50: #fffbeb;
+  --color-gold-100: #fef0c7;
+  --color-gold-200: #fde08a;
+  --color-gold-300: #fbc94d;
+  --color-gold-400: #f9b115;
+  --color-gold-500: #e8960a;
+  --color-gold-600: #c77a08;
+  --color-gold-700: #a55e06;
+  --color-gold-800: #834604;
+  --color-gold-900: #612e02;
+
+  /* ── Danger: Warm Red ── */
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+
+  /* ── Neutral ── */
+  --color-stone-50: #fafaf9;
+  --color-stone-100: #f5f5f4;
+  --color-stone-200: #e7e5e4;
+  --color-stone-300: #d6d3d1;
+  --color-stone-400: #a8a29e;
+  --color-stone-500: #78716c;
+  --color-stone-600: #57534e;
+  --color-stone-700: #44403c;
+  --color-stone-800: #292524;
+  --color-stone-900: #1c1917;
+
+  /* ── Typography ── */
+  --font-display: "Fredoka", "Nunito", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* ── Spacing ── */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  /* ── Radii ── */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* ── Touch Targets (min 48px for kids) ── */
+  --touch-min: 48px;
+  --touch-comfortable: 56px;
+  --touch-large: 64px;
+}

@@ -1,0 +1,166 @@
+services:
+
+  # ── Reverse Proxy ──
+  traefik:
+    image: traefik:v3.2
+    command:
+      - "--api.dashboard=false"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+    networks:
+      - frontend
+
+  # ── Frontend App ──
+  app:
+    build:
+      context: ./frontend
+      dockerfile: apps/app/Dockerfile
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.app.entrypoints=web"
+      - "traefik.http.routers.app.priority=1"
+      - "traefik.http.services.app.loadbalancer.server.port=80"
+    networks:
+      - frontend
+
+  # ── Landing Page ──
+  landing:
+    build:
+      context: ./frontend
+      dockerfile: apps/landing/Dockerfile
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.landing.rule=Host(`dino-atlas.local`) && PathPrefix(`/`)"
+      - "traefik.http.routers.landing.entrypoints=web"
+      - "traefik.http.routers.landing.priority=2"
+      - "traefik.http.services.landing.loadbalancer.server.port=80"
+    networks:
+      - frontend
+    profiles: [landing]
+
+  # ── Rust Backend ──
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - POCKETBASE_URL=${POCKETBASE_URL:-http://pocketbase:8090}
+      - POCKETBASE_ADMIN_EMAIL=${POCKETBASE_ADMIN_EMAIL:?Set POCKETBASE_ADMIN_EMAIL in .env}
+      - POCKETBASE_ADMIN_PASSWORD=${POCKETBASE_ADMIN_PASSWORD:?Set POCKETBASE_ADMIN_PASSWORD in .env}
+      - JWT_SECRET=${JWT_SECRET:?Set JWT_SECRET in .env (min 32 chars)}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - VALKEY_URL=redis://valkey:6379
+      - TTS_URL=http://tts-api:3100
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost,http://localhost:5173}
+      - PORT=3001
+      - RUST_LOG=${RUST_LOG:-info}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-auth.rule=PathPrefix(`/api/v1/auth`)"
+      - "traefik.http.routers.backend-auth.entrypoints=web"
+      - "traefik.http.routers.backend-auth.priority=20"
+      - "traefik.http.routers.backend-auth.middlewares=auth-rate-limit@file"
+      - "traefik.http.routers.backend-auth.service=backend"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api/v1`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.routers.backend.priority=10"
+      - "traefik.http.routers.backend.middlewares=api-rate-limit@file"
+      - "traefik.http.services.backend.loadbalancer.server.port=3001"
+    depends_on:
+      - pocketbase
+      - valkey
+    networks:
+      - frontend
+      - backend
+
+  # ── Generator Worker ──
+  generator:
+    build:
+      context: ./generator
+      dockerfile: Dockerfile
+    environment:
+      - POCKETBASE_URL=${POCKETBASE_URL:-http://pocketbase:8090}
+      - POCKETBASE_ADMIN_EMAIL=${POCKETBASE_ADMIN_EMAIL}
+      - POCKETBASE_ADMIN_PASSWORD=${POCKETBASE_ADMIN_PASSWORD}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - VALKEY_URL=redis://valkey:6379
+      - TTS_URL=http://tts-api:3100
+      - RUST_LOG=${RUST_LOG:-info}
+    depends_on:
+      - pocketbase
+      - valkey
+      - tts-api
+    networks:
+      - backend
+
+  # ── TTS Service ──
+  tts-api:
+    build:
+      context: ./tts-api
+      dockerfile: Dockerfile
+    volumes:
+      - tts-cache:/app/cache
+      - tts-models:/app/models
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tts.rule=PathPrefix(`/tts`)"
+      - "traefik.http.routers.tts.entrypoints=web"
+      - "traefik.http.routers.tts.priority=15"
+      - "traefik.http.services.tts.loadbalancer.server.port=3100"
+    networks:
+      - frontend
+      - backend
+
+  # ── PocketBase ──
+  pocketbase:
+    image: ghcr.io/muchobien/pocketbase:latest
+    environment:
+      - PB_ADMIN_EMAIL=${POCKETBASE_ADMIN_EMAIL:?Set POCKETBASE_ADMIN_EMAIL in .env}
+      - PB_ADMIN_PASSWORD=${POCKETBASE_ADMIN_PASSWORD:?Set POCKETBASE_ADMIN_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:8090:8090"
+    volumes:
+      - pocketbase_data:/pb_data
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - backend
+
+  # ── Valkey (Job Queue) ──
+  valkey:
+    image: valkey/valkey:8-alpine
+    volumes:
+      - valkey_data:/data
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - backend
+
+  # ── Cloudflare Tunnel (optional) ──
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - frontend
+    profiles: [tunnel]
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true
+
+volumes:
+  pocketbase_data:
+  valkey_data:
+  tts-cache:
+  tts-models:

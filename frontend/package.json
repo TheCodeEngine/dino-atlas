@@ -1,0 +1,20 @@
+{
+  "name": "dino-atlas",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "pnpm --filter @dino-atlas/app dev",
+    "dev:storybook": "pnpm --filter @dino-atlas/storybook dev",
+    "dev:landing": "pnpm --filter @dino-atlas/landing dev",
+    "build": "pnpm --filter @dino-atlas/app build",
+    "build:landing": "pnpm --filter @dino-atlas/landing build",
+    "build:storybook": "pnpm --filter @dino-atlas/storybook build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "clean": "pnpm -r exec rm -rf dist node_modules"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=9"
+  }
+}

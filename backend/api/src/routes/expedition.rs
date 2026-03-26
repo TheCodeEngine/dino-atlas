@@ -63,8 +63,7 @@ pub(crate) async fn get_active(
         return Err(AppError::Unauthorized);
     }
 
-    let today = chrono::Utc::now().format("%Y-%m-%d").to_string();
-    let filter = format!("player_id='{}' && date~'{}'  && status!='complete'", player_id, today);
+    let filter = format!("player_id='{}' && status!='complete'", player_id);
 
     let resp: PbListResponse<PbExpedition> = state.pb
         .list("expeditions", Some(&filter), Some("-created"), Some(1))

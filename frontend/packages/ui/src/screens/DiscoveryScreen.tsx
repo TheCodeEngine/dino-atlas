@@ -17,6 +17,8 @@ export interface DinoData {
   periodEndMya?: number;
   continent: string;
   story: string;
+  /** TTS version of story with [[IPA]] phonemes for correct pronunciation */
+  storyTts?: string;
   comicImageUrl: string;
   images: { id: string; label: string; icon: string; url: string; bg?: string; contain?: boolean }[];
   facts: Fact[];
@@ -101,7 +103,7 @@ export function DiscoveryScreen({
 
         {/* Main Story */}
         <div className="mb-4 px-4">
-          <AudioPlayer text={dino.story} duration={35} />
+          <AudioPlayer text={dino.story} ttsText={dino.storyTts} duration={35} />
         </div>
 
         {/* Fact Carousel */}

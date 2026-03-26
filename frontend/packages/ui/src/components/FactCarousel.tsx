@@ -8,6 +8,8 @@ export interface Fact {
   value: string;
   sub?: string;
   story: string;
+  /** TTS version with [[IPA]] phonemes */
+  storyTts?: string;
   color?: string;
 }
 
@@ -63,7 +65,7 @@ export function FactCarousel({ facts, title = "Steckbrief — wische durch" }: F
                 {fact.sub && <p className="text-[9px] text-on-surface-variant">{fact.sub}</p>}
               </div>
             </div>
-            <AudioPlayer text={fact.story} duration={12} compact />
+            <AudioPlayer text={fact.story} ttsText={fact.storyTts} duration={12} compact />
           </div>
         ))}
       </div>

@@ -17,7 +17,10 @@ export interface TtsContextValue {
 export const TtsContext = createContext<TtsContextValue | null>(null);
 
 export interface AudioPlayerProps {
+  /** Display text (shown as karaoke sentences) */
   text: string;
+  /** TTS text sent to API — may contain [[IPA]] phonemes. Falls back to `text` if not set. */
+  ttsText?: string;
   status?: AudioPlayerStatus;
   progress?: number;
   currentTime?: number;
@@ -39,6 +42,7 @@ function splitSentences(text: string): string[] {
 
 export function AudioPlayer({
   text,
+  ttsText: ttsTextProp,
   status: statusProp = "idle",
   progress: progressProp = 0,
   currentTime: currentTimeProp = 0,
@@ -47,16 +51,19 @@ export function AudioPlayer({
   onPause: onPauseProp,
   compact = false,
 }: AudioPlayerProps) {
+  // The text sent to TTS API (may have [[IPA]] tags). Display text is always `text`.
+  const spokenText = ttsTextProp || text;
+
   // Check TTS context — if available and no explicit onPlay, use it
   const ttsCtx = useContext(TtsContext);
   const hasTts = !!ttsCtx && !onPlayProp;
-  const ttsActive = hasTts && ttsCtx!.activeText === text;
+  const ttsActive = hasTts && ttsCtx!.activeText === spokenText;
 
   const status = ttsActive ? ttsCtx!.status : statusProp;
   const progress = ttsActive ? ttsCtx!.progress : progressProp;
   const currentTime = ttsActive ? ttsCtx!.currentTime : currentTimeProp;
   const duration = ttsActive ? ttsCtx!.duration : durationProp;
-  const onPlay = hasTts ? () => ttsCtx!.speak(text) : onPlayProp;
+  const onPlay = hasTts ? () => ttsCtx!.speak(spokenText) : onPlayProp;
   const onPause = hasTts ? () => ttsCtx!.stop() : onPauseProp;
 
   const isPlaying = status === "playing";

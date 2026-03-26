@@ -21,6 +21,7 @@ export function DiscoveryPage() {
     periodEndMya: dino!.period_end_mya ?? undefined,
     continent: dino!.continent ?? "",
     story: dino!.kid_summary ?? "",
+    storyTts: (dino! as any).kid_summary_tts || undefined,
     comicImageUrl: dino!.image_comic_url ?? "",
     images: [
       dino!.image_real_url && { id: "real", label: "Echt", icon: "photo_camera", url: dino!.image_real_url },
@@ -33,6 +34,7 @@ export function DiscoveryPage() {
       value: f.value ?? "",
       sub: f.sub,
       story: f.story ?? "",
+      storyTts: f.story_tts || undefined,
     })) : [],
     foodOptions: Array.isArray(dino!.food_options) ? dino!.food_options : undefined,
   };

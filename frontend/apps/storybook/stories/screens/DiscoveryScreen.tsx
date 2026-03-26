@@ -336,54 +336,43 @@ export function DiscoveryScreen() {
           </div>
         </div>
 
-        {/* Time Slider — animates in on scroll */}
+        {/* Time Slider with real maps */}
         <div className="px-4 mb-4">
-          <TimeSlider period="Kreide" startMya={68} endMya={66} dinoName="Triceratops" />
+          <TimeSlider
+            period="Kreide"
+            startMya={68}
+            endMya={66}
+            dinoImage="/dinos/triceratops/comic.png"
+            dinoMapPosition={{ left: "22%", top: "35%" }}
+          />
         </div>
 
-        {/* Two Maps */}
+        {/* Fundorte heute */}
         <div className="px-4 mb-4">
           <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant flex items-center gap-1 mb-2">
-            <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>public</span>
-            Wo hat er gelebt?
+            <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>location_on</span>
+            Wo findet man Skelette heute?
           </p>
-          <div className="grid grid-cols-2 gap-2">
-            {/* Damals (Kreidezeit Kontinent) */}
-            <div className="bg-surface-container-lowest rounded-lg border-[3px] border-on-surface sticker-shadow overflow-hidden">
-              <div className="bg-primary-container/15 p-2 relative h-24">
-                <svg viewBox="0 0 200 120" className="w-full h-full" style={{ fill: "#c0c9bb", stroke: "#a0a99c", strokeWidth: 0.5 }}>
-                  <path d="M30,40 Q60,20 100,30 Q140,15 170,35 Q180,55 160,70 Q130,85 90,80 Q50,90 30,70 Q20,55 30,40Z" />
-                </svg>
-                <div className="absolute" style={{ top: "30%", left: "30%", transform: "translate(-50%,-50%)" }}>
-                  <div className="w-4 h-4 bg-secondary-container border-2 border-on-surface rounded-full flex items-center justify-center">
-                    <span className="material-symbols-outlined text-white" style={{ fontSize: "10px", fontVariationSettings: "'FILL' 1" }}>location_on</span>
-                  </div>
-                </div>
-              </div>
-              <div className="p-2">
-                <p className="text-[9px] font-black uppercase text-on-surface-variant">Damals</p>
-                <p className="text-[11px] font-bold text-on-surface">Kreidezeit</p>
-              </div>
-            </div>
-
-            {/* Heute (Fundorte) */}
-            <div className="bg-surface-container-lowest rounded-lg border-[3px] border-on-surface sticker-shadow overflow-hidden">
-              <div className="bg-tertiary-fixed/20 p-2 relative h-24">
-                <svg viewBox="0 0 200 120" className="w-full h-full" style={{ fill: "#c0c9bb", stroke: "#a0a99c", strokeWidth: 0.5 }}>
-                  <ellipse cx="50" cy="50" rx="30" ry="30" />
-                  <ellipse cx="55" cy="85" rx="15" ry="20" />
-                  <ellipse cx="105" cy="45" rx="15" ry="25" />
-                  <ellipse cx="120" cy="70" rx="22" ry="30" />
-                  <ellipse cx="155" cy="45" rx="28" ry="28" />
-                  <ellipse cx="170" cy="95" rx="15" ry="12" />
-                </svg>
-                {[{ top: "35%", left: "20%" }, { top: "30%", left: "28%" }, { top: "40%", left: "24%" }].map((pos, i) => (
-                  <div key={i} className="absolute w-2.5 h-2.5 bg-secondary-container border border-on-surface rounded-full" style={{ top: pos.top, left: pos.left, transform: "translate(-50%,-50%)" }} />
-                ))}
-              </div>
-              <div className="p-2">
-                <p className="text-[9px] font-black uppercase text-on-surface-variant">Heute (Funde)</p>
-                <p className="text-[11px] font-bold text-on-surface">USA & Kanada</p>
+          <div className="bg-surface-container-lowest rounded-xl border-[3px] border-on-surface sticker-shadow overflow-hidden">
+            <div className="relative">
+              <img src="/maps/heute.png" alt="Heutige Fundorte" className="w-full h-auto" />
+              {/* Pins in USA/Canada */}
+              {[
+                { left: "18%", top: "38%" },
+                { left: "22%", top: "33%" },
+                { left: "15%", top: "42%" },
+              ].map((pos, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-3 h-3 bg-secondary-container border-2 border-on-surface rounded-full shadow-md"
+                  style={{ left: pos.left, top: pos.top, transform: "translate(-50%,-50%)" }}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.3 + i * 0.15, type: "spring", damping: 12 }}
+                />
+              ))}
+              <div className="absolute bottom-2 left-2 bg-on-surface/70 text-white px-2 py-0.5 rounded text-[9px] font-black uppercase">
+                Fundorte · USA & Kanada
               </div>
             </div>
           </div>

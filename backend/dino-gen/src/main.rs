@@ -118,16 +118,59 @@ enum Command {
 pub enum ContentType {
     /// Texts: kid_summary, fun_fact, facts, quiz_questions, food_options, hints
     Texts,
-    /// Images: comic, real, skeleton, shadow
+    /// Images: all 4 image types (comic, real, skeleton, shadow)
     Images,
     /// Audio: name pronunciation, steckbrief narration
     Audio,
     /// All content
     All,
+    /// Only the comic image
+    #[value(alias = "comic")]
+    ImageComic,
+    /// Only the realistic image
+    #[value(alias = "real")]
+    ImageReal,
+    /// Only the skeleton image
+    #[value(alias = "skeleton")]
+    ImageSkeleton,
+    /// Only the shadow silhouette image
+    #[value(alias = "shadow")]
+    ImageShadow,
+}
+
+impl ContentType {
+    /// Returns true if this content type includes the given image subtype
+    pub fn includes_image(&self, image_type: &str) -> bool {
+        match self {
+            ContentType::All | ContentType::Images => true,
+            ContentType::ImageComic => image_type == "comic",
+            ContentType::ImageReal => image_type == "real",
+            ContentType::ImageSkeleton => image_type == "skeleton",
+            ContentType::ImageShadow => image_type == "shadow",
+            _ => false,
+        }
+    }
+
+    pub fn needs_images(&self) -> bool {
+        matches!(self, ContentType::Images | ContentType::All
+            | ContentType::ImageComic | ContentType::ImageReal
+            | ContentType::ImageSkeleton | ContentType::ImageShadow)
+    }
+
+    pub fn needs_texts(&self) -> bool {
+        matches!(self, ContentType::Texts | ContentType::All)
+    }
+
+    pub fn needs_audio(&self) -> bool {
+        matches!(self, ContentType::Audio | ContentType::All)
+    }
 }
 
 #[tokio::main]
 async fn main() {
+    // Load .env file from current dir or parents (ignore if missing)
+    let _ = dotenvy::dotenv();
+
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .init();
@@ -164,6 +207,8 @@ async fn main() {
 
             let config = TtsConfig {
                 piper_bin: cli.piper_bin,
+                phonemize_bin: std::env::var("PHONEMIZE_BIN").unwrap_or_else(|_| "piper_phonemize".into()),
+                espeak_data: std::env::var("ESPEAK_DATA").unwrap_or_else(|_| "espeak-ng-data".into()),
                 model_path: PathBuf::from(&cli.piper_model),
                 ffmpeg_bin: "ffmpeg".into(),
                 cache_dir: PathBuf::from("cache/tts"),

@@ -22,6 +22,7 @@ export function AppLayout() {
   const activePlayer = useAuthStore((s) => s.activePlayer);
   const players = useAuthStore((s) => s.players);
   const setActivePlayer = useAuthStore((s) => s.setActivePlayer);
+  const logout = useAuthStore((s) => s.logout);
 
   const activeNav = PATH_TO_NAV[location.pathname] || "camp";
 
@@ -53,6 +54,8 @@ export function AppLayout() {
               players={playerList}
               active={activePlayer.id}
               onChange={handlePlayerChange}
+              onAddPlayer={() => navigate("/players")}
+              onLogout={() => { logout(); navigate("/login"); }}
             />
           </div>
         ) : undefined

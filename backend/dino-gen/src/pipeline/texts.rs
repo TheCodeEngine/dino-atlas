@@ -31,15 +31,33 @@ pub async fn generate(
     let content: serde_json::Value = serde_json::from_str(&json_str)
         .map_err(|e| format!("JSON parse error: {} — raw: {}", e, &raw[..raw.len().min(200)]))?;
 
+    // Normalize IPA brackets in all TTS fields (Gemini sometimes uses single brackets)
+    let kid_summary_tts = normalize_tts_field(&content, "kid_summary_tts");
+    let fun_fact_tts = normalize_tts_field(&content, "fun_fact_tts");
+
+    // Normalize story_tts in facts array
+    let facts = if let Some(facts_arr) = content["facts"].as_array() {
+        let normalized: Vec<serde_json::Value> = facts_arr.iter().map(|f| {
+            let mut fact = f.clone();
+            if let Some(story_tts) = f["story_tts"].as_str() {
+                fact["story_tts"] = serde_json::Value::String(normalize_ipa_brackets(story_tts));
+            }
+            fact
+        }).collect();
+        serde_json::Value::Array(normalized)
+    } else {
+        content["facts"].clone()
+    };
+
     // Update dino_species record with text fields (including TTS variants)
     let update = serde_json::json!({
         "kid_summary": content["kid_summary"].as_str().unwrap_or(""),
-        "kid_summary_tts": content["kid_summary_tts"].as_str().unwrap_or(""),
+        "kid_summary_tts": kid_summary_tts,
         "fun_fact": content["fun_fact"].as_str().unwrap_or(""),
-        "fun_fact_tts": content["fun_fact_tts"].as_str().unwrap_or(""),
+        "fun_fact_tts": fun_fact_tts,
         "size_comparison": content["size_comparison"].as_str().unwrap_or(""),
         "name_ipa": content["name_ipa"].as_str().unwrap_or(""),
-        "facts": content["facts"],
+        "facts": facts,
         "quiz_questions": content["quiz_questions"],
         "food_options": content["food_options"],
         "identify_hints": content["identify_hints"],
@@ -54,12 +72,35 @@ pub async fn generate(
         dino_slug: dino.slug.clone(),
         duration_ms: duration.as_millis() as u64,
         estimated_cost_usd: 0.001, // ~1000 tokens in, ~2000 out ≈ $0.001
-        details: format!("Generated text content for {}", dino.display_name_de),
     };
     costs::log_cost(pb, &cost).await;
 
     tracing::info!("  Texts saved for {} ({:.1}s)", dino.slug, duration.as_secs_f32());
     Ok(())
+}
+
+/// Normalize single-bracket IPA `[phoneme]` to double-bracket `[[phoneme]]`.
+/// Gemini sometimes generates single brackets despite the prompt.
+fn normalize_ipa_brackets(text: &str) -> String {
+    // Already double-bracketed [[...]] → leave alone
+    // Single-bracketed [IPA] → convert to [[IPA]]
+    // Strategy: first protect existing [[...]], then convert remaining [...], then restore
+    let mut result = text.to_string();
+    // Replace [[ with a placeholder
+    result = result.replace("[[", "\x00OPEN\x00");
+    result = result.replace("]]", "\x00CLOSE\x00");
+    // Now remaining [ ] are single brackets — convert to double
+    result = result.replace('[', "[[");
+    result = result.replace(']', "]]");
+    // Restore original double brackets (they became [[[ → fix)
+    result = result.replace("\x00OPEN\x00", "[[");
+    result = result.replace("\x00CLOSE\x00", "]]");
+    result
+}
+
+fn normalize_tts_field(content: &serde_json::Value, field: &str) -> String {
+    let text = content[field].as_str().unwrap_or("");
+    normalize_ipa_brackets(text)
 }
 
 /// Extract JSON from a response that may be wrapped in ```json ... ```

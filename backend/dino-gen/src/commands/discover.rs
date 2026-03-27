@@ -96,7 +96,7 @@ pub async fn run(
         println!("\nStarte Content-Generierung...\n");
 
         let content_type = only.unwrap_or(ContentType::All);
-        let needs_tts = matches!(content_type, ContentType::Audio | ContentType::All);
+        let needs_tts = content_type.needs_audio();
         let tts = if needs_tts {
             let config = pipeline::audio::create_tts(piper_bin, piper_model);
             Some(PiperTts::new(config).await.expect("TTS init failed"))

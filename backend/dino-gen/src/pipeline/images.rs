@@ -1,3 +1,4 @@
+use crate::ContentType;
 use crate::providers::gemini::GeminiClient;
 use crate::providers::pocketbase::PocketBaseClient;
 use crate::pipeline::prompts;
@@ -20,8 +21,14 @@ pub async fn generate(
     record_id: &str,
     existing: &serde_json::Value,
     force: bool,
+    content_type: &ContentType,
 ) -> Result<(), String> {
     for &(image_type, field) in IMAGE_TYPES {
+        // Skip if this image type is not requested
+        if !content_type.includes_image(image_type) {
+            continue;
+        }
+
         // Skip if already exists and not forcing
         if !force && !existing[field].as_str().unwrap_or("").is_empty() {
             tracing::info!("  Skipping {} (already exists)", image_type);
@@ -51,7 +58,6 @@ pub async fn generate(
             dino_slug: dino.slug.clone(),
             duration_ms: duration.as_millis() as u64,
             estimated_cost_usd: 0.04,
-            details: format!("{} image for {} ({} bytes)", image_type, dino.display_name_de, png_bytes.len()),
         };
         costs::log_cost(pb, &cost).await;
 

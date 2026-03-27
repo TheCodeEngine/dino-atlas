@@ -24,7 +24,7 @@ pub async fn run(
 
     // Init Gemini client if needed for images/texts
     let content_type = only.clone().unwrap_or(ContentType::All);
-    let needs_gemini = matches!(content_type, ContentType::Texts | ContentType::Images | ContentType::All);
+    let needs_gemini = content_type.needs_texts() || content_type.needs_images();
     let gemini = if needs_gemini {
         let key = gemini_key.as_deref().expect("GEMINI_API_KEY required for text/image generation");
         Some(GeminiClient::new(key))
@@ -33,7 +33,7 @@ pub async fn run(
     };
 
     // Init TTS if needed
-    let needs_tts = matches!(content_type, ContentType::Audio | ContentType::All);
+    let needs_tts = content_type.needs_audio();
     let tts = if needs_tts {
         let config = pipeline::audio::create_tts(piper_bin, piper_model);
         Some(PiperTts::new(config).await.expect("TTS init failed"))
@@ -136,7 +136,7 @@ pub async fn generate_one(
     force: bool,
 ) {
     // Texts
-    if matches!(content_type, ContentType::Texts | ContentType::All) {
+    if content_type.needs_texts() {
         let has_text = !existing["kid_summary"].as_str().unwrap_or("").is_empty();
         if force || !has_text || !skip_existing {
             if let Some(gemini) = gemini {
@@ -151,9 +151,9 @@ pub async fn generate_one(
     }
 
     // Images
-    if matches!(content_type, ContentType::Images | ContentType::All) {
+    if content_type.needs_images() {
         if let Some(gemini) = gemini {
-            match pipeline::images::generate(pb, gemini, dino, record_id, existing, force).await {
+            match pipeline::images::generate(pb, gemini, dino, record_id, existing, force, content_type).await {
                 Ok(()) => {}
                 Err(e) => tracing::error!("  Image generation failed for {}: {}", dino.slug, e),
             }
@@ -161,7 +161,7 @@ pub async fn generate_one(
     }
 
     // Audio (needs texts to be generated first for steckbrief)
-    if matches!(content_type, ContentType::Audio | ContentType::All) {
+    if content_type.needs_audio() {
         if let Some(tts) = tts {
             // Re-fetch record to get latest kid_summary (may have just been generated)
             let fresh = pb.find_record("dino_species", &format!("slug='{}'", dino.slug)).await

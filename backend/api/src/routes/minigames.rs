@@ -3,6 +3,7 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
+use rand::seq::SliceRandom;
 use serde::Deserialize;
 use utoipa::ToSchema;
 
@@ -10,6 +11,8 @@ use crate::error::AppError;
 use crate::middleware::auth::AuthUser;
 use crate::pocketbase::models::*;
 use crate::routes::AppState;
+
+const MINIGAME_DINO_SAMPLE: usize = 10;
 
 #[derive(serde::Serialize, ToSchema)]
 pub struct MinigameInfo {
@@ -92,12 +95,12 @@ pub(crate) async fn available(
         return Err(AppError::Unauthorized);
     }
 
-    // Count discovered dinos
+    // Get all discovered dino IDs (only IDs, cheap query)
     let discovered_filter = format!("player_id='{}'", player_id);
     let discovered: PbListResponse<PbMuseumEntry> = state.pb
         .list("museum_entries", Some(&discovered_filter), None, Some(500))
         .await?;
-    let discovered_count = discovered.items.len() as i64;
+    let discovered_count = std::cmp::max(discovered.total_items as i64, discovered.items.len() as i64);
 
     // Get budget
     let today = chrono::Utc::now().format("%Y-%m-%d 00:00:00.000Z").to_string();
@@ -130,13 +133,28 @@ pub(crate) async fn available(
         min_dinos: *min,
     }).collect();
 
-    // Load discovered dino details for minigames
-    let dino_ids: Vec<&str> = discovered.items.iter().map(|e| e.dino_species_id.as_str()).collect();
-    let mut dinos = Vec::new();
-    for dino_id in &dino_ids {
-        if let Ok(d) = state.pb.get_one::<PbDinoSpecies>("dino_species", dino_id).await {
+    // Pick a random sample of discovered dino IDs (max MINIGAME_DINO_SAMPLE)
+    let mut dino_ids: Vec<&str> = discovered.items.iter().map(|e| e.dino_species_id.as_str()).collect();
+    {
+        let mut rng = rand::rng();
+        dino_ids.shuffle(&mut rng);
+    }
+    dino_ids.truncate(MINIGAME_DINO_SAMPLE);
+
+    // Load dino details in a single batch query
+    let dinos = if dino_ids.is_empty() {
+        Vec::new()
+    } else {
+        let id_filter = dino_ids.iter()
+            .map(|id| format!("id='{}'", id))
+            .collect::<Vec<_>>()
+            .join(" || ");
+        let dino_resp: PbListResponse<PbDinoSpecies> = state.pb
+            .list("dino_species", Some(&id_filter), None, Some(MINIGAME_DINO_SAMPLE as u32))
+            .await?;
+        dino_resp.items.into_iter().map(|d| {
             let slug = &d.slug;
-            dinos.push(MinigameDino {
+            MinigameDino {
                 id: d.id.clone(),
                 slug: d.slug.clone(),
                 name: d.display_name_de.clone(),
@@ -146,9 +164,9 @@ pub(crate) async fn available(
                 image_comic_url: if d.image_comic.is_empty() { None } else { Some(format!("/api/v1/dinos/{slug}/file/image_comic")) },
                 image_shadow_url: if d.image_shadow.is_empty() { None } else { Some(format!("/api/v1/dinos/{slug}/file/image_shadow")) },
                 quiz_questions: d.quiz_questions.clone(),
-            });
-        }
-    }
+            }
+        }).collect()
+    };
 
     Ok(Json(AvailableResponse {
         games,

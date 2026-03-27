@@ -5,6 +5,7 @@ pub fn comic_prompt(name: &str, scientific: &str) -> String {
         "Cute friendly cartoon illustration of a {} ({}) dinosaur for a children's app. \
          Full body, side view, standing proudly. Comic sticker style with bold thick black outlines, \
          vibrant saturated colors, big expressive eyes. Kid-friendly sticker art. \
+         Anatomically correct number of limbs for this species. \
          Solid plain white background. No text, no watermark, no frame.",
         name, scientific
     )
@@ -16,8 +17,8 @@ pub fn real_prompt(name: &str, _scientific: &str, _habitat: &str) -> String {
          Style: museum-quality natural history illustration, detailed skin texture, anatomically accurate. \
          Natural realistic coloring with detailed shading and lighting. \
          Full body side or three-quarter view, dynamic pose. \
-         IMPORTANT: Pure solid white background (#FFFFFF). No habitat, no environment, no ground, no other animals. \
-         No text, no watermark, no labels. Square canvas. Ultra detailed, professional scientific illustration.",
+         IMPORTANT: Pure solid white background. No habitat, no environment, no ground, no other animals. \
+         No text, no watermark, no labels, no color codes. Square canvas. Ultra detailed, professional scientific illustration.",
         name
     )
 }
@@ -30,7 +31,7 @@ pub fn skeleton_prompt(name: &str, scientific: &str) -> String {
          embedded in dark brown earthy soil/rock matrix. \
          The skeleton should look like it has just been excavated — partially revealed from surrounding dark dirt. \
          Full skeleton visible: skull, spine, ribs, limbs, tail. Anatomically accurate proportions. \
-         IMPORTANT: Dark soil/earth background (#2C1A0E), no other animals, no text, no labels, no watermark. \
+         IMPORTANT: Dark soil/earth background, no other animals, no text, no labels, no watermark, no color codes. \
          Square canvas. High detail, dramatic lighting from above as if being unearthed.",
         name, scientific
     )
@@ -38,10 +39,13 @@ pub fn skeleton_prompt(name: &str, scientific: &str) -> String {
 
 pub fn shadow_prompt(name: &str) -> String {
     format!(
-        "Pure black silhouette of a {} dinosaur in side view profile. \
-         Completely filled solid black shape on pure white background. \
-         Clean sharp edges. No details inside, just outline filled with solid black. \
-         Simple clean vector style. No text, no frame.",
+        "Black silhouette clip art of a {} dinosaur. \
+         Flat solid black fill, zero detail, zero texture, zero shading, zero gradients. \
+         Like a shadow cast on a wall — only the outer shape is visible. \
+         Side view profile, anatomically correct body proportions. \
+         Pure white background, nothing else in the image. \
+         ONE single dinosaur only. No eyes, no scales, no skin texture. \
+         No text, no labels, no URL, no watermark.",
         name
     )
 }

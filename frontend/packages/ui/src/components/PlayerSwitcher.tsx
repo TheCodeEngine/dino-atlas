@@ -14,9 +14,11 @@ interface PlayerSwitcherProps {
   players: Player[];
   active: string;
   onChange: (id: string) => void;
+  onAddPlayer?: () => void;
+  onLogout?: () => void;
 }
 
-export function PlayerSwitcher({ players, active, onChange }: PlayerSwitcherProps) {
+export function PlayerSwitcher({ players, active, onChange, onAddPlayer, onLogout }: PlayerSwitcherProps) {
   const [open, setOpen] = useState(false);
   const current = players.find((p) => p.id === active);
   const haptics = useHaptics();
@@ -104,6 +106,32 @@ export function PlayerSwitcher({ players, active, onChange }: PlayerSwitcherProp
                     )}
                   </motion.button>
                 ))}
+              </div>
+
+              {/* Divider + Actions */}
+              <div className="border-t-2 border-outline-variant mt-4 pt-3 flex flex-col gap-2">
+                {onAddPlayer && (
+                  <motion.button
+                    onClick={() => { onAddPlayer(); setOpen(false); haptics.tap(); }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center gap-3 w-full p-3 rounded-lg bg-surface-container-low border-[3px] border-on-surface sticker-shadow text-left"
+                  >
+                    <span className="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-lg">＋</span>
+                    <p className="text-sm font-black uppercase tracking-wider">Kind hinzufügen</p>
+                  </motion.button>
+                )}
+                {onLogout && (
+                  <motion.button
+                    onClick={() => { onLogout(); setOpen(false); }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center gap-3 w-full p-3 rounded-lg bg-error-container border-[3px] border-on-surface sticker-shadow text-left"
+                  >
+                    <span className="w-10 h-10 rounded-full bg-error flex items-center justify-center">
+                      <Icon name="logout" size="sm" className="text-on-error" />
+                    </span>
+                    <p className="text-sm font-black uppercase tracking-wider text-on-error-container">Abmelden</p>
+                  </motion.button>
+                )}
               </div>
             </motion.div>
           </div>

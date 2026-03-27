@@ -3,7 +3,10 @@ use tokio::io::AsyncWriteExt;
 use tokio::process::Command;
 use tracing;
 
-/// Piper TTS engine — generates speech from text using local model
+/// Piper TTS engine — generates speech from text using local model.
+/// Strips [[IPA]] phoneme tags before sending to Piper, since Piper 1.2
+/// does not support inline phoneme notation. The display name remains
+/// and eSpeak handles pronunciation automatically.
 pub struct PiperTts {
     config: TtsConfig,
     cache: TtsCache,
@@ -32,23 +35,49 @@ impl PiperTts {
         Ok(Self { config, cache })
     }
 
+    /// Strip [[IPA]] tags from text. Piper 1.2 doesn't support inline phonemes,
+    /// so we remove IPA and let eSpeak handle pronunciation of the raw name.
+    /// "Der [[plaːteoˈzaʊ̯ʁʊs]] war groß" → "Der  war groß"
+    /// Since the IPA replaces the word, we need the display text version for TTS.
+    /// The frontend should send ttsText which already has the names replaced with IPA.
+    /// We strip the IPA tags so Piper just reads the surrounding text.
+    fn strip_ipa_tags(text: &str) -> String {
+        let mut result = String::with_capacity(text.len());
+        let mut remaining = text;
+
+        while let Some(start) = remaining.find("[[") {
+            result.push_str(&remaining[..start]);
+            remaining = &remaining[start + 2..];
+            if let Some(end) = remaining.find("]]") {
+                // Skip the IPA content entirely
+                remaining = &remaining[end + 2..];
+            } else {
+                result.push_str("[[");
+            }
+        }
+        result.push_str(remaining);
+        result
+    }
+
     /// Generate MP3 audio for text
     pub async fn speak(&self, text: &str) -> Result<TtsResult, String> {
-        // Check cache first
+        // Check cache first (on original text including IPA tags)
         if let Some(audio) = self.cache.get(text).await {
             tracing::debug!("TTS cache hit for: {}...", &text[..text.len().min(40)]);
             return Ok(TtsResult { audio, cached: true });
         }
 
-        tracing::info!("TTS generating: {}...", &text[..text.len().min(40)]);
+        // Strip [[IPA]] tags — Piper 1.2 can't process them
+        let clean_text = Self::strip_ipa_tags(text);
+        tracing::info!("TTS generating: {}...", &clean_text[..clean_text.len().min(60)]);
 
-        let pcm_data = self.run_piper(text).await?;
+        let pcm_data = self.run_piper(&clean_text).await?;
         tracing::debug!("Piper produced {} bytes PCM", pcm_data.len());
 
         let mp3_data = self.run_ffmpeg(&pcm_data).await?;
         tracing::info!("TTS complete: {} bytes MP3", mp3_data.len());
 
-        // Cache the result
+        // Cache using original text (with IPA) as key
         if let Err(e) = self.cache.put(text, &mp3_data).await {
             tracing::warn!("Cache write failed: {}", e);
         }
@@ -57,7 +86,6 @@ impl PiperTts {
     }
 
     /// Run piper subprocess: text → raw PCM.
-    /// Writes stdin and reads stdout concurrently to avoid pipe deadlocks.
     async fn run_piper(&self, text: &str) -> Result<Vec<u8>, String> {
         let mut child = Command::new(&self.config.piper_bin)
             .args(["--model", &self.config.model_path.to_string_lossy()])
@@ -68,15 +96,12 @@ impl PiperTts {
             .spawn()
             .map_err(|e| format!("Failed to spawn piper: {}", e))?;
 
-        // Take stdin before spawning the reader task
         let mut stdin = child.stdin.take().ok_or("Failed to open piper stdin")?;
         let text_bytes = text.as_bytes().to_vec();
 
-        // Write stdin in a separate task to prevent deadlock:
-        // piper may fill its stdout buffer before reading all of stdin
         let write_handle = tokio::spawn(async move {
             let _ = stdin.write_all(&text_bytes).await;
-            drop(stdin); // close to signal EOF
+            drop(stdin);
         });
 
         let output = child.wait_with_output().await.map_err(|e| e.to_string())?;
@@ -91,7 +116,6 @@ impl PiperTts {
     }
 
     /// Run ffmpeg subprocess: raw PCM → MP3.
-    /// Same concurrent stdin/stdout pattern to avoid deadlocks.
     async fn run_ffmpeg(&self, pcm_data: &[u8]) -> Result<Vec<u8>, String> {
         let mut child = Command::new(&self.config.ffmpeg_bin)
             .args([

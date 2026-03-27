@@ -51,8 +51,9 @@ export function AudioPlayer({
   onPause: onPauseProp,
   compact = false,
 }: AudioPlayerProps) {
-  // The text sent to TTS API (may have [[IPA]] tags). Display text is always `text`.
-  const spokenText = ttsTextProp || text;
+  // Send the clean display text to Piper TTS (Piper 1.2 can't process [[IPA]] tags).
+  // ttsText is kept for future use when Piper supports inline phonemes.
+  const spokenText = text;
 
   // Check TTS context — if available and no explicit onPlay, use it
   const ttsCtx = useContext(TtsContext);

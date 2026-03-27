@@ -28,7 +28,9 @@ interface DinoDetail {
   continent: string;
   rarity: string;
   kid_summary: string;
+  kid_summary_tts: string;
   fun_fact: string;
+  fun_fact_tts: string;
   size_comparison: string;
   name_ipa: string;
   facts: any;

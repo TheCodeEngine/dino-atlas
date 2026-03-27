@@ -7,7 +7,6 @@ pub struct CostEntry {
     pub dino_slug: String,
     pub duration_ms: u64,
     pub estimated_cost_usd: f64,
-    pub details: String,
 }
 
 /// Log a cost entry to PocketBase ai_usage_log

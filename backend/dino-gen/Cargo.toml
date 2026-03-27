@@ -11,6 +11,7 @@ path = "src/main.rs"
 [dependencies]
 dino-atlas-core = { path = "../core" }
 clap = { version = "4", features = ["derive", "env"] }
+dotenvy = "0.15"
 urlencoding = "2"
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }

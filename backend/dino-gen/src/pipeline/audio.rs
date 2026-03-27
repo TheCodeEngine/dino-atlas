@@ -38,7 +38,6 @@ pub async fn generate(
             dino_slug: dino_slug.into(),
             duration_ms: duration.as_millis() as u64,
             estimated_cost_usd: 0.0, // local, free
-            details: format!("Name audio: {} ({} bytes, cached: {})", display_name, result.audio.len(), result.cached),
         };
         costs::log_cost(pb, &cost).await;
 
@@ -68,7 +67,6 @@ pub async fn generate(
             dino_slug: dino_slug.into(),
             duration_ms: duration.as_millis() as u64,
             estimated_cost_usd: 0.0,
-            details: format!("Steckbrief audio ({} bytes, cached: {})", result.audio.len(), result.cached),
         };
         costs::log_cost(pb, &cost).await;
 
@@ -84,6 +82,8 @@ pub async fn generate(
 pub fn create_tts(piper_bin: &str, model_path: &str) -> TtsConfig {
     TtsConfig {
         piper_bin: piper_bin.into(),
+        phonemize_bin: std::env::var("PHONEMIZE_BIN").unwrap_or_else(|_| "piper_phonemize".into()),
+        espeak_data: std::env::var("ESPEAK_DATA").unwrap_or_else(|_| "espeak-ng-data".into()),
         model_path: PathBuf::from(model_path),
         ffmpeg_bin: std::env::var("FFMPEG_BIN").unwrap_or_else(|_| "ffmpeg".into()),
         cache_dir: PathBuf::from(std::env::var("TTS_CACHE_DIR").unwrap_or_else(|_| "cache/tts".into())),

@@ -23,7 +23,7 @@ export function MuseumDetailPage() {
     periodEndMya: dino.period_end_mya ?? undefined,
     continent: dino.continent ?? "",
     story: dino.kid_summary ?? "",
-    storyTts: (dino as any).kid_summary_tts || undefined,
+    storyTts: dino.kid_summary_tts || undefined,
     comicImageUrl: dino.image_comic_url ?? "",
     images: [
       dino.image_real_url && { id: "real", label: "Echt", icon: "photo_camera", url: dino.image_real_url },

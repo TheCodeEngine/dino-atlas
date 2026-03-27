@@ -15,7 +15,8 @@ interface ForscherSpeechProps {
 
 export function ForscherSpeech({ text, ttsText, subtext, icon = "face", playable = true, onPlay }: ForscherSpeechProps) {
   const ttsCtx = useContext(TtsContext);
-  const spokenText = ttsText || text;
+  // Send clean display text to Piper TTS (Piper 1.2 can't process [[IPA]] tags).
+  const spokenText = text;
 
   // TTS context: check if this text is currently playing
   const ttsActive = ttsCtx?.activeText === spokenText;

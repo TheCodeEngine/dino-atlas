@@ -40,7 +40,7 @@ pub async fn run(pb_url: &str, email: &Option<String>, password: &Option<String>
     println!("\nSchema import complete!");
 }
 
-async fn patch_users_collection(pb: &PocketBaseClient, schema: &serde_json::Value) {
+async fn patch_users_collection(_pb: &PocketBaseClient, schema: &serde_json::Value) {
     // Get existing users collection, add our custom fields
     let custom_fields = schema["fields"].as_array().cloned().unwrap_or_default();
 

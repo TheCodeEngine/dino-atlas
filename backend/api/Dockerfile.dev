@@ -1,15 +1,37 @@
 FROM rust:1.94
 WORKDIR /app
+
+# Install piper-tts and ffmpeg
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg wget \
+    && ARCH=$(dpkg --print-architecture) \
+    && if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then \
+         PIPER_URL="https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_linux_aarch64.tar.gz"; \
+       else \
+         PIPER_URL="https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_linux_x86_64.tar.gz"; \
+       fi \
+    && wget -qO /tmp/piper.tar.gz "$PIPER_URL" \
+    && mkdir -p /opt/piper && tar xzf /tmp/piper.tar.gz -C /opt/piper --strip-components=1 \
+    && ln -s /opt/piper/piper /usr/local/bin/piper \
+    && echo "/opt/piper" > /etc/ld.so.conf.d/piper.conf && ldconfig \
+    && rm /tmp/piper.tar.gz \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 RUN cargo install cargo-watch --locked
 COPY Cargo.toml ./
 COPY core/Cargo.toml core/Cargo.toml
 COPY api/Cargo.toml api/Cargo.toml
 COPY generator/Cargo.toml generator/Cargo.toml
-RUN mkdir -p core/src api/src generator/src \
+COPY tts/Cargo.toml tts/Cargo.toml
+COPY dino-gen/Cargo.toml dino-gen/Cargo.toml
+RUN mkdir -p core/src/domain core/src/adapters api/src generator/src tts/src dino-gen/src \
     && echo 'pub mod domain; pub mod adapters;' > core/src/lib.rs \
+    && touch core/src/domain/mod.rs core/src/adapters/mod.rs \
     && echo 'fn main() {}' > api/src/main.rs \
     && echo 'fn main() {}' > generator/src/main.rs \
+    && echo '' > tts/src/lib.rs \
+    && echo 'fn main() {}' > dino-gen/src/main.rs \
     && cargo build -p dino-atlas-api \
-    && rm -rf core/src api/src generator/src
+    && rm -rf core/src api/src generator/src tts/src dino-gen/src
 COPY . .
-CMD ["cargo", "watch", "-p", "dino-atlas-api", "-x", "run"]
+RUN cargo clean -p dino-atlas-tts 2>/dev/null || true
+CMD ["cargo", "watch", "-w", "api", "-w", "core", "-w", "tts", "-x", "run -p dino-atlas-api"]

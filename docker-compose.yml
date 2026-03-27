@@ -7,15 +7,19 @@ services:
       - "--api.dashboard=false"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=dino-atlas_frontend"
+      - "--providers.docker.constraints=Label(`project`,`dino-atlas`)"
       - "--providers.file.directory=/etc/traefik/dynamic"
       - "--entrypoints.web.address=:80"
+    container_name: dino-atlas-traefik
     ports:
-      - "80:80"
+      - "5020:80"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./services/traefik/dynamic:/etc/traefik/dynamic:ro
     networks:
       - frontend
+      - tunnel-net
 
   # ── Frontend App ──
   app:
@@ -23,6 +27,7 @@ services:
       context: ./frontend
       dockerfile: apps/app/Dockerfile
     labels:
+      - "project=dino-atlas"
       - "traefik.enable=true"
       - "traefik.http.routers.app.rule=PathPrefix(`/`)"
       - "traefik.http.routers.app.entrypoints=web"
@@ -37,6 +42,7 @@ services:
       context: ./frontend
       dockerfile: apps/landing/Dockerfile
     labels:
+      - "project=dino-atlas"
       - "traefik.enable=true"
       - "traefik.http.routers.landing.rule=Host(`dino-atlas.local`) && PathPrefix(`/`)"
       - "traefik.http.routers.landing.entrypoints=web"
@@ -58,10 +64,15 @@ services:
       - JWT_SECRET=${JWT_SECRET:?Set JWT_SECRET in .env (min 32 chars)}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - VALKEY_URL=redis://valkey:6379
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost,http://localhost:5173}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5020,https://dino-atlas.thecodeengine.com}
       - PORT=3001
       - RUST_LOG=${RUST_LOG:-info}
+      - PIPER_BIN=piper
+      - PIPER_MODEL=/app/tts/models/de_DE-thorsten-high.onnx
+      - FFMPEG_BIN=ffmpeg
+      - TTS_CACHE_DIR=/app/cache/tts
     labels:
+      - "project=dino-atlas"
       - "traefik.enable=true"
       - "traefik.http.routers.api-auth.rule=PathPrefix(`/api/v1/auth`)"
       - "traefik.http.routers.api-auth.entrypoints=web"
@@ -75,47 +86,9 @@ services:
       - "traefik.http.services.api.loadbalancer.server.port=3001"
     depends_on:
       - pocketbase
-      - valkey
     networks:
       - frontend
       - backend
-
-  # ── Generator Worker ──
-  generator:
-    build:
-      context: ./backend
-      dockerfile: generator/Dockerfile
-    environment:
-      - POCKETBASE_URL=${POCKETBASE_URL:-http://pocketbase:8090}
-      - POCKETBASE_ADMIN_EMAIL=${POCKETBASE_ADMIN_EMAIL}
-      - POCKETBASE_ADMIN_PASSWORD=${POCKETBASE_ADMIN_PASSWORD}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
-      - VALKEY_URL=redis://valkey:6379
-      - RUST_LOG=${RUST_LOG:-info}
-    depends_on:
-      - pocketbase
-      - valkey
-    networks:
-      - backend
-
-  # ── Content Generator CLI (Piper TTS + Imagen + Gemini) ──
-  dino-gen:
-    build:
-      context: ./backend
-      dockerfile: dino-gen/Dockerfile
-    environment:
-      - POCKETBASE_URL=http://pocketbase:8090
-      - POCKETBASE_ADMIN_EMAIL=${POCKETBASE_ADMIN_EMAIL}
-      - POCKETBASE_ADMIN_PASSWORD=${POCKETBASE_ADMIN_PASSWORD}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
-      - RUST_LOG=${RUST_LOG:-info}
-    volumes:
-      - tts-cache:/app/cache/tts
-    depends_on:
-      - pocketbase
-    networks:
-      - backend
-    profiles: [gen]
 
   # ── PocketBase ──
   pocketbase:
@@ -124,7 +97,7 @@ services:
       - PB_ADMIN_EMAIL=${POCKETBASE_ADMIN_EMAIL:?Set POCKETBASE_ADMIN_EMAIL in .env}
       - PB_ADMIN_PASSWORD=${POCKETBASE_ADMIN_PASSWORD:?Set POCKETBASE_ADMIN_PASSWORD in .env}
     ports:
-      - "127.0.0.1:8091:8090"
+      - "127.0.0.1:5021:8090"
     volumes:
       - pocketbase_data:/pb_data
     labels:
@@ -143,20 +116,14 @@ services:
     networks:
       - backend
 
-  # ── Cloudflare Tunnel (optional) ──
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    command: tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-    networks:
-      - frontend
-    profiles: [tunnel]
-
 networks:
   frontend:
     driver: bridge
   backend:
     driver: bridge
     internal: true
+  tunnel-net:
+    external: true
 
 volumes:
   pocketbase_data:

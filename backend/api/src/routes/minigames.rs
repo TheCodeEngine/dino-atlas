@@ -22,11 +22,25 @@ pub struct MinigameInfo {
 }
 
 #[derive(serde::Serialize, ToSchema)]
+pub struct MinigameDino {
+    pub id: String,
+    pub slug: String,
+    pub name: String,
+    pub period: String,
+    pub diet: String,
+    pub length_m: Option<f64>,
+    pub image_comic_url: Option<String>,
+    pub image_shadow_url: Option<String>,
+    pub quiz_questions: Option<serde_json::Value>,
+}
+
+#[derive(serde::Serialize, ToSchema)]
 pub struct AvailableResponse {
     pub games: Vec<MinigameInfo>,
     pub minigames_remaining: i64,
     pub is_tired: bool,
     pub discovered_count: i64,
+    pub dinos: Vec<MinigameDino>,
 }
 
 #[derive(Deserialize, ToSchema)]
@@ -116,11 +130,32 @@ pub(crate) async fn available(
         min_dinos: *min,
     }).collect();
 
+    // Load discovered dino details for minigames
+    let dino_ids: Vec<&str> = discovered.items.iter().map(|e| e.dino_species_id.as_str()).collect();
+    let mut dinos = Vec::new();
+    for dino_id in &dino_ids {
+        if let Ok(d) = state.pb.get_one::<PbDinoSpecies>("dino_species", dino_id).await {
+            let slug = &d.slug;
+            dinos.push(MinigameDino {
+                id: d.id.clone(),
+                slug: d.slug.clone(),
+                name: d.display_name_de.clone(),
+                period: d.period.clone(),
+                diet: d.diet.clone(),
+                length_m: d.length_m,
+                image_comic_url: if d.image_comic.is_empty() { None } else { Some(format!("/api/v1/dinos/{slug}/file/image_comic")) },
+                image_shadow_url: if d.image_shadow.is_empty() { None } else { Some(format!("/api/v1/dinos/{slug}/file/image_shadow")) },
+                quiz_questions: d.quiz_questions.clone(),
+            });
+        }
+    }
+
     Ok(Json(AvailableResponse {
         games,
         minigames_remaining: remaining,
         is_tired: budget.is_tired,
         discovered_count,
+        dinos,
     }))
 }
 

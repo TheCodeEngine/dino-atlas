@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   DndContext,
   closestCenter,
@@ -19,17 +19,18 @@ import { MinigameShell } from "../components/MinigameShell";
 import { Button } from "../primitives/Button";
 import { Icon } from "../primitives/Icon";
 import { useHaptics } from "../hooks/useHaptics";
+import type { MinigameDino } from "../types/minigame";
 
-const DINOS = [
-  { id: "brachio", name: "Brachiosaurus", length: 26, image: "/dinos/brachiosaurus/comic.png" },
-  { id: "trex", name: "T-Rex", length: 12, image: "/dinos/trex/comic.png" },
-  { id: "tricera", name: "Triceratops", length: 9, image: "/dinos/triceratops/comic.png" },
-  { id: "stego", name: "Stegosaurus", length: 9, image: "/dinos/stegosaurus/comic.png" },
+interface SortDino { id: string; name: string; length: number; image: string }
+
+const FALLBACK: SortDino[] = [
+  { id: "brachio", name: "Brachiosaurus", length: 26, image: "" },
+  { id: "trex", name: "T-Rex", length: 12, image: "" },
+  { id: "tricera", name: "Triceratops", length: 9, image: "" },
+  { id: "stego", name: "Stegosaurus", length: 9, image: "" },
 ];
 
-const CORRECT_ORDER = [...DINOS].sort((a, b) => b.length - a.length).map((d) => d.id);
-
-function SortableDino({ dino, idx, checked, correct }: { dino: typeof DINOS[0]; idx: number; checked: boolean; correct: boolean }) {
+function SortableDino({ dino, idx, checked, correct }: { dino: SortDino; idx: number; checked: boolean; correct: boolean }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: dino.id });
 
   return (
@@ -46,7 +47,11 @@ function SortableDino({ dino, idx, checked, correct }: { dino: typeof DINOS[0]; 
       {...listeners}
     >
       <span className="text-sm font-black text-on-surface-variant w-5 text-center">{idx + 1}</span>
-      <img src={dino.image} alt={dino.name} className="w-12 h-12 object-contain" />
+      {dino.image ? (
+        <img src={dino.image} alt={dino.name} className="w-12 h-12 object-contain" />
+      ) : (
+        <span className="text-3xl w-12 h-12 flex items-center justify-center">🦕</span>
+      )}
       <div className="flex-1 min-w-0">
         <p className="text-xs font-black uppercase">{dino.name}</p>
         <p className="text-[10px] text-on-surface-variant">{dino.length}m lang</p>
@@ -56,16 +61,33 @@ function SortableDino({ dino, idx, checked, correct }: { dino: typeof DINOS[0]; 
   );
 }
 
-export interface SizeSortScreenProps { onComplete?: (score: number) => void; onClose?: () => void; }
-export function SizeSortScreen({ onComplete, onClose }: SizeSortScreenProps = {}) {
-  const [order, setOrder] = useState(() => {
-    const shuffled = [...DINOS];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!];
+function shuffle<T>(arr: T[]): T[] {
+  const s = [...arr];
+  for (let i = s.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [s[i], s[j]] = [s[j]!, s[i]!];
+  }
+  return s;
+}
+
+export interface SizeSortScreenProps { dinos?: MinigameDino[]; onComplete?: (score: number) => void; onClose?: () => void; }
+export function SizeSortScreen({ dinos: rawDinos, onComplete, onClose }: SizeSortScreenProps = {}) {
+  const gameDinos = useMemo<SortDino[]>(() => {
+    const withLength = (rawDinos ?? []).filter((d) => d.length_m != null && d.length_m > 0);
+    if (withLength.length >= 3) {
+      return shuffle(withLength).slice(0, 4).map((d) => ({
+        id: d.id,
+        name: d.name,
+        length: d.length_m!,
+        image: d.image_comic_url ?? "",
+      }));
     }
-    return shuffled;
-  });
+    return FALLBACK;
+  }, [rawDinos]);
+
+  const correctOrder = useMemo(() => [...gameDinos].sort((a, b) => b.length - a.length).map((d) => d.id), [gameDinos]);
+
+  const [order, setOrder] = useState(() => shuffle(gameDinos));
   const [checked, setChecked] = useState(false);
   const [correct, setCorrect] = useState(false);
   const haptics = useHaptics();
@@ -88,7 +110,7 @@ export function SizeSortScreen({ onComplete, onClose }: SizeSortScreenProps = {}
 
   function handleCheck() {
     haptics.tap();
-    const isCorrect = order.every((d, i) => d.id === CORRECT_ORDER[i]);
+    const isCorrect = order.every((d, i) => d.id === correctOrder[i]);
     setChecked(true);
     setCorrect(isCorrect);
     if (isCorrect) haptics.success();
@@ -105,6 +127,7 @@ export function SizeSortScreen({ onComplete, onClose }: SizeSortScreenProps = {}
       done={checked && correct}
       doneTitle="Richtig sortiert!"
       donePraise="Super gemacht! Du weißt welcher Dino am größten ist!"
+      onFinish={() => onComplete?.(gameDinos.length)}
     >
       <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant mb-2 flex items-center gap-1">
         <Icon name="drag_indicator" size="xs" />

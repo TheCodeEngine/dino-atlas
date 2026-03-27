@@ -5,11 +5,16 @@ COPY Cargo.toml ./
 COPY core/Cargo.toml core/Cargo.toml
 COPY api/Cargo.toml api/Cargo.toml
 COPY generator/Cargo.toml generator/Cargo.toml
-RUN mkdir -p core/src api/src generator/src \
+COPY tts/Cargo.toml tts/Cargo.toml
+COPY dino-gen/Cargo.toml dino-gen/Cargo.toml
+RUN mkdir -p core/src/domain core/src/adapters api/src generator/src tts/src dino-gen/src \
     && echo 'pub mod domain; pub mod adapters;' > core/src/lib.rs \
+    && touch core/src/domain/mod.rs core/src/adapters/mod.rs \
     && echo 'fn main() {}' > api/src/main.rs \
     && echo 'fn main() {}' > generator/src/main.rs \
+    && echo '' > tts/src/lib.rs \
+    && echo 'fn main() {}' > dino-gen/src/main.rs \
     && cargo build -p dino-atlas-generator \
-    && rm -rf core/src api/src generator/src
+    && rm -rf core/src api/src generator/src tts/src dino-gen/src
 COPY . .
-CMD ["cargo", "watch", "-p", "dino-atlas-generator", "-x", "run"]
+CMD ["cargo", "watch", "-w", "generator", "-w", "core", "-x", "run -p dino-atlas-generator"]

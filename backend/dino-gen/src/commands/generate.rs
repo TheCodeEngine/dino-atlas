@@ -91,15 +91,31 @@ pub async fn run(
             }
         }
     } else {
-        // Single dino
-        let dino = pipeline::seed_data::all_dinos().into_iter()
-            .find(|d| d.slug == slug)
-            .unwrap_or_else(|| panic!("Unknown dino slug: '{}'. Use one of: {:?}", slug, pipeline::seed_data::all_dino_slugs()));
-
+        // Single dino — check seed data first, then fall back to PocketBase record
         let filter = format!("slug='{}'", slug);
         let record = pb.find_record("dino_species", &filter).await
             .expect("PocketBase query failed")
             .unwrap_or_else(|| panic!("{} not found in PocketBase. Run `seed` first.", slug));
+
+        let dino = pipeline::seed_data::all_dinos().into_iter()
+            .find(|d| d.slug == slug)
+            .unwrap_or_else(|| {
+                // Build DinoSeed from PocketBase record (for discovered dinos)
+                pipeline::seed_data::DinoSeed {
+                    slug: record["slug"].as_str().unwrap_or(slug).to_string(),
+                    display_name_de: record["display_name_de"].as_str().unwrap_or(slug).to_string(),
+                    scientific_name: record["scientific_name"].as_str().unwrap_or("").to_string(),
+                    period: record["period"].as_str().unwrap_or("").to_string(),
+                    period_start_mya: record["period_start_mya"].as_u64().unwrap_or(0) as u32,
+                    period_end_mya: record["period_end_mya"].as_u64().unwrap_or(0) as u32,
+                    diet: record["diet"].as_str().unwrap_or("").to_string(),
+                    length_m: record["length_m"].as_f64().unwrap_or(0.0) as f32,
+                    weight_kg: record["weight_kg"].as_f64().unwrap_or(0.0) as f32,
+                    continent: record["continent"].as_str().unwrap_or("").to_string(),
+                    rarity: record["rarity"].as_str().unwrap_or("common").to_string(),
+                    habitat_description: record["habitat_description"].as_str().unwrap_or("").to_string(),
+                }
+            });
 
         let record_id = record["id"].as_str().unwrap();
         generate_one(&pb, gemini.as_ref(), tts.as_ref(), &dino, record_id, &record, &content_type, skip_existing, force).await;

@@ -20,15 +20,7 @@ services:
       - ./backend:/app
       - cargo-cache:/usr/local/cargo/registry
       - target-cache:/app/target
-
-  generator:
-    build:
-      context: ./backend
-      dockerfile: generator/Dockerfile.dev
-    volumes:
-      - ./backend:/app
-      - generator-cargo-cache:/usr/local/cargo/registry
-      - generator-target-cache:/app/target
+      - tts-cache:/app/cache/tts
 
   storybook:
     build:
@@ -38,7 +30,7 @@ services:
       - ./frontend:/app
       - storybook_node_modules:/app/node_modules
     ports:
-      - "6006:6006"
+      - "5022:6006"
     labels:
       - "traefik.enable=false"
     networks:
@@ -50,5 +42,3 @@ volumes:
   storybook_node_modules:
   cargo-cache:
   target-cache:
-  generator-cargo-cache:
-  generator-target-cache:

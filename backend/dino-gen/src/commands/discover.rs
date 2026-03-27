@@ -23,12 +23,19 @@ pub async fn run(
     pb.auth(email, password).await.expect("PocketBase auth failed");
     let gemini = GeminiClient::new(key);
 
-    // 1. Fetch all existing dino slugs from PocketBase
+    // 1. Fetch all existing dino slugs from PocketBase + seed data
     let existing = pb.list_records("dino_species", None).await.unwrap_or_default();
-    let existing_slugs: Vec<String> = existing
+    let pb_slugs: Vec<String> = existing
         .iter()
         .filter_map(|r| r["slug"].as_str().map(|s| s.to_string()))
         .collect();
+    let seed_slugs = pipeline::seed_data::all_dino_slugs();
+    let mut existing_slugs: Vec<String> = pb_slugs;
+    for s in seed_slugs {
+        if !existing_slugs.contains(&s) {
+            existing_slugs.push(s);
+        }
+    }
 
     println!("Bereits {} Dinos in der Datenbank.", existing_slugs.len());
     println!("Entdecke {} neue Dinos...\n", count);
@@ -148,8 +155,8 @@ struct DiscoveredDino {
     display_name_de: String,
     scientific_name: String,
     period: String,
-    period_start_mya: u32,
-    period_end_mya: u32,
+    period_start_mya: f32,
+    period_end_mya: f32,
     diet: String,
     length_m: f32,
     weight_kg: f32,
@@ -165,8 +172,8 @@ impl DiscoveredDino {
             display_name_de: self.display_name_de.clone(),
             scientific_name: self.scientific_name.clone(),
             period: self.period.clone(),
-            period_start_mya: self.period_start_mya,
-            period_end_mya: self.period_end_mya,
+            period_start_mya: self.period_start_mya.round() as u32,
+            period_end_mya: self.period_end_mya.round() as u32,
             diet: self.diet.clone(),
             length_m: self.length_m,
             weight_kg: self.weight_kg,

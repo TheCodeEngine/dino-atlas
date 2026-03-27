@@ -15,12 +15,16 @@ export function FullscreenHeader({ title, playerEmoji, onClose, variant = "light
 
   return (
     <header className="flex justify-between items-center px-4 py-3">
-      <IconButton
-        icon="close"
-        variant={isDark ? "dark" : "surface"}
-        onClick={onClose}
-        label="Schließen"
-      />
+      {onClose ? (
+        <IconButton
+          icon="close"
+          variant={isDark ? "dark" : "surface"}
+          onClick={onClose}
+          label="Schließen"
+        />
+      ) : (
+        <div className="w-9" />
+      )}
 
       {title && (
         <p className={`text-[10px] font-black uppercase tracking-wider ${isDark ? "text-white/60" : "text-on-surface-variant"}`}>

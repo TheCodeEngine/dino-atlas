@@ -31,7 +31,7 @@ export function MinigameShell({
 }: MinigameShellProps) {
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
-      <FullscreenHeader title={title} playerEmoji={playerEmoji} onClose={onClose} />
+      <FullscreenHeader title={title} playerEmoji={playerEmoji} onClose={done ? undefined : onClose} />
 
       <main className="flex-1 flex flex-col px-4 pb-6 max-w-sm mx-auto w-full">
         <AnimatePresence mode="wait">

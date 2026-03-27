@@ -12,9 +12,9 @@ http:
           - Content-Type
           - Authorization
         accessControlAllowOriginList:
-          - "http://localhost"
-          - "http://localhost:5173"
-          - "http://localhost:6006"
+          - "http://localhost:5030"
+          - "http://localhost:5032"
+          - "https://dino-atlas.thecodeengine.com"
         accessControlMaxAge: 86400
 
     auth-rate-limit:

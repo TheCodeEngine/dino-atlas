@@ -8,6 +8,7 @@ import { PlayerSelectPage } from "@/pages/PlayerSelectPage";
 import { HomePage } from "@/pages/HomePage";
 import { ExpeditionIntroPage } from "@/pages/ExpeditionIntroPage";
 import { ExcavationPage } from "@/pages/ExcavationPage";
+import { SkeletonBreakPage } from "@/pages/SkeletonBreakPage";
 import { PuzzlePage } from "@/pages/PuzzlePage";
 import { IdentifyPage } from "@/pages/IdentifyPage";
 import { DiscoveryPage } from "@/pages/DiscoveryPage";
@@ -47,6 +48,7 @@ export const router = createBrowserRouter([
           { path: "/sleepy", element: <SleepyDinosPage /> },
           { path: "/expedition/intro", element: <ExpeditionIntroPage /> },
           { path: "/expedition/excavation", element: <ExcavationPage /> },
+          { path: "/expedition/skeleton-break", element: <SkeletonBreakPage /> },
           { path: "/expedition/puzzle", element: <PuzzlePage /> },
           { path: "/expedition/identify", element: <IdentifyPage /> },
           { path: "/expedition/discovery", element: <DiscoveryPage /> },

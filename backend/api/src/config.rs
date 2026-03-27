@@ -19,7 +19,7 @@ impl Config {
         }
 
         let allowed_origins = env::var("ALLOWED_ORIGINS")
-            .unwrap_or_else(|_| "http://localhost:5173,http://localhost".to_string())
+            .unwrap_or_else(|_| "http://localhost:5030".to_string())
             .split(',')
             .map(|s| s.trim().to_string())
             .collect();

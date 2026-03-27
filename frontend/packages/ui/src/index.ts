@@ -1,5 +1,8 @@
 // @dino-atlas/ui - Component Library
 
+// Types
+export type { MinigameDino } from "./types/minigame";
+
 // Primitives
 export { Button } from "./primitives/Button";
 export { TextInput } from "./primitives/TextInput";
@@ -31,6 +34,7 @@ export { PlayerSwitcher } from "./components/PlayerSwitcher";
 export { TimeSlider } from "./components/TimeSlider";
 export { ImageSwitcher } from "./components/ImageSwitcher";
 export { MuseumTransition, LandScene } from "./components/museum-transition";
+export { SkeletonBreakTransition } from "./components/skeleton-break-transition";
 export { ExpeditionIntro } from "./components/ExpeditionIntro";
 export { DinoHeader } from "./components/DinoHeader";
 export { FactCarousel } from "./components/FactCarousel";

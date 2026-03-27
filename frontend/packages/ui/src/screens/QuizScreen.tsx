@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ForscherSpeech } from "../components/ForscherSpeech";
 import { FullscreenHeader } from "../components/FullscreenHeader";
@@ -6,8 +6,9 @@ import { Button } from "../primitives/Button";
 import { ProgressBar } from "../primitives/ProgressBar";
 import { StarRating } from "../primitives/StarRating";
 import { useHaptics } from "../hooks/useHaptics";
+import type { MinigameDino } from "../types/minigame";
 
-const QUESTIONS = [
+const FALLBACK_QUESTIONS = [
   {
     question: "Was hat der Triceratops gefressen?",
     options: [
@@ -16,7 +17,7 @@ const QUESTIONS = [
       { label: "Fisch", emoji: "🐟", correct: false },
       { label: "Insekten", emoji: "🐛", correct: false },
     ],
-    explanation: "Richtig! Der Triceratops war ein Pflanzenfresser. Er liebte Farne und Blätter!",
+    explanation: "Richtig! Der Triceratops war ein Pflanzenfresser!",
   },
   {
     question: "Wie viele Hörner hatte der Triceratops?",
@@ -36,26 +37,47 @@ const QUESTIONS = [
       { label: "Kreide", emoji: "☄️", correct: true },
       { label: "Eiszeit", emoji: "🧊", correct: false },
     ],
-    explanation: "Super! Der Triceratops lebte in der Kreidezeit — ganz am Ende der Dino-Zeit!",
+    explanation: "Super! Der Triceratops lebte in der Kreidezeit!",
   },
 ];
 
 type Phase = "question" | "correct" | "wrong" | "done";
 
 export interface QuizScreenProps {
+  dinos?: MinigameDino[];
   onComplete?: (score: number, total: number) => void;
   onClose?: () => void;
 }
 
-export function QuizScreen({ onComplete, onClose }: QuizScreenProps = {}) {
+function buildQuestionsFromDinos(dinos: MinigameDino[]) {
+  const questions: typeof FALLBACK_QUESTIONS = [];
+  for (const dino of dinos) {
+    if (dino.quiz_questions && Array.isArray(dino.quiz_questions)) {
+      for (const q of dino.quiz_questions) {
+        if (q.question && q.options) {
+          questions.push(q);
+        }
+      }
+    }
+  }
+  // Shuffle and pick up to 5
+  return questions.sort(() => Math.random() - 0.5).slice(0, 5);
+}
+
+export function QuizScreen({ dinos, onComplete, onClose }: QuizScreenProps = {}) {
+  const questions = useMemo(() => {
+    const fromDinos = dinos?.length ? buildQuestionsFromDinos(dinos) : [];
+    return fromDinos.length >= 3 ? fromDinos : FALLBACK_QUESTIONS;
+  }, [dinos]);
+
   const [current, setCurrent] = useState(0);
   const [stars, setStars] = useState(0);
   const [phase, setPhase] = useState<Phase>("question");
   const [explanation, setExplanation] = useState("");
   const haptics = useHaptics();
 
-  const q = QUESTIONS[current]!;
-  const total = QUESTIONS.length;
+  const q = questions[current]!;
+  const total = questions.length;
 
   function handleAnswer(correct: boolean) {
     if (phase !== "question") return;
@@ -89,7 +111,7 @@ export function QuizScreen({ onComplete, onClose }: QuizScreenProps = {}) {
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
-      <FullscreenHeader title="Dino-Quiz" playerEmoji="🦖" onClose={onClose} />
+      <FullscreenHeader title="Dino-Quiz" playerEmoji="🦖" onClose={phase === "done" ? undefined : onClose} />
 
       <main className="flex-1 flex flex-col px-4 pb-6 max-w-sm mx-auto w-full">
         {/* Progress + Stars */}
@@ -131,11 +153,11 @@ export function QuizScreen({ onComplete, onClose }: QuizScreenProps = {}) {
               </p>
               <ForscherSpeech
                 text={stars === total
-                  ? "Wow, du weißt alles über den Triceratops! Du bist ein echter Dino-Experte!"
+                  ? "Wow, du weißt alles! Du bist ein echter Dino-Experte!"
                   : "Super gemacht! Beim nächsten Mal schaffst du bestimmt noch mehr!"}
               />
               <div className="w-full mt-6">
-                <Button variant="primary" fullWidth icon="check">Fertig!</Button>
+                <Button variant="primary" fullWidth icon="check" onClick={() => onComplete?.(stars, total)}>Fertig!</Button>
               </div>
             </motion.div>
           ) : (

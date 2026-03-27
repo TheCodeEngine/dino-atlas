@@ -17,7 +17,7 @@ export function ExcavationPage() {
       biome={expedition!.biom}
       onComplete={async (timeMs) => {
         await advance({ playerId: player!.id, excavationTimeMs: timeMs });
-        navigate("/expedition/puzzle");
+        navigate("/expedition/skeleton-break");
       }}
       onClose={() => navigate("/")}
     />

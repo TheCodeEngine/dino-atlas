@@ -2,15 +2,16 @@ use crate::ContentType;
 use crate::pipeline;
 use crate::providers::gemini::GeminiClient;
 use crate::providers::pocketbase::PocketBaseClient;
-use dino_atlas_tts::PiperTts;
+use crate::providers::tts::TtsApiClient;
 
 pub async fn run(
     pb_url: &str,
+    api_url: &str,
     gemini_key: &Option<String>,
-    piper_bin: &str,
-    piper_model: &str,
     pb_email: &Option<String>,
     pb_password: &Option<String>,
+    api_email: &Option<String>,
+    api_password: &Option<String>,
     count: u32,
     generate: bool,
     only: Option<ContentType>,
@@ -98,8 +99,15 @@ pub async fn run(
         let content_type = only.unwrap_or(ContentType::All);
         let needs_tts = content_type.needs_audio();
         let tts = if needs_tts {
-            let config = pipeline::audio::create_tts(piper_bin, piper_model);
-            Some(PiperTts::new(config).await.expect("TTS init failed"))
+            let tts_email = api_email.as_deref().expect("DINO_GEN_API_EMAIL required for audio");
+            let tts_password = api_password.as_deref().expect("DINO_GEN_API_PASSWORD required for audio");
+            match TtsApiClient::new(api_url, tts_email, tts_password).await {
+                Ok(client) => Some(client),
+                Err(e) => {
+                    tracing::error!("TTS API init failed: {}. Audio will be skipped.", e);
+                    None
+                }
+            }
         } else {
             None
         };

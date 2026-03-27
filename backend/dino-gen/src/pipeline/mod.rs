@@ -4,3 +4,4 @@ pub mod images;
 pub mod texts;
 pub mod audio;
 pub mod costs;
+pub mod cutout;

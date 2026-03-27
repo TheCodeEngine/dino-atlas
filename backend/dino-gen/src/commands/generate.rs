@@ -2,15 +2,16 @@ use crate::ContentType;
 use crate::pipeline;
 use crate::providers::gemini::GeminiClient;
 use crate::providers::pocketbase::PocketBaseClient;
-use dino_atlas_tts::PiperTts;
+use crate::providers::tts::TtsApiClient;
 
 pub async fn run(
     pb_url: &str,
+    api_url: &str,
     gemini_key: &Option<String>,
-    piper_bin: &str,
-    piper_model: &str,
     pb_email: &Option<String>,
     pb_password: &Option<String>,
+    api_email: &Option<String>,
+    api_password: &Option<String>,
     slug: &str,
     only: Option<ContentType>,
     skip_existing: bool,
@@ -32,11 +33,18 @@ pub async fn run(
         None
     };
 
-    // Init TTS if needed
+    // Init TTS API client if needed (calls the running Dino-Atlas API in Docker)
     let needs_tts = content_type.needs_audio();
     let tts = if needs_tts {
-        let config = pipeline::audio::create_tts(piper_bin, piper_model);
-        Some(PiperTts::new(config).await.expect("TTS init failed"))
+        let tts_email = api_email.as_deref().expect("DINO_GEN_API_EMAIL required for audio generation");
+        let tts_password = api_password.as_deref().expect("DINO_GEN_API_PASSWORD required for audio generation");
+        match TtsApiClient::new(api_url, tts_email, tts_password).await {
+            Ok(client) => Some(client),
+            Err(e) => {
+                tracing::error!("TTS API init failed: {}. Audio generation will be skipped.", e);
+                None
+            }
+        }
     } else {
         None
     };
@@ -127,7 +135,7 @@ pub async fn run(
 pub async fn generate_one(
     pb: &PocketBaseClient,
     gemini: Option<&GeminiClient>,
-    tts: Option<&PiperTts>,
+    tts: Option<&TtsApiClient>,
     dino: &pipeline::seed_data::DinoSeed,
     record_id: &str,
     existing: &serde_json::Value,
@@ -135,27 +143,32 @@ pub async fn generate_one(
     skip_existing: bool,
     force: bool,
 ) {
+    println!("\n🦕 {} ({})", dino.display_name_de, dino.slug);
+    println!("   Record: {}\n", record_id);
+
     // Texts
     if content_type.needs_texts() {
         let has_text = !existing["kid_summary"].as_str().unwrap_or("").is_empty();
         if force || !has_text || !skip_existing {
             if let Some(gemini) = gemini {
+                println!("   📝 [1/3] Generating texts via Gemini Flash...");
                 match pipeline::texts::generate(pb, gemini, dino, record_id).await {
-                    Ok(()) => {}
-                    Err(e) => tracing::error!("  Text generation failed for {}: {}", dino.slug, e),
+                    Ok(()) => println!("   📝 Texts done ✓"),
+                    Err(e) => println!("   📝 Texts FAILED ✗ — {}", e),
                 }
             }
         } else {
-            tracing::info!("  Skipping texts (already exists)");
+            println!("   📝 [1/3] Texts — skipped (already exists)");
         }
     }
 
     // Images
     if content_type.needs_images() {
         if let Some(gemini) = gemini {
+            println!("   🖼️  [2/3] Generating images...");
             match pipeline::images::generate(pb, gemini, dino, record_id, existing, force, content_type).await {
-                Ok(()) => {}
-                Err(e) => tracing::error!("  Image generation failed for {}: {}", dino.slug, e),
+                Ok(()) => println!("   🖼️  Images done ✓"),
+                Err(e) => println!("   🖼️  Images FAILED ✗ — {}", e),
             }
         }
     }
@@ -163,6 +176,7 @@ pub async fn generate_one(
     // Audio (needs texts to be generated first for steckbrief)
     if content_type.needs_audio() {
         if let Some(tts) = tts {
+            println!("   🔊 [3/3] Generating audio via TTS API...");
             // Re-fetch record to get latest kid_summary (may have just been generated)
             let fresh = pb.find_record("dino_species", &format!("slug='{}'", dino.slug)).await
                 .unwrap_or(Some(existing.clone()))
@@ -174,11 +188,11 @@ pub async fn generate_one(
                 .unwrap_or("");
             let name_ipa = fresh["name_ipa"].as_str().unwrap_or("");
             match pipeline::audio::generate(pb, tts, record_id, &dino.slug, &dino.display_name_de, kid_summary_tts, name_ipa, &fresh, force).await {
-                Ok(()) => {}
-                Err(e) => tracing::error!("  Audio generation failed for {}: {}", dino.slug, e),
+                Ok(()) => println!("   🔊 Audio done ✓"),
+                Err(e) => println!("   🔊 Audio FAILED ✗ — {}", e),
             }
         }
     }
 
-    tracing::info!("  Done: {}", dino.slug);
+    println!("\n   ✅ {} complete!\n", dino.slug);
 }

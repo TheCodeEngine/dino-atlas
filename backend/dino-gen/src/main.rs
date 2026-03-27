@@ -5,11 +5,17 @@ mod pipeline;
 use clap::{Parser, Subcommand};
 use tracing_subscriber::EnvFilter;
 
+/// Resolve PocketBase URL: DINO_GEN_POCKETBASE_URL > POCKETBASE_URL > default localhost:5021
+fn default_pb_url() -> String {
+    std::env::var("POCKETBASE_URL")
+        .unwrap_or_else(|_| "http://localhost:5021".into())
+}
+
 #[derive(Parser)]
 #[command(name = "dino-gen", about = "Dino-Atlas Content Generator CLI")]
 struct Cli {
-    /// PocketBase URL
-    #[arg(long, env = "POCKETBASE_URL", default_value = "http://localhost:8090")]
+    /// PocketBase URL (checks DINO_GEN_POCKETBASE_URL first, then POCKETBASE_URL)
+    #[arg(long, env = "DINO_GEN_POCKETBASE_URL", default_value_t = default_pb_url())]
     pocketbase_url: String,
 
     /// PocketBase admin email
@@ -24,13 +30,17 @@ struct Cli {
     #[arg(long, env = "GEMINI_API_KEY")]
     gemini_key: Option<String>,
 
-    /// Path to piper binary
-    #[arg(long, env = "PIPER_BIN", default_value = "piper")]
-    piper_bin: String,
+    /// Dino-Atlas API URL (for TTS via Docker)
+    #[arg(long, env = "DINO_GEN_API_URL", default_value = "http://localhost:5020")]
+    api_url: String,
 
-    /// Path to piper voice model (.onnx)
-    #[arg(long, env = "PIPER_MODEL", default_value = "models/de_DE-thorsten-high.onnx")]
-    piper_model: String,
+    /// API login email (for TTS authentication)
+    #[arg(long, env = "DINO_GEN_API_EMAIL")]
+    api_email: Option<String>,
+
+    /// API login password (for TTS authentication)
+    #[arg(long, env = "DINO_GEN_API_PASSWORD")]
+    api_password: Option<String>,
 
     #[command(subcommand)]
     command: Command,
@@ -172,7 +182,10 @@ async fn main() {
     let _ = dotenvy::dotenv();
 
     tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env())
+        .with_env_filter(
+            EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| EnvFilter::new("dino_gen=info"))
+        )
         .init();
 
     let cli = Cli::parse();
@@ -180,9 +193,9 @@ async fn main() {
     match cli.command {
         Command::Generate { slug, only, skip_existing, force } => {
             commands::generate::run(
-                &cli.pocketbase_url, &cli.gemini_key,
-                &cli.piper_bin, &cli.piper_model,
+                &cli.pocketbase_url, &cli.api_url, &cli.gemini_key,
                 &cli.pb_email, &cli.pb_password,
+                &cli.api_email, &cli.api_password,
                 &slug, only, skip_existing, force,
             ).await;
         }
@@ -190,7 +203,7 @@ async fn main() {
             commands::evaluate::run(&cli.gemini_key, &photo, &dino).await;
         }
         Command::GenerateStory { family_id } => {
-            commands::story::run(&cli.pocketbase_url, &cli.gemini_key, &cli.piper_bin, &cli.piper_model, &family_id).await;
+            commands::story::run(&cli.pocketbase_url, &cli.gemini_key, &cli.api_url, &family_id).await;
         }
         Command::Seed { skip_existing } => {
             commands::seed::run(&cli.pocketbase_url, &cli.pb_email, &cli.pb_password, skip_existing).await;
@@ -202,39 +215,25 @@ async fn main() {
             commands::costs::run(&cli.pocketbase_url, &cli.pb_email, &cli.pb_password).await;
         }
         Command::TtsTest { text, output } => {
-            use dino_atlas_tts::{PiperTts, TtsConfig};
-            use std::path::PathBuf;
-
-            let config = TtsConfig {
-                piper_bin: cli.piper_bin,
-                phonemize_bin: std::env::var("PHONEMIZE_BIN").unwrap_or_else(|_| "piper_phonemize".into()),
-                espeak_data: std::env::var("ESPEAK_DATA").unwrap_or_else(|_| "espeak-ng-data".into()),
-                model_path: PathBuf::from(&cli.piper_model),
-                ffmpeg_bin: "ffmpeg".into(),
-                cache_dir: PathBuf::from("cache/tts"),
-                sample_rate: 22050,
-            };
-
-            tracing::info!("Initializing TTS...");
-            let tts = PiperTts::new(config).await.expect("TTS init failed");
+            let tts_email = cli.api_email.as_deref().expect("DINO_GEN_API_EMAIL required");
+            let tts_password = cli.api_password.as_deref().expect("DINO_GEN_API_PASSWORD required");
+            let tts = crate::providers::tts::TtsApiClient::new(&cli.api_url, tts_email, tts_password)
+                .await.expect("TTS API login failed");
 
             tracing::info!("Generating speech for: {}", &text);
-            let result = tts.speak(&text).await.expect("TTS generation failed");
+            let audio = tts.speak(&text).await.expect("TTS generation failed");
 
-            tokio::fs::write(&output, &result.audio).await.expect("Failed to write output");
-            println!(
-                "Generated {} bytes MP3 → {} (cached: {})",
-                result.audio.len(), output, result.cached
-            );
+            tokio::fs::write(&output, &audio).await.expect("Failed to write output");
+            println!("Generated {} bytes MP3 → {}", audio.len(), output);
         }
         Command::Status => {
             commands::status::run(&cli.pocketbase_url, &cli.pb_email, &cli.pb_password).await;
         }
         Command::Discover { count, generate, only } => {
             commands::discover::run(
-                &cli.pocketbase_url, &cli.gemini_key,
-                &cli.piper_bin, &cli.piper_model,
+                &cli.pocketbase_url, &cli.api_url, &cli.gemini_key,
                 &cli.pb_email, &cli.pb_password,
+                &cli.api_email, &cli.api_password,
                 count, generate, only,
             ).await;
         }

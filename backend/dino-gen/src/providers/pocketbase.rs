@@ -116,6 +116,20 @@ impl PocketBaseClient {
         Ok(records.into_iter().next())
     }
 
+    /// Download a file from a record
+    pub async fn download_file(&self, collection: &str, record_id: &str, filename: &str) -> Result<Vec<u8>, String> {
+        let url = format!("{}/api/files/{}/{}/{}", self.base_url, collection, record_id, filename);
+        let mut req = self.client.get(&url);
+        if let Some(auth) = self.auth_header() {
+            req = req.header("Authorization", auth);
+        }
+        let res = req.send().await.map_err(|e| e.to_string())?;
+        if !res.status().is_success() {
+            return Err(format!("Download failed: {}", res.status()));
+        }
+        res.bytes().await.map(|b| b.to_vec()).map_err(|e| e.to_string())
+    }
+
     /// Create a collection via Admin API
     pub async fn import_collection(&self, schema: &serde_json::Value) -> Result<(), String> {
         let url = format!("{}/api/collections", self.base_url);

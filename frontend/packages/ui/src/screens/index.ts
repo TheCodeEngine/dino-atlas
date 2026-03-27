@@ -20,5 +20,8 @@ export { QuizScreen } from "./QuizScreen";
 export { ShadowGuessScreen } from "./ShadowGuessScreen";
 export { SizeSortScreen } from "./SizeSortScreen";
 export { SleepyDinosScreen } from "./SleepyDinosScreen";
+export { StoryLibraryScreen } from "./StoryLibraryScreen";
+export type { StoryPreview } from "./StoryLibraryScreen";
 export { StoryTimeScreen } from "./StoryTimeScreen";
+export type { StoryDino } from "./StoryTimeScreen";
 export { TimelineSortScreen } from "./TimelineSortScreen";

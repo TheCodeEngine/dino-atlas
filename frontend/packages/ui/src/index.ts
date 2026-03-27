@@ -2,6 +2,7 @@
 
 // Types
 export type { MinigameDino } from "./types/minigame";
+export { StoryCard } from "./components/StoryCard";
 
 // Primitives
 export { Button } from "./primitives/Button";
@@ -71,6 +72,9 @@ export {
   ShadowGuessScreen,
   SizeSortScreen,
   SleepyDinosScreen,
+  StoryLibraryScreen,
   StoryTimeScreen,
   TimelineSortScreen,
 } from "./screens";
+export type { StoryPreview } from "./screens";
+export type { StoryDino } from "./screens";

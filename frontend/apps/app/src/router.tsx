@@ -17,6 +17,9 @@ import { MuseumDetailPage } from "@/pages/MuseumDetailPage";
 import { MinigameSelectPage } from "@/pages/MinigameSelectPage";
 import { MinigamePage } from "@/pages/MinigamePage";
 import { SleepyDinosPage } from "@/pages/SleepyDinosPage";
+import { StoryPage } from "@/pages/StoryPage";
+import { StoryPlayerPage } from "@/pages/StoryPlayerPage";
+import { ParentResetPage } from "@/pages/ParentResetPage";
 
 export const router = createBrowserRouter([
   // Public
@@ -39,13 +42,16 @@ export const router = createBrowserRouter([
               { path: "/", element: <HomePage /> },
               { path: "/museum", element: <MuseumPage /> },
               { path: "/minigames", element: <MinigameSelectPage /> },
+              { path: "/story", element: <StoryPage /> },
             ],
           },
 
           // Fullscreen (no nav)
+          { path: "/story/:id", element: <StoryPlayerPage /> },
           { path: "/museum/:slug", element: <MuseumDetailPage /> },
           { path: "/minigames/:type", element: <MinigamePage /> },
           { path: "/sleepy", element: <SleepyDinosPage /> },
+          { path: "/parent/reset", element: <ParentResetPage /> },
           { path: "/expedition/intro", element: <ExpeditionIntroPage /> },
           { path: "/expedition/excavation", element: <ExcavationPage /> },
           { path: "/expedition/skeleton-break", element: <SkeletonBreakPage /> },

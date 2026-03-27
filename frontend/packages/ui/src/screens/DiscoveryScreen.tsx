@@ -82,7 +82,11 @@ export function DiscoveryScreen({
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-2 z-10">
-        <IconButton icon="close" variant="surface" label="Schließen" onClick={onClose} />
+        {mode === "museum" && onClose ? (
+          <IconButton icon="close" variant="surface" label="Schließen" onClick={onClose} />
+        ) : (
+          <div className="w-9" />
+        )}
         {mode === "discovery" && (
           <span className="bg-secondary-container text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase whitespace-nowrap flex items-center gap-1">
             <Icon name="new_releases" size="xs" filled />

@@ -1,50 +1,51 @@
 /// Image generation prompts
-/// All images use Imagen 4. For comic/skeleton/shadow, we first describe the real image
-/// via Gemini Flash (vision), then embed that description into the Imagen prompt.
+/// All images use Imagen 4. Before generating, we ask Gemini Flash to research
+/// how the dinosaur actually looked based on fossil evidence, then embed that
+/// description into structured Imagen prompts.
 
-// ── Imagen 4 prompts ──
+// ── Gemini Flash: research prompt ──
 
-pub fn real_prompt(name: &str) -> String {
+pub fn research_appearance(name: &str) -> String {
     format!(
-        "Photorealistic scientific illustration of a {} dinosaur, based on current paleontological research. \
-         Anatomically accurate reconstruction matching the latest fossil evidence and scientific consensus. \
-         Style: museum-quality natural history illustration, detailed skin/feather texture where scientifically appropriate. \
-         Natural realistic coloring with detailed shading and lighting. \
-         Full body side or three-quarter view, dynamic pose. \
-         IMPORTANT: Pure solid white background. No habitat, no environment, no ground, no other animals. \
-         No text, no watermark, no labels, no color codes. Square canvas. Ultra detailed, professional scientific illustration.",
+        "Describe the physical appearance of {} in exactly ONE sentence for an artist. \
+         Include: body type, limb types, distinctive features. \
+         Example: 'A large quadrupedal herbivore with three facial horns, a bony neck frill, and a beak-like mouth.' \
+         English only. Max 30 words.",
         name
     )
 }
 
-pub fn comic_prompt(name: &str, scientific: &str) -> String {
+// ── Imagen 4 prompts (with Gemini research as appearance context) ──
+
+pub fn real_prompt(name: &str, appearance: &str) -> String {
     format!(
-        "Cute friendly cartoon illustration of a {} ({}) dinosaur for a children's app. \
-         Full body, side view, standing proudly. Cartoon style with bold thick black outlines, \
-         vibrant saturated colors, big expressive eyes. Kid-friendly cartoon art. \
-         Scientifically accurate anatomy for this species — correct number of limbs, \
-         correct body features (wings, horns, plates, feathers etc. as appropriate). \
-         No sticker border, no drop shadow, no outline glow around the character. \
-         Solid plain white background. No text, no watermark, no frame.",
-        name, scientific
+        "Photorealistic scientific illustration of a {}: {}. \
+         Museum-quality, anatomically accurate, detailed texture, natural coloring. \
+         Full body side view, dynamic pose. \
+         Pure solid white background. No water, no habitat, no ground. No text.",
+        name, appearance
     )
 }
 
-pub fn skeleton_prompt(name: &str, scientific: &str) -> String {
+pub fn comic_prompt(name: &str, appearance: &str) -> String {
     format!(
-        "Fossilized dinosaur skeleton of a {} ({}) viewed from the side. \
-         Scientific museum fossil exhibit, detailed bone anatomy, paleontology textbook quality. \
-         Cream-white and beige bones with subtle warm brown shadows, \
-         embedded in dark brown earthy soil/rock matrix. \
-         The skeleton looks like it has just been excavated — partially revealed from surrounding dark dirt. \
-         Full skeleton visible: skull, spine, ribs, limbs, tail. Anatomically accurate proportions. \
-         ONLY BONES — no skin, no feathers, no muscles, no soft tissue. Pure fossil skeleton only. \
-         IMPORTANT: Dark soil/earth background, no other animals, no text, no labels, no watermark, no color codes. \
-         Square canvas. High detail, dramatic lighting from above as if being unearthed.",
-        name, scientific
+        "Cute cartoon of a {}: {}. \
+         Correct anatomy, no extra limbs. \
+         Bold black outlines, vibrant colors, big expressive eyes. Kid-friendly. \
+         Full body, side view. White background. No sticker border, no text.",
+        name, appearance
     )
 }
 
+pub fn skeleton_prompt(name: &str, appearance: &str) -> String {
+    format!(
+        "Fossilized skeleton of a {}: {}. Match those proportions as bones. \
+         Museum fossil exhibit, side view, paleontology textbook quality. \
+         Cream bones in dark brown earth/soil matrix, just excavated. \
+         ONLY BONES, no soft tissue. No text, no labels.",
+        name, appearance
+    )
+}
 
 /// Prompt to discover new dinosaurs via AI
 pub fn discover_prompt(existing_slugs: &[String], count: u32) -> String {
@@ -97,13 +98,13 @@ Er war ein {}, {} Meter lang und wog {} kg.
 Antworte als JSON mit folgender Struktur:
 {{
   "kid_summary": "5-6 Saetze voller ECHTE Fakten fuer 4-6 Jaehrige. Jeder Satz MUSS einen konkreten Fakt enthalten: Zeitperiode, Gewicht, Laenge, Ernaehrung oder Lebensraum. Jeden Fakt mit einem kindgerechten Vergleich erklaeren (Gewicht in Elefanten oder Autos, Laenge in Schulbussen oder Betten, Zeit als 'lange bevor es Menschen gab'). Beispielton: 'Der Triceratops lebte in der Kreidezeit, vor 68 Millionen Jahren — das ist sooo lange her! Er war 9 Meter lang, so lang wie ein Schulbus! Und er wog 12 Tonnen, so viel wie 2 grosse Elefanten zusammen!' KEINE Geschichten, KEINE Fantasie, NUR echte Fakten mit Vergleichen.",
-  "kid_summary_tts": "Gleicher Text wie kid_summary, aber mit IPA-Aussprachehilfen fuer lateinische/wissenschaftliche Begriffe im Format [[IPA]]. Beispiel: 'Das ist der [[tʁiˈt͡seːʁatɔps]]! Er war ein riesiger Pflanzenfresser.' Nur Dino-Namen und Fachbegriffe bekommen [[IPA]], nicht deutsche Woerter. Nutze deutsche IPA-Phonetik.",
+  "kid_summary_tts": "Gleicher Text wie kid_summary, aber mit IPA-Aussprachehilfen. Der Name bleibt IMMER im Text, IPA kommt direkt NACH dem Wort: 'Der Triceratops [[tʁiˈt͡seːʁatɔps]] war gross.' Nutze deutsche IPA-Phonetik.",
   "fun_fact": "1-2 Saetze, ueberraschender Fakt mit Vergleich",
-  "fun_fact_tts": "Gleicher Text mit [[IPA]] fuer Fachbegriffe",
+  "fun_fact_tts": "Gleicher Text mit Name + [[IPA]] dahinter",
   "size_comparison": "Vergleich mit etwas das Kinder kennen (z.B. 'So gross wie 2 Autos')",
   "name_ipa": "IPA-Aussprache des Dino-Namens, z.B. tʁiˈt͡seːʁatɔps",
   "facts": [
-    {{ "icon": "calendar_month", "label": "Zeitalter", "value": "{}", "sub": "X Mio. Jahre", "story": "3 Saetze kindgerecht", "story_tts": "Gleicher Text mit [[IPA]] fuer Fachbegriffe" }},
+    {{ "icon": "calendar_month", "label": "Zeitalter", "value": "{}", "sub": "X Mio. Jahre", "story": "3 Saetze kindgerecht", "story_tts": "Gleicher Text mit Name + [[IPA]]" }},
     {{ "icon": "restaurant", "label": "Nahrung", "value": "{}", "story": "3 Saetze", "story_tts": "..." }},
     {{ "icon": "straighten", "label": "Laenge", "value": "{} Meter", "story": "3 Saetze mit Vergleich", "story_tts": "..." }},
     {{ "icon": "scale", "label": "Gewicht", "value": "X Tonnen", "story": "3 Saetze mit Vergleich", "story_tts": "..." }},
@@ -125,12 +126,10 @@ Antworte als JSON mit folgender Struktur:
 }}
 
 WICHTIG zur TTS-Aussprache:
-- Alle *_tts Felder enthalten den gleichen deutschen Text wie das Originalfeld
-- Lateinische/wissenschaftliche Namen behalten den Namen UND bekommen die IPA-Aussprache direkt dahinter: "Der Triceratops [[tʁiˈt͡seːʁatɔps]] war gross."
+- Der Name bleibt IMMER im Text stehen, [[IPA]] kommt direkt NACH dem Wort
+- Beispiel: "Der Triceratops [[tʁiˈt͡seːʁatɔps]] war gross." (NICHT "Der [[tʁiˈt͡seːʁatɔps]] war gross.")
 - Nutze DEUTSCHE IPA-Phonetik (nicht englisch!)
 - Nur Dino-Namen und echte Fachbegriffe bekommen [[IPA]], NICHT normale deutsche Woerter
-- Der Name bleibt IMMER im Text stehen, [[IPA]] kommt direkt NACH dem Wort als Aussprachehilfe
-- Beispiele: "Der Triceratops [[tʁiˈt͡seːʁatɔps]] war gross.", "Der Tyrannosaurus [[tyˈʁanːozaʊ̯ʁʊs]] war ein Raeuber.", Kreidezeit→Kreidezeit (normales Deutsch, kein IPA)
 
 Wichtig: Kindgerecht, spannend, mit Vergleichen die 4-6 Jaehrige verstehen."#,
         name, scientific, period, continent, diet, length_m, weight_kg,

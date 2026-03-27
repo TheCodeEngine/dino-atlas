@@ -25,6 +25,27 @@ pub async fn generate(
 ) -> Result<(), String> {
     let mut real_transparent: Option<Vec<u8>> = None;
 
+    // Step 0: Research how the dino actually looked via Gemini Flash
+    let needs_generation = GENERATED_TYPES.iter().any(|&(t, f)|
+        content_type.includes_image(t) && (force || existing[f].as_str().unwrap_or("").is_empty())
+    );
+    let appearance = if needs_generation {
+        println!("      Researching appearance via Gemini Flash...");
+        let research_prompt = prompts::research_appearance(&dino.display_name_de);
+        match gemini.generate_text(&research_prompt).await {
+            Ok(desc) => {
+                println!("      → {}", &desc[..desc.len().min(120)]);
+                desc
+            }
+            Err(e) => {
+                println!("      ⚠ Research failed: {}, using name only", e);
+                format!("A {} dinosaur.", dino.display_name_de)
+            }
+        }
+    } else {
+        String::new()
+    };
+
     for &(image_type, field) in GENERATED_TYPES {
         if !content_type.includes_image(image_type) {
             continue;
@@ -35,7 +56,7 @@ pub async fn generate(
             continue;
         }
 
-        let prompt = build_prompt(image_type, dino);
+        let prompt = build_prompt(image_type, dino, &appearance);
 
         println!("      {} — generating via Imagen 4...", image_type);
         let start = std::time::Instant::now();
@@ -120,11 +141,11 @@ async fn download_file(pb: &PocketBaseClient, existing: &serde_json::Value, reco
     pb.download_file("dino_species", record_id, filename).await.ok()
 }
 
-fn build_prompt(image_type: &str, dino: &DinoSeed) -> String {
+fn build_prompt(image_type: &str, dino: &DinoSeed, appearance: &str) -> String {
     match image_type {
-        "real" => prompts::real_prompt(&dino.display_name_de),
-        "comic" => prompts::comic_prompt(&dino.display_name_de, &dino.scientific_name),
-        "skeleton" => prompts::skeleton_prompt(&dino.display_name_de, &dino.scientific_name),
+        "real" => prompts::real_prompt(&dino.display_name_de, appearance),
+        "comic" => prompts::comic_prompt(&dino.display_name_de, appearance),
+        "skeleton" => prompts::skeleton_prompt(&dino.display_name_de, appearance),
         _ => unreachable!(),
     }
 }
